@@ -37,8 +37,8 @@ class ItemRecommender(GenericRecommender):
     def predict_rating_item_based_nn_wtd(self, active_user_id: int, candidate_movie_id: int) -> float:
         ic("item_rec.predict_rating_item_based_nn_wtd()")
         
-        nns = self.get_k_thresholded_nearest_movies(Similarities.sim_cosine, self.k, 0.0, candidate_movie_id, active_user_id)
-        #nns = self.get_k_nearest_movies(Similarities.sim_cosine, self.k, candidate_movie_id, active_user_id)
+        #nns = self.get_k_thresholded_nearest_movies(Similarities.sim_cosine, self.k, 0.0, candidate_movie_id, active_user_id)
+        nns = self.get_k_nearest_movies(Similarities.sim_cosine, self.k, candidate_movie_id, active_user_id)
         prediction = self.calculate_wtd_avg_rating(nns)
         
         if prediction:
@@ -59,7 +59,7 @@ class ItemRecommender(GenericRecommender):
         [{movie_id: int, rating: float, sim: float}]
 
         Get the k nearest movies to candidate_movie_id.
-        Optionally, if active_user_id is not None, the set of neighbours is confined to those rated by active_user_id.
+        Optionally, if active_user_id is specified, the set of neighbours (movies) is confined to those rated by active_user_id.
         In this case, active_user_id's rating for candidate_movie_id is part of the final result.
         """
         
@@ -81,7 +81,7 @@ class ItemRecommender(GenericRecommender):
         
         nearest_neighbours = []
         
-        for movie_id in self.movie_training_ratings:
+        for movie_id in self.movie_training_ratings: # what is happening here???
             if candidate_movie_id == movie_id:
                 continue
             
@@ -121,7 +121,7 @@ class ItemRecommender(GenericRecommender):
         [{movie_id: int, rating: float, sim: float}]
         
         Get the movies which are more than a threshold similar to candidate_movie_id
-        Optionally, if active_user_id is not None, the set of neighbours is confined to those rated by active_user_id.
+        Optionally, if active_user_id is specified, the set of neighbours (movies) is confined to those rated by active_user_id.
         In this case, active_user_id's rating for candidate_movie_id is part of the final result.
         """
         
@@ -170,7 +170,7 @@ class ItemRecommender(GenericRecommender):
         [{movie_id: int, rating: float, sim: float}]
 
         Get the k nearest movies to candidate_movie_id provided their similarity to candidate_movie_id exceeds the threshold.
-        Optionally, if active_user_id is not None, the set of neighbours is confined to those rated by active_user_id.
+        Optionally, if active_user_id is specified, the set of neighbours (movies) is confined to those rated by active_user_id.
         In this case, active_user_id's rating for candidate_movie_id is part of the final result.
         """
         

@@ -58,7 +58,7 @@ class UserRecommender(GenericRecommender):
         [{user_id: int, rating: float, sim: float}]
 
         Get the k nearest users to active_user_id.
-        Optionally, if candidate_movie_id is not None, the set of neighbours is confined to those who have 
+        Optionally, if candidate_movie_id is specifies, the set of neighbours (users) is confined to those who have 
         rated candidate_movie_id.
         In this case, each neighbour's rating for candidate_movie_id is part of the final result.
         
@@ -123,7 +123,7 @@ class UserRecommender(GenericRecommender):
         [{user_id: int, rating: float, sim: float}]
 
         Get the users who are more than a threshold similar to active_user_id
-        Optionally, if movie_id is not None, the set of neighbours is confined to those who have rated candidate_movie_id.
+        Optionally, if movie_id is specified, the set of neighbours (users) is confined to those who have rated candidate_movie_id.
         In this case, each neighbour's rating for candidate_movie_id is part of the final result.
         """
         
@@ -172,7 +172,7 @@ class UserRecommender(GenericRecommender):
         [{user_id: int, rating: float, sim: float}]
 
         Get the k nearest users to active_user_id provided their similarity to active_user_id exceeds the threshold.
-        Optionally, if movie_id is not None, the set of neighbours is confined to those who have rated candidate_movie_id.
+        Optionally, if movie_id is specified, the set of neighbours (users) is confined to those who have rated candidate_movie_id.
         In this case, each neighbour's rating for candidate_movie_id is part of the final result.
         """
         

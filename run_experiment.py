@@ -25,7 +25,7 @@ def run_experiment(k: int, which: str) -> None:
             movie_id = test['movie_id']
             rating = test['rating']
             
-            predicted_rating = user_r.predict_rating_user_based_nn_wtd(user_id, movie_id)
+            predicted_rating = user_r.predict_rating_user_based_nn_wtd(active_user_id = user_id, candidate_movie_id = movie_id)
             
             print(user_id, movie_id, rating, round(predicted_rating, 1))
             print("\n")
@@ -43,7 +43,7 @@ def run_experiment(k: int, which: str) -> None:
             movie_id = test['movie_id']
             rating = test['rating']
             
-            predicted_rating = item_r.predict_rating_item_based_nn_wtd(user_id, movie_id)
+            predicted_rating = item_r.predict_rating_item_based_nn_wtd(active_user_id = user_id, candidate_movie_id = movie_id)
             
             print(user_id, movie_id, rating, round(predicted_rating, 1))
             print("\n")
