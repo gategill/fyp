@@ -20,7 +20,7 @@ class UserRecommender(GenericRecommender):
     def predict_rating_user_based_nn(self, active_user_id: int, candidate_movie_id: int) -> float:
         ic("user_rec.predict_rating_user_based_nn()")
         
-        nns = self.get_k_nearest_users(Similarities.sim_pearson, active_user_id, candidate_movie_id)
+        nns = self.get_k_nearest_users(Similarities.sim_pearson, self.k, active_user_id, candidate_movie_id)
         prediction = self.calculate_avg_rating(nns)
         
         if prediction:
@@ -37,7 +37,7 @@ class UserRecommender(GenericRecommender):
     def predict_rating_user_based_nn_wtd(self, active_user_id: int, candidate_movie_id: int) -> float:
         ic("user_rec.predict_rating_user_based_nn_wtd()")
         
-        nns = self.get_k_nearest_users(Similarities.sim_pearson, active_user_id, candidate_movie_id)
+        nns = self.get_k_nearest_users(Similarities.sim_pearson, self.k, active_user_id, candidate_movie_id)
         prediction = self.calculate_wtd_avg_rating(nns)
         
         if prediction:
@@ -51,7 +51,7 @@ class UserRecommender(GenericRecommender):
                 return self.mean_training_rating
 
 
-    def get_k_nearest_users(self, similarity_function: types.FunctionType, active_user_id: int, candidate_movie_id: int = None) -> list:
+    def get_k_nearest_users(self, similarity_function: types.FunctionType, k: int, active_user_id: int, candidate_movie_id: int = None) -> list:
         ic("user_rec.get_k_nearest_users()")
         
         """
@@ -67,10 +67,10 @@ class UserRecommender(GenericRecommender):
         
         if type(similarity_function) != types.FunctionType:
             raise TypeError("get_k_nearest_users: you supplied similarity_function = '%s' but similarity_function must be a function" % similarity_function)
-        if type(self.k) != int or self.k < 1:
-            raise TypeError("get_k_nearest_users: you supplied k = '%s' but k must be a positive integer" % self.k)
-        if self.k > len(self.user_training_ratings):
-            raise ValueError("get_k_nearest_users: you supplied k = %i but this is too large" % self.k)
+        if type(k) != int or k < 1:
+            raise TypeError("get_k_nearest_users: you supplied k = '%s' but k must be a positive integer" % k)
+        if k > len(self.user_training_ratings):
+            raise ValueError("get_k_nearest_users: you supplied k = %i but this is too large" % k)
         if type(active_user_id) != int or active_user_id < 1:
             raise TypeError("get_k_nearest_users: you supplied active_user_id = '%s' but active_user_id must be a positive integer" % active_user_id)
         if active_user_id not in self.user_training_ratings:
@@ -99,7 +99,7 @@ class UserRecommender(GenericRecommender):
             nearest_neighbours.append(candidate_neighbour)
             
             # ensure there are at most k neighbours, else remove the most unsimilar
-            if len(nearest_neighbours) > self.k:
+            if len(nearest_neighbours) > k:
                 lowest_sim_index = -1
                 lowest_sim = float('inf')
                 index = 0
@@ -165,7 +165,7 @@ class UserRecommender(GenericRecommender):
         return nearest_neighbours
 
 
-    def get_k_thresholded_nearest_users(self, similarity_function: types.FunctionType, threshold: float, active_user_id: int, candidate_movie_id: int = None) -> list:
+    def get_k_thresholded_nearest_users(self, similarity_function: types.FunctionType, k:int, threshold: float, active_user_id: int, candidate_movie_id: int = None) -> list:
         ic("user_rec.get_k_thresholded_nearest_users()")
         
         """
@@ -178,10 +178,10 @@ class UserRecommender(GenericRecommender):
         
         if type(similarity_function) != types.FunctionType:
             raise TypeError("get_k_thresholded_nearest_users: you supplied similarity_function = '%s' but similarity_function must be a function" % similarity_function)
-        if type(self.k) != int or self.k < 1:
-            raise TypeError("get_k_thresholded_nearest_users: you supplied k = '%s' but k must be a positive integer" % self.k)
-        if self.k > len(self.user_training_ratings):
-            raise ValueError("get_k_thresholded_nearest_users: you supplied k = %i but this is too large" % self.k)
+        if type(k) != int or k < 1:
+            raise TypeError("get_k_thresholded_nearest_users: you supplied k = '%s' but k must be a positive integer" % k)
+        if k > len(self.user_training_ratings):
+            raise ValueError("get_k_thresholded_nearest_users: you supplied k = %i but this is too large" % k)
         if type(threshold) != float:
             raise TypeError("get_k_thresholded_nearest_users: you supplied threshold = '%s' but threshold must be a floating point number" % threshold)
         if type(active_user_id) != int or active_user_id < 1:
@@ -216,7 +216,7 @@ class UserRecommender(GenericRecommender):
                 
             nearest_neighbours.append(candidate_neighbour)
             
-            if len(nearest_neighbours) > self.k:
+            if len(nearest_neighbours) > k:
                 lowest_sim_index = -1
                 lowest_sim = float('inf')
                 index = 0

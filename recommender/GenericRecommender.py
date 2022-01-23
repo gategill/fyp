@@ -50,7 +50,6 @@ class GenericRecommender:
         # weighted, introduces similarity
         # [{sim, user_id, rating}]
         ic("gen_rec.calculate_wtd_avg_rating()")
-        #ic(neighbours)
         
         if len(neighbours) == 0:
             return None
