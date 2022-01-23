@@ -54,17 +54,13 @@ def run_experiment(k: int, which: str) -> None:
     if "r" in which:
         bs_r = BootstrapRecommender(k)
         
-        for test in bs_r.test_ratings:
-            user_id = test['user_id']
-            movie_id = test['movie_id']
-            rating = test['rating']
-            
-            predicted_rating = bs_r.predict_rating_item_based_nn_wtd(user_id, movie_id)
-            
-            print(user_id, movie_id, rating, round(predicted_rating, 1))
-            print("\n")
-            #sleep(1)
-            break
+
+        bs_r.enrich(5)
+        
+        #print(user_id, movie_id, rating, round(predicted_rating, 1))
+        print("\n")
+        #sleep(1)
+        
         
 
     if "p" in which:

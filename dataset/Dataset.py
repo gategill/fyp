@@ -32,7 +32,7 @@ class Dataset:
             movie_id, title, release_date, video_release_date, url = substrings[:START]
             genres = [int(genre) for genre in substrings[FINISH:]]
             self.movie_descriptors[int(movie_id)] = {'title': title, 'release_date': release_date, 'video_release_date': video_release_date, 'url': url, 'genres': genres}
-            movie_ids.append(movie_id)
+            movie_ids.append(int(movie_id))
             
         self.movie_ids = np.unique(movie_ids)
         
@@ -46,7 +46,7 @@ class Dataset:
         for line in open(self.DATA_PATH + filename):
             user_id, age, gender, occupation, zipcode = line.strip().split('|')
             self.user_demographics[int(user_id)] = {'age': int(age), 'gender': gender, 'occupation': occupation, 'zipcode': zipcode}
-            user_ids.append(user_id)
+            user_ids.append(int(user_id))
         
         self.user_ids = np.unique(user_ids)
         
@@ -84,7 +84,7 @@ class Dataset:
             self.user_training_ratings.setdefault(user_id, {})
             self.movie_training_ratings.setdefault(movie_id, {})
             
-            if random.random() >= test_proportion: # goes to train
+            if random.random() >= test_proportion: # goes to training
                 self.user_training_ratings[user_id][movie_id] = rating
                 self.movie_training_ratings[movie_id][user_id] = rating
                 self.mean_training_rating= self.mean_training_rating + rating
@@ -143,7 +143,6 @@ class Dataset:
         # {user_id: int : {moive_id: int : rating: float}
         ic("ds.get_user_training_ratings()")
     
-        ic(self.user_training_ratings)
         return self.user_training_ratings
     
     
