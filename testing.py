@@ -1,4 +1,4 @@
-from rec import Recommender
+from Recommender import Recommender
 from icecream import ic
 from time import sleep
 
@@ -13,6 +13,7 @@ test_set = r.get_test_ratings()
 
 # For each rating in the test set, make a prediction using a 
 # user-based KNN with k = 3
+
 for test in test_set:
     user_id = test['user_id']
     movie_id = test['movie_id']
@@ -23,6 +24,7 @@ for test in test_set:
 
 # For each rating in the test set, make a prediction using an 
 # item-based KNN with k = 3
+
 for test in test_set:
     user_id = test['user_id']
     movie_id = test['movie_id']
