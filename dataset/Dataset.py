@@ -118,9 +118,10 @@ class Dataset:
                 
 
     def get_user_training_ratings(self) -> dict:
-        # {user_id: int : {moive_id: int, rating: float}
+        # {user_id: int : {moive_id: int : rating: float}
         ic("ds.get_user_training_ratings()")
     
+        ic(self.user_training_ratings)
         return self.user_training_ratings
     
     
