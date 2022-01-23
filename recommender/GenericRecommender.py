@@ -24,8 +24,11 @@ class GenericRecommender:
         self.user_training_means = dataset.get_user_training_means()
         self.movie_training_ratings = dataset.get_movie_training_ratings()
         self.movie_training_means = dataset.get_movie_training_means()
-        self.test_ratings = dataset.get_test_ratings()
         
+        self.user_test_ratings = dataset.get_user_test_ratings()
+        self.movie_test_ratings = dataset.get_movie_test_ratings()
+        self.test_ratings = dataset.get_test_ratings()
+                
 
     def calculate_avg_rating(self, neighbours: list) -> float:
         ic("gen_rec.calculate_avg_rating()")

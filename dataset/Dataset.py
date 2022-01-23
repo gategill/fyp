@@ -105,13 +105,17 @@ class Dataset:
             else:
                 self.movie_training_means[movie_id] = None
                 
-
-    def get_test_ratings(self) -> list:
-        # [{movie_id: int, rating: float, user_id: int}]
-        ic("ds.get_test_ratings()")
-
-        return self.test_ratings
-    
+        for val in self.test_ratings:
+            user_id = val["user_id"]
+            movie_id = val["movie_id"]
+            rating = val["rating"]
+            
+            self.user_test_ratings.setdefault(user_id, {})
+            self.movie_test_ratings.setdefault(movie_id, {})
+            
+            self.user_test_ratings[user_id][movie_id] = rating
+            self.movie_test_ratings[movie_id][user_id] = rating
+                
 
     def get_user_training_ratings(self) -> dict:
         # {user_id: int : {moive_id: int, rating: float}
@@ -139,6 +143,27 @@ class Dataset:
         ic("ds.get_movie_training_means()")
 
         return self.movie_training_means
+        
+
+    def get_test_ratings(self) -> list:
+        # [{movie_id: int, rating: float, user_id: int}]
+        ic("ds.get_test_ratings()")
+
+        return self.test_ratings
+    
+    
+    def get_user_test_ratings(self) -> dict:
+        # {user_id : {movie_id, rating}
+        ic("ds.get_user_test_ratings()")
+
+        return self.user_test_ratings
+
+
+    def get_movie_test_ratings(self) -> dict:
+        # {movie_d: int : {user_id: int, rating: float}
+        ic("ds.get_movie_test_ratingss()")
+        
+        return self.movie_test_ratings
     
     
     def __reset(self) -> None:
@@ -148,6 +173,9 @@ class Dataset:
         self.user_training_means = {}
         self.movie_training_ratings = {}
         self.movie_training_means = {}
+        
+        self.user_test_ratings = {}
+        self.movie_test_ratings = {}
         self.test_ratings = []
 
 
