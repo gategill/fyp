@@ -1,56 +1,18 @@
+"""
+
+"""
+
 from icecream import ic
 import types
 import Datasets as ds
 import Similarities as sm
+from GenericRecommender import GenericRecommender
 
-class ItemRecommender:
+class ItemRecommender(GenericRecommender):
     def __init__(self):
         ic("item_rec.__init__()")
         
-        dataset = ds.Datasets()
-        self.user_training_ratings = dataset.get_user_training_ratings()
-        self.user_training_means = dataset.get_user_training_means()
-        self.movie_training_ratings = dataset.get_movie_training_ratings()
-        self.movie_training_means = dataset.get_movie_training_means()
-        self.test_ratings = dataset.get_test_ratings()
-        
-        
-    def calculate_avg_rating(self, neighbours):
-        ic("item_rec.calculate_avg_rating()")
-        
-        if len(neighbours) == 0:
-            return None
-        numerator = 0.0
-        denominator = len(neighbours)
-        
-        for u_s_r in neighbours:
-            rating = u_s_r['rating']
-            numerator = numerator + rating
-            
-        if denominator <= 0.0:
-            return None
-        
-        return numerator / denominator
-
-
-    def calculate_wtd_avg_rating(self, neighbours): # weighted, introduces similarity
-        ic("item_rec.calculate_wtd_avg_rating()")
-        
-        if len(neighbours) == 0:
-            return None
-        numerator = 0.0
-        denominator = 0.0
-        
-        for u_s_r in neighbours:
-            rating = u_s_r['rating']
-            sim = u_s_r['sim']
-            numerator = numerator + sim * rating
-            denominator = denominator + sim
-            
-        if denominator <= 0.0:
-            return None
-        
-        return numerator / denominator
+        super().__init__()
     
     
     def predict_rating_item_based_nn(self, active_user_id, candidate_movie_id, k):
@@ -95,6 +57,7 @@ class ItemRecommender:
         Optionally, if active_user_id is not None, the set of neighbours is confined to those rated by active_user_id.
         In this case, active_user_id's rating for candidate_movie_id is part of the final result.
         """
+        
         if type(similarity_function) != types.FunctionType:
             raise TypeError("get_k_nearest_movies: you supplied similarity_function = '%s' but similarity_function must be a function" % similarity_function)
         if type(k) != int or k < 1:

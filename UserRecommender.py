@@ -1,57 +1,16 @@
+from GenericRecommender import GenericRecommender
 from icecream import ic
 import types
 import Datasets as ds
 import Similarities as sm
+from GenericRecommender import GenericRecommender
 
 
-class UserRecommender:
+class UserRecommender(GenericRecommender):
     def __init__(self):
         ic("user_rec.__init__()")
         
-        dataset = ds.Datasets()
-        self.user_training_ratings = dataset.get_user_training_ratings()
-        self.user_training_means = dataset.get_user_training_means()
-        self.movie_training_ratings = dataset.get_movie_training_ratings()
-        self.movie_training_means = dataset.get_movie_training_means()
-        self.test_ratings = dataset.get_test_ratings()
-        
-        
-    def calculate_avg_rating(self, neighbours):
-        ic("user_rec.calculate_avg_rating()")
-        
-        if len(neighbours) == 0:
-            return None
-        numerator = 0.0
-        denominator = len(neighbours)
-        
-        for u_s_r in neighbours:
-            rating = u_s_r['rating']
-            numerator = numerator + rating
-            
-        if denominator <= 0.0:
-            return None
-        
-        return numerator / denominator
-
-
-    def calculate_wtd_avg_rating(self, neighbours): # weighted, introduces similarity
-        ic("user_rec.calculate_wtd_avg_rating()")
-        
-        if len(neighbours) == 0:
-            return None
-        numerator = 0.0
-        denominator = 0.0
-        
-        for u_s_r in neighbours:
-            rating = u_s_r['rating']
-            sim = u_s_r['sim']
-            numerator = numerator + sim * rating
-            denominator = denominator + sim
-            
-        if denominator <= 0.0:
-            return None
-        
-        return numerator / denominator
+        super().__init__()
 
 
     def predict_rating_user_based_nn(self, active_user_id, candidate_movie_id, k):
@@ -86,6 +45,7 @@ class UserRecommender:
                 return prediction
             else:
                 return self.mean_training_rating
+
 
     def get_k_nearest_users(self, similarity_function, k, active_user_id, candidate_movie_id = None):
         ic("user_rec.get_k_nearest_users()")

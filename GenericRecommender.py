@@ -3,7 +3,6 @@
 import types
 from time import sleep
 from icecream import ic
-
 import Similarities as sm
 import Datasets as ds
 
@@ -20,7 +19,7 @@ class GenericRecommender:
         self.test_ratings = dataset.get_test_ratings()
 
 
-    def calculate_avg_rating(self, neighbours): # GENERIC
+    def calculate_avg_rating(self, neighbours):
         ic("gen_rec.calculate_avg_rating()")
         
         if len(neighbours) == 0:
@@ -38,7 +37,7 @@ class GenericRecommender:
         return numerator / denominator
 
 
-    def calculate_wtd_avg_rating(self, neighbours): # weighted, introduces similarity # GENERIC
+    def calculate_wtd_avg_rating(self, neighbours): # weighted, introduces similarity
         ic("gen_rec.calculate_wtd_avg_rating()")
         
         if len(neighbours) == 0:
