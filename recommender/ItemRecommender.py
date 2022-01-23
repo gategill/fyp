@@ -11,21 +11,21 @@ from recommender.GenericRecommender import GenericRecommender
 
 
 class ItemRecommender(GenericRecommender):
-    def __init__(self):
+    def __init__(self, k):
         ic("item_rec.__init__()")
         
-        super().__init__()
+        super().__init__(k)
     
     
-    def predict_rating_item_based_nn(self, active_user_id, candidate_movie_id, k):
+    def predict_rating_item_based_nn(self, active_user_id, candidate_movie_id):
         ic("item_rec.predict_rating_item_based_nn()")
         
-        nns = self.get_k_thresholded_nearest_movies(Similarities.sim_cosine, k, 0.0, candidate_movie_id, active_user_id)
+        nns = self.get_k_thresholded_nearest_movies(Similarities.sim_cosine, 0.0, candidate_movie_id, active_user_id)
         prediction = self.calculate_avg_rating(nns)
         
         if prediction:
-            return prediction 
-        else: 
+            return prediction
+        else:
             prediction = self.get_movie_mean_rating(candidate_movie_id)
             
             if prediction:
@@ -34,15 +34,15 @@ class ItemRecommender(GenericRecommender):
                 return self.mean_training_rating
 
 
-    def predict_rating_item_based_nn_wtd(self, active_user_id, candidate_movie_id, k):
+    def predict_rating_item_based_nn_wtd(self, active_user_id, candidate_movie_id):
         ic("item_rec.predict_rating_item_based_nn_wtd()")
         
-        nns = self.get_k_thresholded_nearest_movies(Similarities.sim_cosine, k, 0.0, candidate_movie_id, active_user_id)
+        nns = self.get_k_thresholded_nearest_movies(Similarities.sim_cosine, 0.0, candidate_movie_id, active_user_id)
         prediction = self.calculate_wtd_avg_rating(nns)
         
         if prediction:
-            return prediction 
-        else: 
+            return prediction
+        else:
             prediction = self.get_movie_mean_rating(candidate_movie_id)
             
             if prediction:
@@ -51,7 +51,7 @@ class ItemRecommender(GenericRecommender):
                 return self.mean_training_rating
             
 
-    def get_k_nearest_movies(self, similarity_function, k, candidate_movie_id, active_user_id = None):
+    def get_k_nearest_movies(self, similarity_function, candidate_movie_id, active_user_id = None):
         ic("item_rec.get_k_nearest_movies()")
         
         """
@@ -62,10 +62,10 @@ class ItemRecommender(GenericRecommender):
         
         if type(similarity_function) != types.FunctionType:
             raise TypeError("get_k_nearest_movies: you supplied similarity_function = '%s' but similarity_function must be a function" % similarity_function)
-        if type(k) != int or k < 1:
-            raise TypeError("get_k_nearest_movies: you supplied k = '%s' but k must be a positive integer" % k)
-        if k > len(self.movie_training_ratings):
-            raise ValueError("get_k_nearest_movies: you supplied k = %i but this is too large" % k)
+        if type(self.k) != int or self.k < 1:
+            raise TypeError("get_k_nearest_movies: you supplied k = '%s' but k must be a positive integer" % self.k)
+        if self.k > len(self.movie_training_ratings):
+            raise ValueError("get_k_nearest_movies: you supplied k = %i but this is too large" % self.k)
         if type(candidate_movie_id) != int or candidate_movie_id < 1:
             raise TypeError("get_k_nearest_movies: you supplied candidate_movie_id = '%s' but candidate_movie_id must be a positive integer" % candidate_movie_id)
         if candidate_movie_id not in self.movie_training_ratings:
@@ -93,7 +93,7 @@ class ItemRecommender(GenericRecommender):
                 
             nearest_neighbours.append(candidate_neighbour)
             
-            if len(nearest_neighbours) > k:
+            if len(nearest_neighbours) > self.k:
                 lowest_sim_index = -1
                 lowest_sim = float('inf')
                 index = 0
@@ -108,7 +108,7 @@ class ItemRecommender(GenericRecommender):
                     
                 nearest_neighbours.pop(lowest_sim_index)
                 
-        return nearest_neighbours  
+        return nearest_neighbours
 
 
     def get_thresholded_nearest_movies(self, similarity_function, threshold, candidate_movie_id, active_user_id = None):
@@ -158,7 +158,7 @@ class ItemRecommender(GenericRecommender):
         return nearest_neighbours   
 
 
-    def get_k_thresholded_nearest_movies(self, similarity_function, k, threshold, candidate_movie_id, active_user_id = None):
+    def get_k_thresholded_nearest_movies(self, similarity_function, threshold, candidate_movie_id, active_user_id = None):
         ic("item_rec.get_k_thresholded_nearest_movies()")
         
         """
@@ -169,10 +169,10 @@ class ItemRecommender(GenericRecommender):
         
         if type(similarity_function) != types.FunctionType:
             raise TypeError("get_k_thresholded_nearest_movies: you supplied similarity_function = '%s' but similarity_function must be a function" % similarity_function)
-        if type(k) != int or k < 1:
-            raise TypeError("get_k_thresholded_nearest_movies: you supplied k = '%s' but k must be a positive integer" % k)
-        if k > len(self.movie_training_ratings):
-            raise ValueError("get_k_thresholded_nearest_movies: you supplied k = %i but this is too large" % k)
+        if type(self.k) != int or self.k < 1:
+            raise TypeError("get_k_thresholded_nearest_movies: you supplied k = '%s' but k must be a positive integer" % self.k)
+        if self.k > len(self.movie_training_ratings):
+            raise ValueError("get_k_thresholded_nearest_movies: you supplied k = %i but this is too large" % self.k)
         if type(threshold) != float:
             raise TypeError("get_k_thresholded_nearest_movies: you supplied threshold = '%s' but threshold must be a floating point number" % threshold)            
         if type(candidate_movie_id) != int or candidate_movie_id < 1:
@@ -206,7 +206,7 @@ class ItemRecommender(GenericRecommender):
                 
             nearest_neighbours.append(candidate_neighbour)
             
-            if len(nearest_neighbours) > k:
+            if len(nearest_neighbours) > self.k:
                 lowest_sim_index = -1
                 lowest_sim = float('inf')
                 index = 0

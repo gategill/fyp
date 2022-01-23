@@ -5,13 +5,19 @@
 
 from time import sleep
 from icecream import ic
-#import recommender.Similarities as sm
 from dataset.Dataset import Dataset
 
 
 class GenericRecommender:
-    def __init__(self):
+    def __init__(self, k):
         ic("gen_rec.__init__()")
+        
+        self.k = k
+        self.load_dataset()
+        
+
+    def load_dataset(self):
+        ic("gen_load_dataset()")
         
         dataset = Dataset()
         self.user_training_ratings = dataset.get_user_training_ratings()
@@ -19,7 +25,7 @@ class GenericRecommender:
         self.movie_training_ratings = dataset.get_movie_training_ratings()
         self.movie_training_means = dataset.get_movie_training_means()
         self.test_ratings = dataset.get_test_ratings()
-
+        
 
     def calculate_avg_rating(self, neighbours):
         ic("gen_rec.calculate_avg_rating()")
