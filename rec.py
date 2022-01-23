@@ -2,6 +2,9 @@ import random
 from tkinter.messagebox import NO
 import types
 import math
+from time import sleep
+from icecream import ic
+
 
 def sim_pearson(ratings1, ratings2):
     # Get co-rated
@@ -80,10 +83,12 @@ class Recommender:
         if not seed is None and type(seed) != int:
             raise TypeError("load_ratings: you supplied seed = '%s' but seed, if supplied at all, must be an integer" % seed)
         random.seed(seed)
+        
         self.__reset()
         test_proportion = test_percentage / 100.0
         self.mean_training_rating = 0.0
         num_ratings = 0
+        
         for line in open(filename):
             substrings = line.strip().split('\t')
             user_id = int(substrings[0])
@@ -91,19 +96,33 @@ class Recommender:
             rating = float(substrings[2])
             self.user_training_ratings.setdefault(user_id, {})
             self.movie_training_ratings.setdefault(movie_id, {})
-            if random.random() >= test_proportion:
+            
+            if random.random() >= test_proportion: # goes to train
                 self.user_training_ratings[user_id][movie_id] = rating
                 self.movie_training_ratings[movie_id][user_id] = rating
                 self.mean_training_rating= self.mean_training_rating + rating
                 num_ratings = num_ratings + 1
-            else:
+                
+                ic(self.user_training_ratings)
+                ic(self.movie_training_ratings)
+
+                
+            else: # goes to testing
                 self.test_ratings.append({'user_id': user_id, 'movie_id': movie_id, 'rating': rating})
+                
+                ic(self.user_training_ratings)
+                
+            sleep(1)
+                
         self.mean_training_rating = self.mean_training_rating / num_ratings
+        
+        
         for user_id, ratings in self.user_training_ratings.items():
             if len(ratings) > 0:
                 self.user_training_means[user_id] = sum(ratings.values()) * 1.0 / len(ratings)
             else:
                 self.user_training_means[user_id] = None
+                
         for movie_id, ratings in self.movie_training_ratings.items():
             if len(ratings) > 0:
                 self.movie_training_means[movie_id] = sum(ratings.values()) * 1.0 / len(ratings)
@@ -128,7 +147,7 @@ class Recommender:
             return None
         return numerator / denominator
 
-    def calculate_wtd_avg_rating(self, neighbours):
+    def calculate_wtd_avg_rating(self, neighbours): # weighted, introduces similarity
         if len(neighbours) == 0:
             return None
         numerator = 0.0
@@ -191,12 +210,16 @@ class Recommender:
                 return self.mean_training_rating
 
     def get_k_nearest_users(self, similarity_function, k, active_user_id, candidate_movie_id = None):
+        
         """
         Get the k nearest users to active_user_id.
         Optionally, if candidate_movie_id is not None, the set of neighbours is confined to those who have 
         rated candidate_movie_id.
         In this case, each neighbour's rating for candidate_movie_id is part of the final result.
+        
+        THIS FOR PEARL PU!!!
         """
+        
         if type(similarity_function) != types.FunctionType:
             raise TypeError("get_k_nearest_users: you supplied similarity_function = '%s' but similarity_function must be a function" % similarity_function)
         if type(k) != int or k < 1:
@@ -212,17 +235,22 @@ class Recommender:
                 raise TypeError("get_k_nearest_users: you supplied candidate_movie_id = '%s' but candidate_movie_id must be a positive integer" % candidate_movie_id)
             if candidate_movie_id not in self.movie_training_ratings:
                 raise ValueError("get_k_nearest_users: you supplied candidate_movie_id = %i but this movie does not exist" % candidate_movie_id)     
+        
         nearest_neighbours = []
         for user_id in self.user_training_ratings:
             if active_user_id == user_id:
                 continue
             if (not candidate_movie_id is None) and (not candidate_movie_id in self.user_training_ratings[user_id]):
                 continue
+            
             sim = similarity_function(self.user_training_ratings[active_user_id], self.user_training_ratings[user_id])
             candidate_neighbour = {'user_id': user_id, 'sim': sim}
-            if not candidate_movie_id is None:
-                candidate_neighbour['rating'] = self.user_training_ratings[user_id][candidate_movie_id]
+            
+            if not candidate_movie_id is None: # if not None = if confined to users with that movie ID
+                candidate_neighbour['rating'] = self.user_training_ratings[user_id][candidate_movie_id] # what's your ID? 
             nearest_neighbours.append(candidate_neighbour)
+            
+            # ensure there are at most k neighbours, else remove the most unsimilar
             if len(nearest_neighbours) > k:
                 lowest_sim_index = -1
                 lowest_sim = float('inf')
@@ -233,6 +261,7 @@ class Recommender:
                         lowest_sim = neighbour['sim']
                     index = index + 1
                 nearest_neighbours.pop(lowest_sim_index)
+                
         return nearest_neighbours  
 
     def get_thresholded_nearest_users(self, similarity_function, threshold, active_user_id, candidate_movie_id = None):
@@ -254,8 +283,9 @@ class Recommender:
                 raise TypeError("get_thresholded_nearest_users: you supplied candidate_movie_id = '%s' but candidate_movie_id must be a positive integer" % candidate_movie_id)
             if candidate_movie_id not in self.movie_training_ratings:
                 raise ValueError("get_thresholded_nearest_users: you supplied candidate_movie_id = %i but this movie does not exist" % candidate_movie_id)     
+        
         nearest_neighbours = []
-        for user_id in self.user_training_ratings:
+        for user_id in self.user_training_ratings: # 
             if active_user_id == user_id:
                 continue
             if (not candidate_movie_id is None) and (not candidate_movie_id in self.user_training_ratings[user_id]):

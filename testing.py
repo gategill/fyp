@@ -1,4 +1,6 @@
 from rec import Recommender
+from icecream import ic
+from time import sleep
 
 # Create the recommender (also reads in the movie and user data)
 r = Recommender()
@@ -16,7 +18,8 @@ for test in test_set:
     movie_id = test['movie_id']
     rating = test['rating']
     predicted_rating = r.predict_rating_user_based_nn_wtd(user_id, movie_id, k)
-    print(user_id, movie_id, rating, predicted_rating)
+    print(user_id, movie_id, rating, round(predicted_rating, 1))
+    sleep(1)
 
 # For each rating in the test set, make a prediction using an 
 # item-based KNN with k = 3
