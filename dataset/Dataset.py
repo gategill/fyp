@@ -6,6 +6,7 @@
 import random
 from icecream import ic
 import os
+import numpy as np
 
 
 class Dataset:
@@ -24,24 +25,31 @@ class Dataset:
         START = 5
         FINISH = -19
         self.movie_descriptors = {}
-
+        movie_ids = []
         
         for line in open(self.DATA_PATH + filename):
             substrings = line.strip().split('|')
             movie_id, title, release_date, video_release_date, url = substrings[:START]
             genres = [int(genre) for genre in substrings[FINISH:]]
             self.movie_descriptors[int(movie_id)] = {'title': title, 'release_date': release_date, 'video_release_date': video_release_date, 'url': url, 'genres': genres}
+            movie_ids.append(movie_id)
+            
+        self.movie_ids = np.unique(movie_ids)
         
         
     def load_users(self, filename: str = "users.txt") -> None:
         ic("ds.load_users()")
 
+        user_ids = []
         self.user_demographics = {}
         
         for line in open(self.DATA_PATH + filename):
             user_id, age, gender, occupation, zipcode = line.strip().split('|')
             self.user_demographics[int(user_id)] = {'age': int(age), 'gender': gender, 'occupation': occupation, 'zipcode': zipcode}
-            
+            user_ids.append(user_id)
+        
+        self.user_ids = np.unique(user_ids)
+        
         
     def load_ratings(self, filename: str = "ratings.txt", test_percentage: int = 20, seed: int = 2) -> None:
         ic("ds.load_ratings()")
@@ -116,6 +124,20 @@ class Dataset:
             self.user_test_ratings[user_id][movie_id] = rating
             self.movie_test_ratings[movie_id][user_id] = rating
                 
+                
+    def get_user_ids(self) -> list:
+        # [user_ids]
+        ic("ds.get_user_ids()")
+        
+        return self.user_ids
+        
+        
+    def get_movie_ids(self) -> list:
+        # [movie_ids]
+        ic("ds.get_movie_ids()")
+        
+        return self.movie_ids
+
 
     def get_user_training_ratings(self) -> dict:
         # {user_id: int : {moive_id: int : rating: float}
@@ -169,6 +191,9 @@ class Dataset:
     
     def __reset(self) -> None:
         ic("ds.__reset()")
+        
+        self.user_ids = []
+        self.movie_ids = []
         
         self.user_training_ratings = {}
         self.user_training_means = {}

@@ -20,6 +20,10 @@ class GenericRecommender:
         ic("gen_load_dataset()")
         
         dataset = Dataset()
+        
+        self.user_ids = dataset.get_user_ids()
+        self.movie_ids = dataset.get_movie_ids()
+        
         self.user_training_ratings = dataset.get_user_training_ratings()
         self.user_training_means = dataset.get_user_training_means()
         self.movie_training_ratings = dataset.get_movie_training_ratings()

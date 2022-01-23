@@ -46,7 +46,7 @@ class BootstrapRecommender:
                 movies_I_rated_test = set(list(enriched_ratings[user_id].keys()))
                 movies_I_rated = movies_I_rated_training.intersection(movies_I_rated_test)
                 
-                movies_I_didnt_see = set(self.user_r.ids_of_movies).difference(movies_I_rated)
+                movies_I_didnt_see = set(self.user_r.movie_ids).difference(movies_I_rated)
                 movies_I_didnt_see = list(movies_I_didnt_see)
                 movies_I_didnt_see = random.sample(movies_I_didnt_see, k = 10)
                 
