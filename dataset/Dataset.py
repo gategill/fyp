@@ -18,7 +18,7 @@ class Dataset:
         self.load_ratings()
        
         
-    def load_items(self, filename = "movies.txt"):
+    def load_items(self, filename: str = "movies.txt") -> None:
         ic("ds.load_items()")
         
         START = 5
@@ -33,7 +33,7 @@ class Dataset:
             self.movie_descriptors[int(movie_id)] = {'title': title, 'release_date': release_date, 'video_release_date': video_release_date, 'url': url, 'genres': genres}
         
         
-    def load_users(self, filename = "users.txt"):
+    def load_users(self, filename: str = "users.txt") -> None:
         ic("ds.load_users()")
 
         self.user_demographics = {}
@@ -43,7 +43,7 @@ class Dataset:
             self.user_demographics[int(user_id)] = {'age': int(age), 'gender': gender, 'occupation': occupation, 'zipcode': zipcode}
             
         
-    def load_ratings(self, filename = "ratings.txt", test_percentage = 20, seed = 2):
+    def load_ratings(self, filename: str = "ratings.txt", test_percentage: int = 20, seed: int = 2) -> None:
         ic("ds.load_ratings()")
 
         """
@@ -106,40 +106,43 @@ class Dataset:
                 self.movie_training_means[movie_id] = None
                 
 
-    def get_test_ratings(self):
+    def get_test_ratings(self) -> list:
+        # [{movie_id: int, rating: float, user_id: int}]
         ic("ds.get_test_ratings()")
 
         return self.test_ratings
     
 
-    def get_user_training_ratings(self):
+    def get_user_training_ratings(self) -> dict:
+        # {user_id: int : {moive_id: int, rating: float}
         ic("ds.get_user_training_ratings()")
     
         return self.user_training_ratings
     
     
-    def get_user_training_means(self):
+    def get_user_training_means(self) -> dict:
+        # {user_id: int, rating: float}
         ic("ds.get_user_training_means()")
     
         return self.user_training_means
     
     
-    def get_movie_training_ratings(self):
+    def get_movie_training_ratings(self) -> dict:
+        # {movie_id: int : {user_id: int, rating: float}
         ic("ds.get_movie_training_ratings()")
     
         return self.movie_training_ratings
     
     
-    def get_movie_training_means(self):
+    def get_movie_training_means(self) -> dict:
+        # {movie_id: int : rating: float}
         ic("ds.get_movie_training_means()")
 
         return self.movie_training_means
     
-
     
-    def __reset(self):
+    def __reset(self) -> None:
         ic("ds.__reset()")
-        # get all variable here
         
         self.user_training_ratings = {}
         self.user_training_means = {}
@@ -148,11 +151,11 @@ class Dataset:
         self.test_ratings = []
 
 
-
-
     @staticmethod
-    def __d_to_dlist(dict, keykey, valkey):
+    def __d_to_dlist(dict: dict, keykey: int, valkey: int) -> list:
         ic("ds.__d_to_dlist()")
+        ic(keykey)
+        ic(valkey)
         
         list = []
         for key, val in dict.items():

@@ -11,13 +11,13 @@ from recommender.GenericRecommender import GenericRecommender
 
 
 class UserRecommender(GenericRecommender):
-    def __init__(self, k):
+    def __init__(self, k: int) -> None:
         ic("user_rec.__init__()")
         
         super().__init__(k)
 
 
-    def predict_rating_user_based_nn(self, active_user_id, candidate_movie_id):
+    def predict_rating_user_based_nn(self, active_user_id: int, candidate_movie_id: int) -> float:
         ic("user_rec.predict_rating_user_based_nn()")
         
         nns = self.get_k_nearest_users(Similarities.sim_pearson, active_user_id, candidate_movie_id)
@@ -34,7 +34,7 @@ class UserRecommender(GenericRecommender):
                 return self.mean_training_rating
 
 
-    def predict_rating_user_based_nn_wtd(self, active_user_id, candidate_movie_id):
+    def predict_rating_user_based_nn_wtd(self, active_user_id: int, candidate_movie_id: int) -> float:
         ic("user_rec.predict_rating_user_based_nn_wtd()")
         
         nns = self.get_k_nearest_users(Similarities.sim_pearson, active_user_id, candidate_movie_id)
@@ -51,10 +51,12 @@ class UserRecommender(GenericRecommender):
                 return self.mean_training_rating
 
 
-    def get_k_nearest_users(self, similarity_function, active_user_id, candidate_movie_id = None):
+    def get_k_nearest_users(self, similarity_function: types.FunctionType, active_user_id: int, candidate_movie_id: int = None) -> list:
         ic("user_rec.get_k_nearest_users()")
         
         """
+        [{user_id: int, rating: float, sim: float}]
+
         Get the k nearest users to active_user_id.
         Optionally, if candidate_movie_id is not None, the set of neighbours is confined to those who have 
         rated candidate_movie_id.
@@ -114,10 +116,12 @@ class UserRecommender(GenericRecommender):
         return nearest_neighbours
 
 
-    def get_thresholded_nearest_users(self, similarity_function, threshold, active_user_id, candidate_movie_id = None):
+    def get_thresholded_nearest_users(self, similarity_function: types.FunctionType, threshold: float, active_user_id: int, candidate_movie_id: int = None) -> list:
         ic("user_rec.get_thresholded_nearest_users()")
         
         """
+        [{user_id: int, rating: float, sim: float}]
+
         Get the users who are more than a threshold similar to active_user_id
         Optionally, if movie_id is not None, the set of neighbours is confined to those who have rated candidate_movie_id.
         In this case, each neighbour's rating for candidate_movie_id is part of the final result.
@@ -161,10 +165,12 @@ class UserRecommender(GenericRecommender):
         return nearest_neighbours
 
 
-    def get_k_thresholded_nearest_users(self, similarity_function, threshold, active_user_id, candidate_movie_id = None):
+    def get_k_thresholded_nearest_users(self, similarity_function: types.FunctionType, threshold: float, active_user_id: int, candidate_movie_id: int = None) -> list:
         ic("user_rec.get_k_thresholded_nearest_users()")
         
         """
+        [{user_id: int, rating: float, sim: float}]
+
         Get the k nearest users to active_user_id provided their similarity to active_user_id exceeds the threshold.
         Optionally, if movie_id is not None, the set of neighbours is confined to those who have rated candidate_movie_id.
         In this case, each neighbour's rating for candidate_movie_id is part of the final result.
@@ -228,7 +234,7 @@ class UserRecommender(GenericRecommender):
         return nearest_neighbours
 
 
-    def get_user_movie_rating(self, user_id, movie_id):
+    def get_user_movie_rating(self, user_id: int, movie_id: int) -> float:
         ic("user_rec.get_user_movie_rating()")
         
         """
@@ -251,10 +257,12 @@ class UserRecommender(GenericRecommender):
             return None
             
             
-    def get_user_ratings(self, user_id):
+    def get_user_ratings(self, user_id: int) -> list:
         ic("user_rec.get_user_ratings()")
          
         """
+        [ratings: float]
+
         Gets all of user_id's ratings from the training set as a list. If this user has no ratings in the
         training set, an empty list is the result.
         """
@@ -270,7 +278,7 @@ class UserRecommender(GenericRecommender):
             return []
             
             
-    def get_user_mean_rating(self, user_id):
+    def get_user_mean_rating(self, user_id: int) -> float:
         ic("user_rec.get_user_mean_rating()")
          
         """
@@ -286,7 +294,7 @@ class UserRecommender(GenericRecommender):
         return self.user_training_means[user_id]
     
            
-    def get_demographic_ratings(self, age = None, gender = None, occupation = None, zipcode = None):
+    def get_demographic_ratings(self, age = None, gender = None, occupation = None, zipcode = None) -> list:
         ic("user_rec.get_demographic_ratings()")
         
         """
@@ -306,7 +314,7 @@ class UserRecommender(GenericRecommender):
         return ratings               
 
 
-    def get_user_demographics(self, user_id):
+    def get_user_demographics(self, user_id: int) -> dict:
         ic("user_rec.get_user_demographics()")
         
         """

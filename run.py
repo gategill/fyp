@@ -9,11 +9,11 @@ from recommender.UserRecommender import UserRecommender
 from recommender.ItemRecommender import ItemRecommender
 
 
-# For each rating in the test set, make a prediction using a 
-# user-based KNN with k = 3
-
-def run_experiment(k, which):
+def run_experiment(k: int, which: str) -> None:
+    
     if "u" in which:
+        # For each rating in the test set, make a prediction using a 
+        # user-based KNN with k = 3
         user_r = UserRecommender(k)
         
         for test in user_r.test_ratings:
@@ -42,5 +42,6 @@ def run_experiment(k, which):
             predicted_rating = item_r.predict_rating_item_based_nn_wtd(user_id, movie_id)
             
             print(user_id, movie_id, rating, round(predicted_rating, 1))
+            print("\n")
             #sleep(1)
             break

@@ -11,13 +11,13 @@ from recommender.GenericRecommender import GenericRecommender
 
 
 class ItemRecommender(GenericRecommender):
-    def __init__(self, k):
+    def __init__(self, k: int) -> None:
         ic("item_rec.__init__()")
         
         super().__init__(k)
     
     
-    def predict_rating_item_based_nn(self, active_user_id, candidate_movie_id):
+    def predict_rating_item_based_nn(self, active_user_id: int, candidate_movie_id: int) -> float:
         ic("item_rec.predict_rating_item_based_nn()")
         
         nns = self.get_k_thresholded_nearest_movies(Similarities.sim_cosine, 0.0, candidate_movie_id, active_user_id)
@@ -34,10 +34,11 @@ class ItemRecommender(GenericRecommender):
                 return self.mean_training_rating
 
 
-    def predict_rating_item_based_nn_wtd(self, active_user_id, candidate_movie_id):
+    def predict_rating_item_based_nn_wtd(self, active_user_id: int, candidate_movie_id: int) -> float:
         ic("item_rec.predict_rating_item_based_nn_wtd()")
         
         nns = self.get_k_thresholded_nearest_movies(Similarities.sim_cosine, 0.0, candidate_movie_id, active_user_id)
+        #nns = self.get_k_nearest_movies(Similarities.sim_cosine, candidate_movie_id, active_user_id)
         prediction = self.calculate_wtd_avg_rating(nns)
         
         if prediction:
@@ -51,10 +52,12 @@ class ItemRecommender(GenericRecommender):
                 return self.mean_training_rating
             
 
-    def get_k_nearest_movies(self, similarity_function, candidate_movie_id, active_user_id = None):
+    def get_k_nearest_movies(self, similarity_function: types.FunctionType, candidate_movie_id: int, active_user_id: int = None) -> list:
         ic("item_rec.get_k_nearest_movies()")
         
         """
+        [{movie_id: int, rating: float, sim: float}]
+
         Get the k nearest movies to candidate_movie_id.
         Optionally, if active_user_id is not None, the set of neighbours is confined to those rated by active_user_id.
         In this case, active_user_id's rating for candidate_movie_id is part of the final result.
@@ -111,10 +114,12 @@ class ItemRecommender(GenericRecommender):
         return nearest_neighbours
 
 
-    def get_thresholded_nearest_movies(self, similarity_function, threshold, candidate_movie_id, active_user_id = None):
+    def get_thresholded_nearest_movies(self, similarity_function: types.FunctionType, threshold: float, candidate_movie_id: int, active_user_id: int = None) -> list:
         ic("item_rec.get_thresholded_nearest_movies()")
         
         """
+        [{movie_id: int, rating: float, sim: float}]
+        
         Get the movies which are more than a threshold similar to candidate_movie_id
         Optionally, if active_user_id is not None, the set of neighbours is confined to those rated by active_user_id.
         In this case, active_user_id's rating for candidate_movie_id is part of the final result.
@@ -158,10 +163,12 @@ class ItemRecommender(GenericRecommender):
         return nearest_neighbours   
 
 
-    def get_k_thresholded_nearest_movies(self, similarity_function, threshold, candidate_movie_id, active_user_id = None):
+    def get_k_thresholded_nearest_movies(self, similarity_function: types.FunctionType, threshold: float, candidate_movie_id: int, active_user_id: int = None) -> list:
         ic("item_rec.get_k_thresholded_nearest_movies()")
         
         """
+        [{movie_id: int, rating: float, sim: float}]
+
         Get the k nearest movies to candidate_movie_id provided their similarity to candidate_movie_id exceeds the threshold.
         Optionally, if active_user_id is not None, the set of neighbours is confined to those rated by active_user_id.
         In this case, active_user_id's rating for candidate_movie_id is part of the final result.
@@ -224,10 +231,12 @@ class ItemRecommender(GenericRecommender):
         return nearest_neighbours
     
     
-    def get_movie_ratings(self, movie_id):
+    def get_movie_ratings(self, movie_id: int) -> list:
         ic("item_rec.get_movie_ratings()")
         
         """
+        [ratings: float]
+        
         Gets all of movie_id's ratings from the training set as a list. If this movie has no ratings in the
         training set, an empty list is the result.
         """
@@ -243,7 +252,7 @@ class ItemRecommender(GenericRecommender):
             return []
             
             
-    def get_movie_mean_rating(self, movie_id):
+    def get_movie_mean_rating(self, movie_id: int) -> float:
         ic("item_rec.get_movie_mean_rating()")
         
         """
@@ -259,10 +268,12 @@ class ItemRecommender(GenericRecommender):
         return self.movie_training_means[movie_id]
             
             
-    def get_genre_ratings(self, genre):
+    def get_genre_ratings(self, genre: str) -> list:
         ic("item_rec.get_genre_ratings()")
         
         """
+        [ratings: float]
+        
         Gets all ratings from the training set as a list for movies whose genre matches the value in the argument.
         """
         
@@ -279,7 +290,7 @@ class ItemRecommender(GenericRecommender):
         return ratings  
 
 
-    def get_movie_descriptors(self, movie_id):
+    def get_movie_descriptors(self, movie_id: int) -> dict:
         ic("item_rec.get_movie_descriptors()")
         
         """

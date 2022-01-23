@@ -9,14 +9,14 @@ from dataset.Dataset import Dataset
 
 
 class GenericRecommender:
-    def __init__(self, k):
+    def __init__(self, k: int) -> None:
         ic("gen_rec.__init__()")
         
         self.k = k
         self.load_dataset()
         
 
-    def load_dataset(self):
+    def load_dataset(self) -> None:
         ic("gen_load_dataset()")
         
         dataset = Dataset()
@@ -27,8 +27,9 @@ class GenericRecommender:
         self.test_ratings = dataset.get_test_ratings()
         
 
-    def calculate_avg_rating(self, neighbours):
+    def calculate_avg_rating(self, neighbours: list) -> float:
         ic("gen_rec.calculate_avg_rating()")
+        # [{sim, user_id, rating}]
         
         if len(neighbours) == 0:
             return None
@@ -45,8 +46,11 @@ class GenericRecommender:
         return numerator / denominator
 
 
-    def calculate_wtd_avg_rating(self, neighbours): # weighted, introduces similarity
+    def calculate_wtd_avg_rating(self, neighbours: list) -> float:
+        # weighted, introduces similarity
+        # [{sim, user_id, rating}]
         ic("gen_rec.calculate_wtd_avg_rating()")
+        #ic(neighbours)
         
         if len(neighbours) == 0:
             return None
