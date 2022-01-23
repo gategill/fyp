@@ -1,17 +1,19 @@
-#import random
-#from tkinter.messagebox import NO
-import types
+"""
+
+"""
+
+
 from time import sleep
 from icecream import ic
-import Similarities as sm
-import Datasets as ds
+#import recommender.Similarities as sm
+from dataset.Dataset import Dataset
 
 
 class GenericRecommender:
     def __init__(self):
         ic("gen_rec.__init__()")
         
-        dataset = ds.Datasets()
+        dataset = Dataset()
         self.user_training_ratings = dataset.get_user_training_ratings()
         self.user_training_means = dataset.get_user_training_means()
         self.movie_training_ratings = dataset.get_movie_training_ratings()

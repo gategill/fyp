@@ -2,11 +2,13 @@
 
 """
 
+
 from icecream import ic
 import types
-import Datasets as ds
-import Similarities as sm
-from GenericRecommender import GenericRecommender
+from dataset.Dataset import Dataset
+from recommender.Similarities import Similarities
+from recommender.GenericRecommender import GenericRecommender
+
 
 class ItemRecommender(GenericRecommender):
     def __init__(self):
@@ -18,7 +20,7 @@ class ItemRecommender(GenericRecommender):
     def predict_rating_item_based_nn(self, active_user_id, candidate_movie_id, k):
         ic("item_rec.predict_rating_item_based_nn()")
         
-        nns = self.get_k_thresholded_nearest_movies(sm.sim_cosine, k, 0.0, candidate_movie_id, active_user_id)
+        nns = self.get_k_thresholded_nearest_movies(Similarities.sim_cosine, k, 0.0, candidate_movie_id, active_user_id)
         prediction = self.calculate_avg_rating(nns)
         
         if prediction:
@@ -35,7 +37,7 @@ class ItemRecommender(GenericRecommender):
     def predict_rating_item_based_nn_wtd(self, active_user_id, candidate_movie_id, k):
         ic("item_rec.predict_rating_item_based_nn_wtd()")
         
-        nns = self.get_k_thresholded_nearest_movies(sm.sim_cosine, k, 0.0, candidate_movie_id, active_user_id)
+        nns = self.get_k_thresholded_nearest_movies(Similarities.sim_cosine, k, 0.0, candidate_movie_id, active_user_id)
         prediction = self.calculate_wtd_avg_rating(nns)
         
         if prediction:
@@ -236,7 +238,7 @@ class ItemRecommender(GenericRecommender):
             raise ValueError("get_movie_ratings: you supplied movie_id = %i but this movie does not exist" % movie_id)
         
         if movie_id in self.movie_training_ratings:
-            return ds.__d_to_dlist(self.movie_training_ratings[movie_id], 'user_id', 'rating')
+            return Dataset.__d_to_dlist(self.movie_training_ratings[movie_id], 'user_id', 'rating')
         else:
             return []
             
@@ -269,7 +271,7 @@ class ItemRecommender(GenericRecommender):
         for movie_id, movie_ratings in self.movie_training_ratings.items():
             genres = self.movie_descriptors[movie_id]['genres']
             
-            if genre in ds.__genre_names and genres[ds.__genre_names.index(genre)] == 1:
+            if genre in Dataset.__genre_names and genres[Dataset.__genre_names.index(genre)] == 1:
                 
                 for user_id, rating in movie_ratings.items():
                     ratings.append({'user_id': user_id, 'movie_id': movie_id, 'rating': rating})

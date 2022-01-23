@@ -1,9 +1,13 @@
-from GenericRecommender import GenericRecommender
+"""
+
+"""
+
+
 from icecream import ic
 import types
-import Datasets as ds
-import Similarities as sm
-from GenericRecommender import GenericRecommender
+from dataset.Dataset import Dataset
+from recommender.Similarities import Similarities
+from recommender.GenericRecommender import GenericRecommender
 
 
 class UserRecommender(GenericRecommender):
@@ -16,7 +20,7 @@ class UserRecommender(GenericRecommender):
     def predict_rating_user_based_nn(self, active_user_id, candidate_movie_id, k):
         ic("user_rec.predict_rating_user_based_nn()")
         
-        nns = self.get_k_nearest_users(sm.sim_pearson, k, active_user_id, candidate_movie_id)
+        nns = self.get_k_nearest_users(Similarities.sim_pearson, k, active_user_id, candidate_movie_id)
         prediction = self.calculate_avg_rating(nns)
         
         if prediction:
@@ -33,7 +37,7 @@ class UserRecommender(GenericRecommender):
     def predict_rating_user_based_nn_wtd(self, active_user_id, candidate_movie_id, k):
         ic("user_rec.predict_rating_user_based_nn_wtd()")
         
-        nns = self.get_k_nearest_users(sm.sim_pearson, k, active_user_id, candidate_movie_id)
+        nns = self.get_k_nearest_users(Similarities.sim_pearson, k, active_user_id, candidate_movie_id)
         prediction = self.calculate_wtd_avg_rating(nns)
         
         if prediction:
@@ -261,7 +265,7 @@ class UserRecommender(GenericRecommender):
             raise ValueError("get_user_ratings: you supplied user_id = %i but this user does not exist" % user_id)
         
         if user_id in self.user_training_ratings:
-            return ds.__d_to_dlist(self.user_training_ratings[user_id], 'movie_id', 'rating')
+            return Dataset.__d_to_dlist(self.user_training_ratings[user_id], 'movie_id', 'rating')
         else:
             return []
             

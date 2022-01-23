@@ -1,10 +1,17 @@
+"""
+
+"""
+
+
 import random
 from icecream import ic
+import os
 
-class Datasets:
+
+class Dataset:
     def __init__(self):
         ic("ds.__init__()")
-        
+        self.DATA_PATH = "C:/Users/Asus/Desktop/UCC 4/CS4701 -Final Year Project/FYP_Code/data/derek/"
         self.__reset()
         self.load_items()
         self.load_users()
@@ -17,8 +24,9 @@ class Datasets:
         START = 5
         FINISH = -19
         self.movie_descriptors = {}
+
         
-        for line in open(filename):
+        for line in open(self.DATA_PATH + filename):
             substrings = line.strip().split('|')
             movie_id, title, release_date, video_release_date, url = substrings[:START]
             genres = [int(genre) for genre in substrings[FINISH:]]
@@ -30,7 +38,7 @@ class Datasets:
 
         self.user_demographics = {}
         
-        for line in open(filename):
+        for line in open(self.DATA_PATH + filename):
             user_id, age, gender, occupation, zipcode = line.strip().split('|')
             self.user_demographics[int(user_id)] = {'age': int(age), 'gender': gender, 'occupation': occupation, 'zipcode': zipcode}
             
@@ -60,7 +68,7 @@ class Datasets:
         self.mean_training_rating = 0.0
         num_ratings = 0
         
-        for line in open(filename):
+        for line in open(self.DATA_PATH + filename):
             substrings = line.strip().split('\t')
             user_id = int(substrings[0])
             movie_id = int(substrings[1])
