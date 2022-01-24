@@ -8,10 +8,6 @@ from icecream import ic
 #from dataset.Dataset import Dataset
 
 
-class PearlPuRecommender:
+class MostPopRecommender:
     def __init__(self, k: int) -> None:
-        ic("pp_rec.__init__()")        
-
-
-
-            
+        ic("mp_rec.__init__()")
