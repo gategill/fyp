@@ -5,7 +5,6 @@
 
 from icecream import ic
 import types
-from dataset.Dataset import Dataset
 from recommender.Similarities import Similarities
 from recommender.GenericRecommender import GenericRecommender
 
@@ -273,7 +272,7 @@ class UserRecommender(GenericRecommender):
             raise ValueError("get_user_ratings: you supplied user_id = %i but this user does not exist" % user_id)
         
         if user_id in self.user_training_ratings:
-            return Dataset.__d_to_dlist(self.user_training_ratings[user_id], 'movie_id', 'rating')
+            return self.dataset.__d_to_dlist(self.user_training_ratings[user_id], 'movie_id', 'rating')
         else:
             return []
             

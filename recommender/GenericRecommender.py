@@ -13,13 +13,15 @@ class GenericRecommender:
         ic("gen_rec.__init__()")
         
         self.k = k
-        self.load_dataset()
+        
+        self.dataset = Dataset()
+        self.load_dataset(self.dataset)
         
 
-    def load_dataset(self) -> None:
+    def load_dataset(self, dataset) -> None:
         ic("gen_load_dataset()")
         
-        dataset = Dataset()
+        #dataset = Dataset()
         
         self.user_ids = dataset.get_user_ids()
         self.movie_ids = dataset.get_movie_ids()
@@ -32,6 +34,8 @@ class GenericRecommender:
         self.user_test_ratings = dataset.get_user_test_ratings()
         self.movie_test_ratings = dataset.get_movie_test_ratings()
         self.test_ratings = dataset.get_test_ratings()
+        
+        self.mean_training_rating = dataset.get_mean_training_rating()
                 
 
     def calculate_avg_rating(self, neighbours: list) -> float:
@@ -74,5 +78,10 @@ class GenericRecommender:
         
         return numerator / denominator
     
+    def add_new_recommendations(self, new_recommendations) -> None:
+        # 
+        ic("gen_rec.add_new_recommendations()")
+        
+        self.dataset.add_new_recommendations_to_dataset(new_recommendations)
 
             

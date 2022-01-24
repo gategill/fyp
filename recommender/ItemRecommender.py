@@ -5,7 +5,6 @@
 
 from icecream import ic
 import types
-from dataset.Dataset import Dataset
 from recommender.Similarities import Similarities
 from recommender.GenericRecommender import GenericRecommender
 
@@ -160,7 +159,7 @@ class ItemRecommender(GenericRecommender):
                 
             nearest_neighbours.append(candidate_neighbour)
             
-        return nearest_neighbours   
+        return nearest_neighbours 
 
 
     def get_k_thresholded_nearest_movies(self, similarity_function: types.FunctionType, k: int, threshold: float, candidate_movie_id: int, active_user_id: int = None) -> list:
@@ -247,7 +246,7 @@ class ItemRecommender(GenericRecommender):
             raise ValueError("get_movie_ratings: you supplied movie_id = %i but this movie does not exist" % movie_id)
         
         if movie_id in self.movie_training_ratings:
-            return Dataset.__d_to_dlist(self.movie_training_ratings[movie_id], 'user_id', 'rating')
+            return self.dataset.__d_to_dlist(self.movie_training_ratings[movie_id], 'user_id', 'rating')
         else:
             return []
             
@@ -282,7 +281,7 @@ class ItemRecommender(GenericRecommender):
         for movie_id, movie_ratings in self.movie_training_ratings.items():
             genres = self.movie_descriptors[movie_id]['genres']
             
-            if genre in Dataset.__genre_names and genres[Dataset.__genre_names.index(genre)] == 1:
+            if genre in self.dataset.__genre_names and genres[self.dataset.__genre_names.index(genre)] == 1:
                 
                 for user_id, rating in movie_ratings.items():
                     ratings.append({'user_id': user_id, 'movie_id': movie_id, 'rating': rating})

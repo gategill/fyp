@@ -73,7 +73,6 @@ class Dataset:
         
         #self.__reset()
         test_proportion = test_percentage / 100.0
-        self.mean_training_rating = 0.0
         num_ratings = 0
         
         for line in open(self.DATA_PATH + filename):
@@ -87,7 +86,7 @@ class Dataset:
             if random.random() >= test_proportion: # goes to training
                 self.user_training_ratings[user_id][movie_id] = rating
                 self.movie_training_ratings[movie_id][user_id] = rating
-                self.mean_training_rating= self.mean_training_rating + rating
+                self.mean_training_rating = self.mean_training_rating + rating
                 num_ratings = num_ratings + 1
                 
                 #ic(self.user_training_ratings)
@@ -102,12 +101,14 @@ class Dataset:
         self.mean_training_rating = self.mean_training_rating / num_ratings
         
         for user_id, ratings in self.user_training_ratings.items():
+            
             if len(ratings) > 0:
                 self.user_training_means[user_id] = sum(ratings.values()) * 1.0 / len(ratings)
             else:
                 self.user_training_means[user_id] = None
                 
         for movie_id, ratings in self.movie_training_ratings.items():
+            
             if len(ratings) > 0:
                 self.movie_training_means[movie_id] = sum(ratings.values()) * 1.0 / len(ratings)
             else:
@@ -123,7 +124,18 @@ class Dataset:
             
             self.user_test_ratings[user_id][movie_id] = rating
             self.movie_test_ratings[movie_id][user_id] = rating
-                
+
+
+    def add_new_recommendations_to_dataset(self, new_recommendations):
+        # 
+        ic("ds.add_new_recommendations_to_dataset()")
+        
+        self.update_user_training_ratings(new_recommendations)
+        self.update_movie_training_ratings(new_recommendations)
+        self.update_user_training_means()
+        self.update_movie_training_means()
+        self.update_mean_training_rating()
+
                 
     def get_user_ids(self) -> list:
         # [user_ids]
@@ -144,8 +156,71 @@ class Dataset:
         ic("ds.get_user_training_ratings()")
     
         return self.user_training_ratings
-    
-    
+
+
+    def update_user_training_ratings(self, new_recommendations: list) -> None:
+        # 
+        ic("ds.update_user_training_ratings()")
+        
+        for recommendation in new_recommendations:
+            user_id = recommendation["user_id"]
+            movie_id = recommendation["movie_id"]
+            rating = recommendation["rating"]
+            
+            self.user_training_ratings[user_id][movie_id] = rating
+                
+        
+    def update_user_training_means(self) -> None:
+        # 
+        ic("ds.update_user_training_means()")
+        
+        for user_id, ratings in self.user_training_ratings.items():
+            if len(ratings) > 0:
+                self.user_training_means[user_id] = sum(ratings.values()) * 1.0 / len(ratings)
+            else:
+                self.user_training_means[user_id] = None
+                
+                
+    def update_movie_training_ratings(self, new_recommendations: list) -> None:
+        # 
+        ic("ds.update_movie_training_ratings()")
+        
+   
+        for recommendation in new_recommendations:
+            user_id = recommendation["user_id"]
+            movie_id = recommendation["movie_id"]
+            rating = recommendation["rating"]
+            
+            self.movie_training_ratings[movie_id][user_id] = rating
+                                
+        
+    def update_movie_training_means(self) -> None:
+        # 
+        ic("ds.update_movie_training_means()")
+        
+        for movie_id, ratings in self.movie_training_ratings.items():
+            if len(ratings) > 0:
+                self.movie_training_means[movie_id] = sum(ratings.values()) * 1.0 / len(ratings)
+            else:
+                self.movie_training_means[movie_id] = None
+                
+                    
+    def update_mean_training_rating(self) -> None:
+        # 
+        ic("ds.update_mean_training_rating()")
+        
+        new_mean_training_rating = np.sum(list(self.movie_training_means.values())) / len(self.movie_training_means)
+        
+        self.mean_training_rating = new_mean_training_rating
+
+                
+    def get_mean_training_rating(self) -> float:
+        # 
+        ic("ds.get_mean_training_rating()")
+
+        return self.mean_training_rating
+
+
     def get_user_training_means(self) -> dict:
         # {user_id: int, rating: float}
         ic("ds.get_user_training_means()")
@@ -186,7 +261,7 @@ class Dataset:
         ic("ds.get_movie_test_ratingss()")
         
         return self.movie_test_ratings
-    
+        
     
     def __reset(self) -> None:
         ic("ds.__reset()")
@@ -202,6 +277,8 @@ class Dataset:
         self.user_test_ratings = {}
         self.movie_test_ratings = {}
         self.test_ratings = []
+        
+        self.mean_training_rating = 0.0
 
 
     @staticmethod

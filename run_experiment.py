@@ -52,21 +52,28 @@ def run_experiment(k: int, which: str) -> None:
         
     
     if "r" in which:
-        bs_r = BootstrapRecommender(k)
+        bs_r = BootstrapRecommender(k, iterations = 5, additions = 10)
         
-
-        bs_r.enrich(5)
+        bs_r.enrich()
         
-        #print(user_id, movie_id, rating, round(predicted_rating, 1))
         print("\n")
-        #sleep(1)
         
+        for test in bs_r.test_ratings:
+            user_id = test['user_id']
+            movie_id = test['movie_id']
+            rating = test['rating']
+            
+            predicted_rating = bs_r.predict_rating_user_based_nn_wtd(active_user_id = user_id, candidate_movie_id = movie_id)
+            
+            print(user_id, movie_id, rating, round(predicted_rating, 1))
+            print("\n")
+            sleep(1)
         
 
     if "p" in which:
         pp_r = PearlPuRecommender(k)
         
-        for test in pp_r.test_ratings:
+        '''for test in pp_r.test_ratings:
             user_id = test['user_id']
             movie_id = test['movie_id']
             rating = test['rating']
@@ -76,12 +83,12 @@ def run_experiment(k: int, which: str) -> None:
             print(user_id, movie_id, rating, round(predicted_rating, 1))
             print("\n")
             #sleep(1)
-            break
+            break'''
         
     if "c" in which:
         cr_r = CoRecRecommender(k)
         
-        for test in cr_r.test_ratings:
+        '''for test in cr_r.test_ratings:
             user_id = test['user_id']
             movie_id = test['movie_id']
             rating = test['rating']
@@ -91,5 +98,5 @@ def run_experiment(k: int, which: str) -> None:
             print(user_id, movie_id, rating, round(predicted_rating, 1))
             print("\n")
             #sleep(1)
-            break
+            break'''
     
