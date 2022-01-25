@@ -66,8 +66,8 @@ def run_experiment(k: int, which: str) -> None:
             predicted_rating = bs_r.predict_rating_user_based_nn_wtd(active_user_id = user_id, candidate_movie_id = movie_id)
             
             print(user_id, movie_id, rating, round(predicted_rating, 1))
-            print("\n")
-            sleep(1)
+            #print("\n")
+            sleep(0.1)
         
 
     if "p" in which:

@@ -60,16 +60,21 @@ class BootstrapRecommender(UserRecommender):
                 
                 #ic(movies_I_rated)
                 #ic(type(self.user_r.movie_ids[0]))
+                
                 movies_unrated = list(set(self.movie_ids).difference(movies_rated))
                 #movies_unrated = list(movies_unrated)
                 #ic(type(movies_unrated[0]))
 
                 movies_unrated = random.sample(movies_unrated, k = self.additions)
-                
+
                 #predicted_rating = random.choice(range(5 + 1), 10)
                 for mm in movies_unrated:
-                    r =  round(random.uniform(0, 5), 1)
-                    new_recommendations.append({"user_id" : user_id , "movie_id" : mm ,"rating" : r})
+                    #ic(mm)
+                    #ic(user_id)
+                    predicted_rating = self.predict_rating_user_based_nn_wtd(user_id, int(mm))
+                    r = round(predicted_rating, 2)
+                    #r =  round(random.uniform(0, 5), 1)
+                    new_recommendations.append({"user_id" : int(user_id) , "movie_id" : int(mm) ,"rating" : float(r)})
                     
                     #to add it again, you need to recalculate fields in dataset
                     #add 1, ad3d multple

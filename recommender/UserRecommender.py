@@ -34,7 +34,7 @@ class UserRecommender(GenericRecommender):
 
 
     def predict_rating_user_based_nn_wtd(self, active_user_id: int, candidate_movie_id: int) -> float:
-        ic("user_rec.predict_rating_user_based_nn_wtd()")
+        #ic("user_rec.predict_rating_user_based_nn_wtd()")
         
         nns = self.get_k_nearest_users(Similarities.sim_pearson, self.k, active_user_id, candidate_movie_id)
         prediction = self.calculate_wtd_avg_rating(nns)
@@ -51,7 +51,7 @@ class UserRecommender(GenericRecommender):
 
 
     def get_k_nearest_users(self, similarity_function: types.FunctionType, k: int, active_user_id: int, candidate_movie_id: int = None) -> list:
-        ic("user_rec.get_k_nearest_users()")
+        #ic("user_rec.get_k_nearest_users()")
         
         """
         [{user_id: int, rating: float, sim: float}]
@@ -278,7 +278,7 @@ class UserRecommender(GenericRecommender):
             
             
     def get_user_mean_rating(self, user_id: int) -> float:
-        ic("user_rec.get_user_mean_rating()")
+        #ic("user_rec.get_user_mean_rating()")
          
         """
         Gets the mean of user_id's ratings from the training set. If this user has no ratings in the
