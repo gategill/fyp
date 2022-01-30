@@ -89,7 +89,8 @@ class UserRecommender(GenericRecommender):
             if (not candidate_movie_id is None) and (not candidate_movie_id in self.user_training_ratings[user_id]):
                 continue
             
-            sim = similarity_function(self.user_training_ratings[active_user_id], self.user_training_ratings[user_id])
+            sim = self.get_user_similarity(similarity_function, active_user_id, user_id)
+            
             candidate_neighbour = {'user_id': user_id, 'sim': sim}
             
             if not candidate_movie_id is None: # if not None = if confined to users with that movie ID
@@ -150,7 +151,7 @@ class UserRecommender(GenericRecommender):
             if (not candidate_movie_id is None) and (not candidate_movie_id in self.user_training_ratings[user_id]):
                 continue
             
-            sim = similarity_function(self.user_training_ratings[active_user_id], self.user_training_ratings[user_id])
+            sim = self.get_user_similarity(similarity_function, active_user_id, user_id)
             if sim <= threshold:
                 continue
             
@@ -203,7 +204,7 @@ class UserRecommender(GenericRecommender):
             if (not candidate_movie_id is None) and (not candidate_movie_id in self.user_training_ratings[user_id]):
                 continue
             
-            sim = similarity_function(self.user_training_ratings[active_user_id], self.user_training_ratings[user_id])
+            sim = self.get_user_similarity(similarity_function, active_user_id, user_id)
             
             if sim <= threshold:
                 continue
@@ -329,3 +330,12 @@ class UserRecommender(GenericRecommender):
             return self.user_demographics[user_id]
         else:
             return {}
+        
+        
+    def get_user_similarity(self, similarity_function: types.FunctionType, active_user_id: int, user_id: int) -> float:
+        """"""
+        #ic("user_rec.get_user_similarity()")
+        
+        sim = similarity_function(self.user_training_ratings[active_user_id], self.user_training_ratings[user_id])
+        
+        return sim

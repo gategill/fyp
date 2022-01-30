@@ -87,7 +87,7 @@ class ItemRecommender(GenericRecommender):
             if (not active_user_id is None) and (not active_user_id in self.movie_training_ratings[movie_id]):
                 continue
             
-            sim = similarity_function(self.movie_training_ratings[candidate_movie_id], self.movie_training_ratings[movie_id])
+            sim = self.get_item_similarity(similarity_function, candidate_movie_id, movie_id)
             candidate_neighbour = {'movie_id': movie_id, 'sim': sim}
             
             if not active_user_id is None:
@@ -147,7 +147,7 @@ class ItemRecommender(GenericRecommender):
             if (not active_user_id is None) and (not active_user_id in self.movie_training_ratings[movie_id]):
                 continue
             
-            sim = similarity_function(self.movie_training_ratings[candidate_movie_id], self.movie_training_ratings[movie_id])
+            sim = self.get_item_similarity(similarity_function, candidate_movie_id, movie_id)
             
             if sim <= threshold:
                 continue
@@ -200,7 +200,7 @@ class ItemRecommender(GenericRecommender):
             if (not active_user_id is None) and (not active_user_id in self.movie_training_ratings[movie_id]):
                 continue
             
-            sim = similarity_function(self.movie_training_ratings[candidate_movie_id], self.movie_training_ratings[movie_id])
+            sim = self.get_item_similarity(similarity_function, candidate_movie_id, movie_id)
             
             if sim <= threshold:
                 continue
@@ -305,3 +305,11 @@ class ItemRecommender(GenericRecommender):
             return self.movie_descriptors[movie_id]
         else:
             return {} 
+        
+        
+    def get_item_similarity(self, similarity_function: types.FunctionType, candidate_movie_id: int, movie_id: int) -> float:
+        """"""
+        #ic("item_rec.get_item_similarity()")
+        
+        return similarity_function(self.movie_training_ratings[candidate_movie_id], self.movie_training_ratings[movie_id])
+        

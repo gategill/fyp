@@ -68,6 +68,7 @@ def run_experiment(k: int, which: str) -> None:
             print(user_id, movie_id, rating, round(predicted_rating, 1))
             print("\n")
             sleep(1)
+            break
         
 
     if "p" in which:
@@ -84,6 +85,7 @@ def run_experiment(k: int, which: str) -> None:
             print("\n")
             sleep(1)
             break
+        
         
     if "c" in which:
         cr_r = CoRecRecommender(k)
