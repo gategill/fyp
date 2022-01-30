@@ -16,6 +16,7 @@ class GenericRecommender:
         
         self.dataset = Dataset()
         self.load_dataset(self.dataset)
+        self.predictions = []
         
 
     def load_dataset(self, dataset) -> None:
@@ -83,3 +84,8 @@ class GenericRecommender:
         ic("gen_rec.add_new_recommendations()")
         
         self.dataset.add_new_recommendations_to_dataset(new_recommendations)
+
+    
+    def add_prediction(self, prediction: dict) -> None:
+        self.predictions.append(prediction)
+
