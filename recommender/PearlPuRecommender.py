@@ -56,8 +56,8 @@ class PearlPuRecommender:
         
         mean_rating_for_active_user = self.user_rec.get_user_mean_rating(active_user)
         
-        ic(alpha)
-        ic(beta)
+        #ic(alpha)
+        #ic(beta)
         
         
         if beta == 0.0:
