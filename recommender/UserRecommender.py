@@ -338,4 +338,7 @@ class UserRecommender(GenericRecommender):
         
         sim = similarity_function(self.user_training_ratings[active_user_id], self.user_training_ratings[user_id])
         
+        #ic(sim)
+        
+        
         return sim
