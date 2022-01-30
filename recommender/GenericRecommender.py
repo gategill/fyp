@@ -83,5 +83,3 @@ class GenericRecommender:
         ic("gen_rec.add_new_recommendations()")
         
         self.dataset.add_new_recommendations_to_dataset(new_recommendations)
-
-            

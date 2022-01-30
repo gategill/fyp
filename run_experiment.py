@@ -66,24 +66,27 @@ def run_experiment(k: int, which: str) -> None:
             predicted_rating = bs_r.predict_rating_user_based_nn_wtd(active_user_id = user_id, candidate_movie_id = movie_id)
             
             print(user_id, movie_id, rating, round(predicted_rating, 1))
-            #print("\n")
-            sleep(0.1)
+
+            print("\n")
+            sleep(1)
+            break
         
 
     if "p" in which:
         pp_r = PearlPuRecommender(k)
         
-        '''for test in pp_r.test_ratings:
+        for test in pp_r.test_ratings:
             user_id = test['user_id']
             movie_id = test['movie_id']
             rating = test['rating']
             
-            predicted_rating = pp_r.predict_rating_item_based_nn_wtd(user_id, movie_id)
+            predicted_rating = pp_r.recursive_prediction(user_id, movie_id)
             
             print(user_id, movie_id, rating, round(predicted_rating, 1))
             print("\n")
-            #sleep(1)
-            break'''
+            sleep(1)
+            break
+        
         
     if "c" in which:
         cr_r = CoRecRecommender(k)
