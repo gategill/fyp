@@ -4,7 +4,7 @@
 
 
 import math
-#from icecream import ic
+from icecream import ic
 
 
 class Similarities:
@@ -52,6 +52,11 @@ class Similarities:
             return 0.0
         
         # Calculate Pearson correlation
+        
+        #ic(sum_prods)
+        
+        #ic(sum_prods / (math.sqrt(sum_squares1) * math.sqrt(sum_squares2)))
+        
         return sum_prods / (math.sqrt(sum_squares1) * math.sqrt(sum_squares2))
 
 
