@@ -19,7 +19,7 @@ class Dataset:
         self.load_ratings()     
         
         print("There are {} ratings in the trainset".format(self.num_ratings))  
-        print("Sparsity of the trainset is: {}%".format(self.sparsity))  
+        print("Sparsity of the trainset is: {}%".format(round(self.sparsity, 5)))  
     
         
     def load_items(self, filename: str = "movies.txt") -> None:
@@ -142,11 +142,11 @@ class Dataset:
         self.update_user_training_means()
         self.update_movie_training_means()
         self.update_mean_training_rating()
-        
+        self.update_num_ratings(new_recommendations)
         
         # will have to update these !!!
         print("There are {} ratings in the trainset".format(self.num_ratings))
-        print("Sparsity of the trainset is: {}%".format(self.sparsity))
+        #print("Sparsity of the trainset is: {}%".format(self.sparsity))
 
                 
     def get_user_ids(self) -> list:
@@ -173,6 +173,8 @@ class Dataset:
     def update_user_training_ratings(self, new_recommendations: list) -> None:
         # 
         ic("ds.update_user_training_ratings()")
+        
+        #self.num_ratings += len(new_recommendations)
         
         for recommendation in new_recommendations:
             user_id = recommendation["user_id"]
@@ -240,8 +242,6 @@ class Dataset:
         return self.user_training_means
     
     
- 
-    
     def get_movie_training_ratings(self) -> dict:
         # {movie_id: int : {user_id: int, rating: float}
         ic("ds.get_movie_training_ratings()")
@@ -276,6 +276,13 @@ class Dataset:
         
         return self.movie_test_ratings
         
+        
+    def update_num_ratings(self, new_recommendations: list) -> None:
+        """"""
+        ic("ds.update_num_ratings()")
+        
+        self.num_ratings += len(new_recommendations)
+
     
     def __reset(self) -> None:
         ic("ds.__reset()")
@@ -296,12 +303,7 @@ class Dataset:
         
         self.transactions = 0
         self.sparsity = 0.0
-
-
-    def get_sparsity(self):
         
-        
-        print
 
     @staticmethod
     def __d_to_dlist(dict: dict, keykey: int, valkey: int) -> list:
