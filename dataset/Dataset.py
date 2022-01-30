@@ -16,8 +16,11 @@ class Dataset:
         self.__reset()
         self.load_items()
         self.load_users()
-        self.load_ratings()
-       
+        self.load_ratings()     
+        
+        print("There are {} ratings in the trainset".format(self.num_ratings))  
+        print("Sparsity of the trainset is: {}%".format(self.sparsity))  
+    
         
     def load_items(self, filename: str = "movies.txt") -> None:
         ic("ds.load_items()")
@@ -100,6 +103,10 @@ class Dataset:
                 
         self.mean_training_rating = self.mean_training_rating / num_ratings
         
+        self.num_ratings = num_ratings
+        self.sparsity = 1 - self.num_ratings / (len(self.user_ids) * len(self.movie_ids))
+        
+        
         for user_id, ratings in self.user_training_ratings.items():
             
             if len(ratings) > 0:
@@ -135,6 +142,11 @@ class Dataset:
         self.update_user_training_means()
         self.update_movie_training_means()
         self.update_mean_training_rating()
+        
+        
+        # will have to update these !!!
+        print("There are {} ratings in the trainset".format(self.num_ratings))
+        print("Sparsity of the trainset is: {}%".format(self.sparsity))
 
                 
     def get_user_ids(self) -> list:
@@ -281,7 +293,15 @@ class Dataset:
         self.test_ratings = []
         
         self.mean_training_rating = 0.0
+        
+        self.transactions = 0
+        self.sparsity = 0.0
 
+
+    def get_sparsity(self):
+        
+        
+        print
 
     @staticmethod
     def __d_to_dlist(dict: dict, keykey: int, valkey: int) -> list:

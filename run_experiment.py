@@ -12,6 +12,9 @@ from recommender.BootstrapRecommender import BootstrapRecommender
 from recommender.CoRecRecommender import CoRecRecommender
 from evaluation.Evaluation import Evaluation
 
+ic.disable()
+#ic.configureOutput(includeContext=True)
+
 
 
 def run_experiment(k: int, which: str) -> None:
@@ -20,30 +23,27 @@ def run_experiment(k: int, which: str) -> None:
         # user-based KNN with k = 3
         user_r = UserRecommender(k)
         
-        mae = 0
-        c = 0
-        
-        for test in user_r.test_ratings:
+        print("\nRunning User Recommender\n")
+
+        for i, test in enumerate(user_r.test_ratings):
             try:
                 user_id = test['user_id']
                 movie_id = test['movie_id']
                 rating = test['rating']
                 
                 predicted_rating = user_r.predict_rating_user_based_nn_wtd(active_user_id = user_id, candidate_movie_id = movie_id)
-                
-                prediction_error = abs(predicted_rating - rating)
-                mae += prediction_error
-                c += 1
-                
+                test["pred_rating"] = predicted_rating
+                user_r.add_prediction(test)
+                              
                 #print(user_id, movie_id, rating, round(predicted_rating, 1))
             except KeyboardInterrupt:
-                print("\n")
+                print("\nStopping\n")
+                print(i)
                 #sleep(1)
                 break
             
-        mae = mae/c
-        ic(c)
-        ic(mae)
+        mae_from_user_r = Evaluation.mean_absolute_error(user_r.predictions)
+        print(mae_from_user_r)
 
 
     # For each rating in the test set, make a prediction using an 
@@ -51,66 +51,62 @@ def run_experiment(k: int, which: str) -> None:
     if "i" in which:
         item_r = ItemRecommender(k)
         
-        mae = 0
-        c = 0
-        
-        for test in item_r.test_ratings:
+        print("\nRunning Item Recommender\n")
+
+        for i, test in enumerate(item_r.test_ratings):
             try:
                 user_id = test['user_id']
                 movie_id = test['movie_id']
                 rating = test['rating']
                 
                 predicted_rating = item_r.predict_rating_item_based_nn_wtd(active_user_id = user_id, candidate_movie_id = movie_id)
-                
-                prediction_error = abs(predicted_rating - rating)
-                mae += prediction_error
-                c += 1
+                test["pred_rating"] = predicted_rating
+                item_r.add_prediction(test)
                 
                 #print(user_id, movie_id, rating, round(predicted_rating, 1))
             except KeyboardInterrupt:
-                print("\n")
+                print("\nStopping\n")
+                print(i)
                 #sleep(1)
                 break
             
-        mae = mae/c
-        ic(c)
-        ic(mae)
+        mae_from_item_r = Evaluation.mean_absolute_error(item_r.predictions)
+        print(mae_from_item_r)
         
     
-    if "r" in which:
+    if "b" in which:
         bs_r = BootstrapRecommender(k, iterations = 5, additions = 10)
+        print("\nEnriching Bootstrap Recommender\n")
+
         bs_r.enrich()
+
+        print("\nRunning Bootstrap Recommender\n")
         
-        mae = 0
-        c = 0
-        
-        print("\n")
-        
-        for test in bs_r.test_ratings:
+        for i, test in enumerate(bs_r.test_ratings):
             try:
                 user_id = test['user_id']
                 movie_id = test['movie_id']
                 rating = test['rating']
                 
                 predicted_rating = bs_r.predict_rating_user_based_nn_wtd(active_user_id = user_id, candidate_movie_id = movie_id)
-
-                prediction_error = abs(predicted_rating - rating)
-                mae += prediction_error
-                c += 1
+                test["pred_rating"] = predicted_rating
+                bs_r.add_prediction(test)
                 
                 #print(user_id, movie_id, rating, round(predicted_rating, 1))
             except KeyboardInterrupt:
-                print("Stopping\n")
+                print("\nStopping\n")
+                print(i)
                 break
             
-        mae = mae/c
-        ic(c)
-        ic(mae)
+        mae_from_bs_r = Evaluation.mean_absolute_error(bs_r.predictions)
+        print(mae_from_bs_r)
         
 
     if "p" in which:
         pp_r = PearlPuRecommender(k)
-                
+
+        print("\nRunning Pearl Pu Recommender\n")
+
         for i, test in enumerate(pp_r.test_ratings):
             try:
                 user_id = test['user_id']
@@ -126,22 +122,21 @@ def run_experiment(k: int, which: str) -> None:
                 
             except KeyboardInterrupt:
                 print("\nStopping\n")
-                ic(i)
+                print(i)
                 break
             #sleep(1)
             
         mae_from_pearl_pu = Evaluation.mean_absolute_error(pp_r.predictions)
-        ic(mae_from_pearl_pu)
+        print(mae_from_pearl_pu)
         
         
     if "c" in which:
         cr_r = CoRecRecommender(k)
-        
-        mae = 0
-        c = 0
-        
+    
+        print("\nRunning Co Rec Recommender\n")
+
         '''
-        for test in cr_r.test_ratings:
+        for i, test in enumerate(cr_r.test_ratings):
             try:
                 user_id = test['user_id']
                 movie_id = test['movie_id']
@@ -149,20 +144,18 @@ def run_experiment(k: int, which: str) -> None:
                 
                 predicted_rating = cr_r.predict_rating_item_based_nn_wtd(user_id, movie_id)
                 
-                prediction_error = abs(predicted_rating - rating)
-                mae += prediction_error
-                c += 1
+                test["pred_rating"] = predicted_rating
+                cr_r.add_prediction(test)
                 
                 #print(user_id, movie_id, rating, round(predicted_rating, 1))
             except KeyboardInterrupt:
-                print("\n")
+                print("\nStopping\n")
+                print(i)
                 #sleep(1)
                 break
                 
-                
-        mae = mae/c
-        ic(c)
-        ic(mae)
+        mae_from_cr_r = Evaluation.mean_absolute_error(cr_r.predictions)
+        print(mae_from_cr_r)
         '''
                 
     
