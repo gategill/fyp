@@ -1,0 +1,20 @@
+In this chapter we finally come to the main subject of the project: Co-Rec
+
+\section{Background}
+we can use the small percentage of labelled item-user rating [usually only 1-5%], produce several confident predictions and. Thus enhancing future training
+
+\section{Design}
+How does it works?
+
+\section{Implementation}
+Issues or challenges when implementing it?
+
+\section{Comparison to Previous Algorithms}
+As we have seen in previous chapters, sparsity is a major hurdle recommender system have to overcome. Bootstrap attempt to alleviate that problem by *iteratively* adding transactions to the training dataset, these net transactions are based on k nearest neighbours
+
+Pearl Pu on the other hand, resolves the sparsity issue by only considering neighbour that have the item in common with the candidate user. That is done *recursively* 
+
+
+Co-Rec uses 
+
+Although at first glance the Bootstrap and Co-Rec seem similar, in that they both use the training dataset to generate predictions that are added to the trainset, Co-Rec uses independent values of the data and only adds it most confident results, while Bootstrap only takes the K nearest neighbours

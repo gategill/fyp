@@ -1,25 +1,16 @@
+Related Work
+other approaches, describe problems, metrics old to new, 
+
+
 \section{Section 1 of Chapter 2}
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum
+Different approaches exist, such as collaborative and content-based approaches. In collaborative approaches, we assume that users who agreed in the past will agree in the future and by grouping a user with others with similar tastes we can score items unseen to the user and provide a recommendation. In content-based approaches, AAA
+The most commonly addressed problems in the literature are sparsity and cold start. Within a recommender system, the number of items is very large and most users would interact with a small subset of the items. This means that only a small percentage of items will be rated by users. This presents a problem as there isn’t enough information to train a model accurately.  
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse. See \ref{fig: hobbit house} cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum
+because any learner system needs sufficient data to perform optimally, otherwise it runs into the risk of overfitting and capturing noise instead of the true underlying pattern. Sparsity is a common problem for collaborative recommenders. To fix it, a human would have to label thousands and perhaps millions of points manually. Because of this, we observe a tail distribution of ratings[]. Co-training aims to fix this by making two recommenders train each other by adding their most confident predictions on the unlabelled data to the training set iteratively.
 
 
-\subsection{Subsection 1 of Section 1 of Chapter 2}
-\begin{figure}[ht]
-\centering
-\includegraphics[scale=0.5]{images/image01.png}
-\caption{An Example Picture}
-\label{fig: hobbit house}
-\end{figure}
+Cold starts refer to the difficulty in providing an accurate recommendation for a new item or user. 
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum
+ There are several ways it has been approached.  for example[] 
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum
+The methods of evaluating recommender systems have also evolved. Instead of trying to predict a rating that a user might assign to an item and measuring the mean absolute error, an entire fan of new methods is used to better evaluate models. Instead of focusing on predicting a rating, they try to <sort> items. This way, we can evaluate novelty, diversity, top N, NG 

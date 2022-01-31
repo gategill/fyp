@@ -10,6 +10,8 @@ from recommender.GenericRecommender import GenericRecommender
 from recommender.UserRecommender import UserRecommender
 from recommender.ItemRecommender import ItemRecommender
 from recommender.Similarities import Similarities
+import random
+import copy
 
 
 class CoRecRecommender(GenericRecommender):
@@ -26,8 +28,21 @@ class CoRecRecommender(GenericRecommender):
         
         
     def co_rec_algorithm(self, X, M):
+        movies_unrated = {}
         # step 1
-        pass
+        for user_id in self.user_training_ratings.keys():
+            movies_unrated[user_id] = self.get_user_unrated_movies(user_id, self.additions)
+        
+        # steps 2
+        training_labelled_user = copy.deepcopy(self.user_training_ratings)
+        training_labelled_item = copy.deepcopy(self.movie_training_ratings)
+        
+        training_unlabelled_user = copy.deepcopy(movies_unrated)
+        training_unlabelled_item = copy.deepcopy(movies_unrated) # need to switch
+        
+        while (not training_unlabelled_user) and (not training_unlabelled_item):     
+               
+            pass
         
 
     def enrich(self) -> None:
@@ -58,7 +73,7 @@ class CoRecRecommender(GenericRecommender):
         
         movies_rated = movies_rated_in_training.intersection(movies_rated_in_test)
         movies_unrated = list(set(self.movie_ids).difference(movies_rated))
-        movies_unrated = random.sample(movies_unrated, k = self.additions)
+        movies_unrated = random.sample(movies_unrated, k = number)
         
         return movies_unrated
         

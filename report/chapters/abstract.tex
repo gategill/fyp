@@ -2,26 +2,37 @@
 
 \begin{center}
     \Large
-    \textbf{Thesis Title}
+    \textbf{Co-Training Recommender Systems}
     
     \vspace{0.4cm}
     \large
-    Thesis Subtitle
+     CoRec: A Co-Training Approach \\ for Recommender Systems
     
     \vspace{0.4cm}
     
-    \textbf{Student Name}
+    \textbf{Michal Krzysztof \\ Polak Szarkowicz}
     
     \vspace{0.4cm} 
     
-    \textbf{Student Number}
+    \textbf{118304271}
     
     \vspace{0.9cm}
      
     \textbf{Abstract}
 \end{center}
  
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum
+We come in contact with recommender systems daily thought services like Netflix, Spotify and possibly soon, in McDonald’s[]. No wonder, there is more and more to choose from every day and recommenders help users to navigate the sea of endless content by serving them what they already like, as well as what they might like.
+
+Thanks to recent advances and more data[], they are better than ever before at providing personalised suggestions[], and it pays off. The average Netflix user spends almost 9hours a week on the platform or that around a third of Amazon’s revenue comes from its recommendations[]
+
+The problem, however an important issue that persists, such as sparsity and cold starts This is where a large number of points are unlabelled due to the large space of items and users and their interactions. By using a term called co-training, where we use existing ratings to enhance the training dataset and produce a more labelled rating for a model to work with. 
+
+In this project, we outline several recommender systems and compare their performance
 
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum
+COPIED FROM DEREK!!!
+Many machine learning algorithms learn from large volumes of labelled data: the labels give 'correct' answers and the algorithm generalises from these. Sometimes, you have large volumes of unlabeled data but only small volumes of labelled data. Co-training is one possible way of coping with this scenario. In one form of co-training, you use two or more (preferably independent) learning algorithms. Iteratively, you use one of the algorithms to provide more labelled data to the other algorithm.
+
+Co-training can be applied to recommender systems, where the shortage of labelled data is a well-known problem, see the paper by \cite{corec}. In this project, we will explore their ideas further: we will try different recommender algorithms, we will try different datasets, we will try different ways of measuring uncertainty, and so on.
+
+
