@@ -23,14 +23,14 @@ class Tests(unittest.TestCase):
         self.assertEqual(mae, 0.66193, "Should be 0.66193")
         
         
-    '''def test_bootstrap_rec(self):
+    def test_bootstrap_rec(self):
         test, mae = rexp.run_bootstrap_rec_experiment(3)
         
-        self.assertEqual(test["user_id"], 130, "Should be 130")
-        self.assertEqual(test["movie_id"], 109, "Should be 109")
-        self.assertEqual(test["rating"], 3.0, "Should be 3.0")
-        self.assertEqual(test["pred_rating"], 3.35, "Should be 3.35")
-        self.assertEqual(mae, 0.77459, "Should be 0.77459")'''
+        self.assertEqual(test["user_id"], 222, "Should be 222")
+        self.assertEqual(test["movie_id"], 366, "Should be 366")
+        self.assertEqual(test["rating"], 4.0, "Should be 4.0")
+        self.assertEqual(test["pred_rating"], 3.68, "Should be 3.68")
+        self.assertEqual(mae, 1.11184, "Should be 1.11184")
         
         
     def test_pearlpu_rec(self):

@@ -110,7 +110,7 @@ def run_item_rec_experiment(k):
 
         
 def run_bootstrap_rec_experiment(k):
-    bs_r = BootstrapRecommender(k, iterations = 2 , additions = 10)
+    bs_r = BootstrapRecommender(k, iterations = 1 , additions = 6)
     print("\nEnriching Bootstrap Recommender\n")
 
     bs_r.enrich()
