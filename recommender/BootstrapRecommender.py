@@ -25,11 +25,10 @@ from recommender.UserRecommender import UserRecommender
 # add new reccomendation to dataset
 
 class BootstrapRecommender(UserRecommender):
-    def __init__(self, k: int, iterations: int = 5, additions: int = 10) -> None:
+    def __init__(self, k: int, iterations: int = 5, additions: int = 10, dataset = None) -> None:
         ic("bs_rec.__init__()")
         
-        super().__init__(k)
-        
+        super().__init__(k, dataset)
         self.iterations = iterations
         self.additions = additions
         

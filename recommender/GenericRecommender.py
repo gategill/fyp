@@ -9,34 +9,34 @@ from dataset.Dataset import Dataset
 
 
 class GenericRecommender:
-    def __init__(self, k: int) -> None:
+    def __init__(self, k: int, dataset = None) -> None:
         ic("gen_rec.__init__()")
         
         self.k = k
-        
-        self.dataset = Dataset()
-        self.load_dataset(self.dataset)
+        self.dataset = dataset
+        self.load_dataset()
         self.predictions = []
         
 
-    def load_dataset(self, dataset) -> None:
+    def load_dataset(self) -> None:
         ic("gen_load_dataset()")
         
-        #dataset = Dataset()
+        if self.dataset is None:
+            self.dataset = Dataset()
         
-        self.user_ids = dataset.get_user_ids()
-        self.movie_ids = dataset.get_movie_ids()
+        self.user_ids = self.dataset.get_user_ids()
+        self.movie_ids = self.dataset.get_movie_ids()
         
-        self.user_training_ratings = dataset.get_user_training_ratings()
-        self.user_training_means = dataset.get_user_training_means()
-        self.movie_training_ratings = dataset.get_movie_training_ratings()
-        self.movie_training_means = dataset.get_movie_training_means()
+        self.user_training_ratings = self.dataset.get_user_training_ratings()
+        self.user_training_means = self.dataset.get_user_training_means()
+        self.movie_training_ratings = self.dataset.get_movie_training_ratings()
+        self.movie_training_means = self.dataset.get_movie_training_means()
         
-        self.user_test_ratings = dataset.get_user_test_ratings()
-        self.movie_test_ratings = dataset.get_movie_test_ratings()
-        self.test_ratings = dataset.get_test_ratings()
+        self.user_test_ratings = self.dataset.get_user_test_ratings()
+        self.movie_test_ratings = self.dataset.get_movie_test_ratings()
+        self.test_ratings = self.dataset.get_test_ratings()
         
-        self.mean_training_rating = dataset.get_mean_training_rating()
+        self.mean_training_rating = self.dataset.get_mean_training_rating()
                 
 
     def calculate_avg_rating(self, neighbours: list) -> float:

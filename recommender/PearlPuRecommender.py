@@ -9,10 +9,10 @@ from recommender.Similarities import Similarities
 
 
 class PearlPuRecommender(UserRecommender):
-    def __init__(self, k: int = 5,  weight_threshold: float = 1.0, recursion_threshold: int = 3) -> None:
-        super().__init__(k)
+    def __init__(self, k: int = 5,  weight_threshold: float = 1.0, recursion_threshold: int = 3, dataset = None) -> None:
         ic("pp_rec.__init__()")
-        #self.k = k
+
+        super().__init__(k, dataset)
         self.weight_threshold = weight_threshold
         self.recursion_threshold = recursion_threshold
         #self.user_rec = UserRecommender(self.k)

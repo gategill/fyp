@@ -10,10 +10,10 @@ from recommender.GenericRecommender import GenericRecommender
 
 
 class UserRecommender(GenericRecommender):
-    def __init__(self, k: int) -> None:
+    def __init__(self, k: int, dataset = None) -> None:
         ic("user_rec.__init__()")
         
-        super().__init__(k)
+        super().__init__(k, dataset)
 
 
     def predict_rating_user_based_nn(self, active_user_id: int, candidate_movie_id: int) -> float:
