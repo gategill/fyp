@@ -35,7 +35,7 @@ class UserRecommender(GenericRecommender):
 
     def predict_rating_user_based_nn_wtd(self, active_user_id: int, candidate_movie_id: int) -> float:
         #ic("user_rec.predict_rating_user_based_nn_wtd()")
-        
+
         nns = self.get_k_nearest_users(Similarities.sim_pearson, self.k, active_user_id, candidate_movie_id)
         prediction = self.calculate_wtd_avg_rating(nns)
         

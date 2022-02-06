@@ -52,9 +52,22 @@ class Dataset:
             user_ids.append(int(user_id))
         
         self.user_ids = np.unique(user_ids)
+        # shuffle, k fod
+        
+    def read_in_ratings(self,  filename: str = "ratings.txt"):
+        all_ratings = []
+        for line in open(self.DATA_PATH + filename):
+            substrings = line.strip().split('\t')
+            user_id = int(substrings[0])
+            movie_id = int(substrings[1])
+            rating = float(substrings[2])
+            
+            all_ratings.append({'user_id': user_id, 'movie_id': movie_id, 'rating': rating})
+
+        self.all_rating = random.shuffle(all_ratings)
         
         
-    def load_ratings(self, filename: str = "ratings.txt", test_percentage: int = 20, seed: int = 2) -> None:
+    def load_ratings(self, filename: str = "ratings.txt", test_percentage: int = 20, seed: int = 42) -> None:
         ic("ds.load_ratings()")
 
         """

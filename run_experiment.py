@@ -145,7 +145,8 @@ def run_bootstrap_rec_experiment(k):
             user_id = test['user_id']
             movie_id = test['movie_id']
             rating = test['rating']
-            
+            print(bs_r.dataset.num_ratings)
+
             predicted_rating = bs_r.predict_rating_user_based_nn_wtd(active_user_id = user_id, candidate_movie_id = movie_id)
             test["pred_rating"] = predicted_rating
             bs_r.add_prediction(test)
@@ -183,12 +184,22 @@ def run_pearlpu_rec_experiment(k):
             rating = test['rating']
             
             predicted_rating = pp_r.recursive_prediction(user_id, movie_id)
+            #assert predicted_rating <= 5
+            #assert predicted_rating >= 0
             
+            if predicted_rating < 0:
+                print("The rating is beyond the range: {}".format(predicted_rating))
+                predicted_rating = 0.0
+                
+            if predicted_rating > 5:
+                print("The rating is beyond the range: {}".format(predicted_rating))
+                predicted_rating = 5.0
+                
             test["pred_rating"] = predicted_rating
             pp_r.add_prediction(test)
             
-            #if i > 17:
-            #    break
+            if i > 10000:
+                break
         
             #print(user_id, movie_id, rating, round(predicted_rating, 1))
             
@@ -198,6 +209,11 @@ def run_pearlpu_rec_experiment(k):
             #sleep(1)
             break
         
+        
+        except AssertionError:
+            print("The rating is beyond the range: {}".format(predicted_rating))
+            continue
+        
     mae = Evaluation.mean_absolute_error(pp_r.predictions)
     mae = round(mae, 5)
     test["pred_rating"] = round(test["pred_rating"], 2)
@@ -206,8 +222,9 @@ def run_pearlpu_rec_experiment(k):
     #print(mae)
     
     return test, mae     
-    
-def run_corec_rec_experiment(k):
+
+
+"""def run_corec_rec_experiment(k):
     cr_r = CoRecRecommender(k)
 
     print("\nRunning Co Rec Recommender\n")
@@ -241,4 +258,17 @@ def run_corec_rec_experiment(k):
     #print(test)
     #print(mae)
     
-    return test, mae     
+    return test, mae"""
+from sklearn.model_selection import train_test_split
+from dataset.Dataset import Dataset
+
+
+def something():
+    ds = Dataset()
+    #print(ds.user_training_ratings)
+    X_train, X_test, y_train, y_test = train_test_split(ds.user_training_ratings, ds.user_test_ratings, test_size=0.2, random_state=2)
+
+    # add entire to dataset
+    # how to resolve the item and user view of the data in sklearn???
+    
+#something()

@@ -54,7 +54,7 @@ class BootstrapRecommender(UserRecommender):
         
         movies_rated = movies_rated_in_training.intersection(movies_rated_in_test)
         movies_unrated = list(set(self.movie_ids).difference(movies_rated))
-        movies_unrated = random.sample(movies_unrated, k = self.additions)
+        movies_unrated = random.sample(movies_unrated, k = number)
         
         return movies_unrated
         
