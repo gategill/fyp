@@ -37,10 +37,10 @@ def save_in_s3(da, which, current_timestamp):
     result = object.put(Body=da)
     
     
-def run_experiment(k: int, which: str, save_results: bool = False, save_in_s3 = False, kflods = 1) -> None:
+def run_experiment(k: int, which: str, save_results: bool = False, save_in_s3 = False, kfolds = 1) -> None:
     
     
-    for i in range(kflods):
+    for i in range(kfolds):
         save_path = "./results/{}".format(current_timestamp)
         os.mkdir(save_path)
         
