@@ -17,8 +17,9 @@ import os
 import boto3
 
 
-session = boto3.Session()
-s3 = session.resource('s3')
+#session = boto3.Session()
+#s3 = session.resource('s3')
+s3 = boto3.client('s3')
 
 
 
@@ -33,8 +34,10 @@ s3_resource = boto3.resource('s3')
 def save_in_s3_function(da, which, current_timestamp):
     #s3_resource.Bucket("fyp-w9797878").upload_file(Filename=filename, Key=key_c)
     #txt_data = da
-    object = s3.Object(BucketName ="fyp-w9797878", File_Key = str(current_timestamp) + "/"+ which + '.txt')
-    result = object.put(Body=da)
+    #object = s3.Object(BucketName ="fyp-w9797878", File_Key = str(current_timestamp) + "/"+ which + '.txt')
+    #result = object.put(Body=da)
+    s3.put_object(Body = da, Bucket = "fyp-w9797878", Key = str(current_timestamp) + "/"+ which + '.txt')
+
     
     
 def run_experiment(k: int, which: str, save_results: bool = False, save_in_s3 = False, kfolds = 1) -> None:
