@@ -105,7 +105,7 @@ class Dataset:
         if not seed is None and type(seed) != int:
             raise TypeError("load_ratings: you supplied seed = '%s' but seed, if supplied at all, must be an integer" % seed)
         
-        random.seed(seed)
+        #random.seed(seed) # removed seed
         
         #self.__reset()
         test_proportion = test_percentage / 100.0

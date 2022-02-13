@@ -13,12 +13,31 @@ from recommender.CoRecRecommender import CoRecRecommender
 from evaluation.Evaluation import Evaluation
 import time
 import os
+import boto3
+
+
+session = boto3.Session()
+s3 = session.resource('s3')
+
+
+
+
 ic.disable()
 #ic.configureOutput(includeContext=True)
+s3_resource = boto3.resource('s3')
+
+
 
 current_timestamp = int(time.time())
 
-def run_experiment(k: int, which: str, save_results: bool = False) -> None:
+def save_in_s3(da, which, current_timestamp):
+    #s3_resource.Bucket("fyp-w9797878").upload_file(Filename=filename, Key=key_c)
+    txt_data = da
+    object = s3.Object("fyp-w9797878", which + '.txt', Key = current_timestamp)
+    result = object.put(Body=txt_data)
+    
+    
+def run_experiment(k: int, which: str, save_results: bool = False, save_in_s3 = False) -> None:
     save_path = "./results/{}".format(current_timestamp)
     os.mkdir(save_path)
     
@@ -57,6 +76,11 @@ def run_experiment(k: int, which: str, save_results: bool = False) -> None:
         
         with open(saved_file, "w") as f:
             f.write(lines_result)
+            
+    if save_in_s3:
+        saved_file = "{}/{}.txt".format(save_path, which)
+        save_in_s3(da, which, current_timestamp)
+
 
 
 def run_user_rec_experiment(k):
