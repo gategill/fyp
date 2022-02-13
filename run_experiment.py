@@ -79,7 +79,7 @@ def run_experiment(k: int, which: str, save_results: bool = False, save_in_s3 = 
             
     if save_in_s3:
         saved_file = "{}/{}.txt".format(save_path, which)
-        save_in_s3(da, which, current_timestamp)
+        save_in_s3(lines_result, which, current_timestamp)
 
 
 
