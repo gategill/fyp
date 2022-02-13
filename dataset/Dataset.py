@@ -12,7 +12,7 @@ import pandas as pd
 class Dataset:
     def __init__(self):
         ic("ds.__init__()")
-        self.DATA_PATH = "C:/Users/Asus/Desktop/UCC 4/CS4701 -Final Year Project/FYP_Code/data/derek/"
+        self.DATA_PATH = "./data/derek/"
         self.__reset()
         self.load_items()
         self.load_users()

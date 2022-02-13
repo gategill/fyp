@@ -1,0 +1,3 @@
+algorithm, mae
+u_rec_k=3, 0.89046
+i_rec_k=3, 0.7907

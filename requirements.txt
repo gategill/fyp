@@ -1,2 +1,4 @@
 icecream
 numpy
+pandas
+boto3
