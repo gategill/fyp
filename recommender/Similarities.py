@@ -13,6 +13,53 @@ class Similarities:
         
         
     @staticmethod
+    def sim_sim(ratings1: dict, ratings2: dict) -> float:
+        
+        co_rated = []
+        
+        for id in ratings1: 
+            
+            if id in ratings2: 
+                co_rated.append(id)
+                
+        n = len(co_rated)
+        
+        if n == 0: 
+            return 0.0
+        
+        # Means over co-rated
+        mean1 = sum([ratings1[id] for id in co_rated]) * 1.0 / n
+        mean2 = sum([ratings2[id] for id in co_rated]) * 1.0 / n
+        
+        # Sums of products of differences and sums of squared differences
+        sum_prods = 0.0
+        sum_squares1 = 0.0
+        sum_squares2 = 0.0
+        
+        for id in co_rated:
+            difference1 = ratings1[id] - mean1
+            difference2 = ratings2[id] - mean2
+            sum_prods = sum_prods + difference1 * difference2
+            sum_squares1 = sum_squares1 + difference1 * difference1
+            sum_squares2 = sum_squares2 + difference2 * difference2
+            
+        # Handle zero variances
+        if sum_squares1 == 0 or sum_squares2 == 0:
+            return 0.0
+        
+        # Calculate Pearson correlation
+        
+        #ic(sum_prods)
+        
+        #ic(sum_prods / (math.sqrt(sum_squares1) * math.sqrt(sum_squares2)))
+        
+        pear =  sum_prods / (math.sqrt(sum_squares1) * math.sqrt(sum_squares2))
+        lambda_param = 100
+        
+        return (n/(n + lambda_param))*pear
+        
+        
+    @staticmethod
     def sim_pearson(ratings1: dict, ratings2: dict) -> float:
         #ic("sm.sim_pearson()")
         # {movie_id/user_id, rating}

@@ -128,6 +128,19 @@ def run_user_rec_experiment(k):
             rating = test['rating']
             
             predicted_rating = user_r.predict_rating_user_based_nn_wtd(active_user_id = user_id, candidate_movie_id = movie_id)
+            
+            
+              
+            if predicted_rating < 1.0:
+                #print("The rating is beyond the range: {}".format(predicted_rating))
+                predicted_rating = 1.0
+                
+            if predicted_rating > 5:
+                #print("The rating is beyond the range: {}".format(predicted_rating))
+                predicted_rating = 5.0
+                
+                
+                
             test["pred_rating"] = predicted_rating
             user_r.add_prediction(test)
             
@@ -164,6 +177,17 @@ def run_item_rec_experiment(k):
             rating = test['rating']
             
             predicted_rating = item_r.predict_rating_item_based_nn_wtd(active_user_id = user_id, candidate_movie_id = movie_id)
+            
+              
+            if predicted_rating < 1.0:
+                #print("The rating is beyond the range: {}".format(predicted_rating))
+                predicted_rating = 1.0
+                
+            if predicted_rating > 5:
+                #print("The rating is beyond the range: {}".format(predicted_rating))
+                predicted_rating = 5.0
+                
+                
             test["pred_rating"] = predicted_rating
             item_r.add_prediction(test)
             
@@ -206,12 +230,12 @@ def run_bootstrap_rec_experiment(k):
             predicted_rating = bs_r.predict_rating_user_based_nn_wtd(active_user_id = user_id, candidate_movie_id = movie_id)
             
             
-            if predicted_rating < 0:
-                print("The rating is beyond the range: {}".format(predicted_rating))
-                predicted_rating = 0.0
+            if predicted_rating < 1.0:
+                #print("The rating is beyond the range: {}".format(predicted_rating))
+                predicted_rating = 1.0
                 
             if predicted_rating > 5:
-                print("The rating is beyond the range: {}".format(predicted_rating))
+                #print("The rating is beyond the range: {}".format(predicted_rating))
                 predicted_rating = 5.0
                 
                 
@@ -254,12 +278,12 @@ def run_pearlpu_rec_experiment(k):
             #assert predicted_rating <= 5
             #assert predicted_rating >= 0
             
-            if predicted_rating < 0:
-                print("The rating is beyond the range: {}".format(predicted_rating))
-                predicted_rating = 0.0
+            if predicted_rating < 1.0:
+                #print("The rating is beyond the range: {}".format(predicted_rating))
+                predicted_rating = 1.0
                 
-            if predicted_rating > 5:
-                print("The rating is beyond the range: {}".format(predicted_rating))
+            if predicted_rating > 5.0:
+                #print("The rating is beyond the range: {}".format(predicted_rating))
                 predicted_rating = 5.0
                 
             test["pred_rating"] = predicted_rating
