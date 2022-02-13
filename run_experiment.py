@@ -33,7 +33,7 @@ s3_resource = boto3.resource('s3')
 def save_in_s3_function(da, which, current_timestamp):
     #s3_resource.Bucket("fyp-w9797878").upload_file(Filename=filename, Key=key_c)
     #txt_data = da
-    object = s3.Object(BucketName ="fyp-w9797878", File_Key = current_timestamp + "/"+ which + '.txt')
+    object = s3.Object(BucketName ="fyp-w9797878", File_Key = str(current_timestamp) + "/"+ which + '.txt')
     result = object.put(Body=da)
     
     
