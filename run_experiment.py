@@ -56,6 +56,11 @@ def run_experiment(k: int, which: str, save_results: bool = False, save_in_s3 = 
             u, mae = run_user_rec_experiment(k)
             print(u, mae)
             lines_result += "u_rec_k={}, {}\n".format(k, mae)
+            
+            if save_in_s3:
+            #saved_file = "{}/{}.txt".format(save_path, which)
+                save_in_s3_function("u_rec_k={}, {}\n".format(k, mae), "u", current_timestamp)
+
 
         # For each rating in the test set, make a prediction using an 
         # item-based KNN with k = 3
@@ -63,21 +68,40 @@ def run_experiment(k: int, which: str, save_results: bool = False, save_in_s3 = 
             u, mae = run_item_rec_experiment(k)
             print(u, mae)
             lines_result += "i_rec_k={}, {}\n".format(k, mae)
+            
+            if save_in_s3:
+            #saved_file = "{}/{}.txt".format(save_path, which)
+                save_in_s3_function("u_rec_k={}, {}\n".format(k, mae), "i", current_timestamp)
+
 
         if "b" in which:
             u, mae = run_bootstrap_rec_experiment(k)
             print(u, mae)
             lines_result += "bs_rec_k={}, {}\n".format(k, mae)
+            
+            if save_in_s3:
+            #saved_file = "{}/{}.txt".format(save_path, which)
+                save_in_s3_function("u_rec_k={}, {}\n".format(k, mae), "b", current_timestamp)
+
 
         if "p" in which:
             u, mae = run_pearlpu_rec_experiment(k)
             print(u, mae)
             lines_result += "pp_rec_k={}, {}\n".format(k, mae)
             
+            if save_in_s3:
+            #saved_file = "{}/{}.txt".format(save_path, which)
+                save_in_s3_function("u_rec_k={}, {}\n".format(k, mae), "p", current_timestamp)
+                
+            
         if "c" in which:
             u, mae = run_corec_rec_experiment(k)
             print(u, mae)
             lines_result += "corec_rec_k={}, {}\n".format(k, mae)
+            
+            if save_in_s3:
+            #saved_file = "{}/{}.txt".format(save_path, which)
+                save_in_s3_function("u_rec_k={}, {}\n".format(k, mae), "c", current_timestamp)
             
         if save_results:
             saved_file = "{}/{}.txt".format(save_path, which)
