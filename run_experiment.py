@@ -3,6 +3,7 @@
 """
 
 
+from sqlite3 import Timestamp
 from icecream import ic
 from time import sleep
 from recommender.UserRecommender import UserRecommender
@@ -28,12 +29,11 @@ s3_resource = boto3.resource('s3')
 
 
 
-current_timestamp = int(time.time())
 
-def save_in_s3_function(da, which):
+def save_in_s3_function(da, which, current_timestamp):
     #s3_resource.Bucket("fyp-w9797878").upload_file(Filename=filename, Key=key_c)
     #txt_data = da
-    object = s3.Object("fyp-w9797878", which + '.txt')
+    object = s3.Object("fyp-w9797878", which + '.txt', Key = current_timestamp)
     result = object.put(Body=da)
     
     
@@ -41,6 +41,8 @@ def run_experiment(k: int, which: str, save_results: bool = False, save_in_s3 = 
     
     
     for i in range(kfolds):
+        
+        current_timestamp = int(time.time())
         save_path = "./results/{}".format(current_timestamp)
         os.mkdir(save_path)
         
@@ -82,7 +84,7 @@ def run_experiment(k: int, which: str, save_results: bool = False, save_in_s3 = 
                 
         if save_in_s3:
             #saved_file = "{}/{}.txt".format(save_path, which)
-            save_in_s3_function(lines_result, which)
+            save_in_s3_function(lines_result, which, current_timestamp)
 
 
 
