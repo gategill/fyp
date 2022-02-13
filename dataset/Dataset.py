@@ -7,7 +7,7 @@ import random
 from icecream import ic
 import os
 import numpy as np
-
+import pandas as pd
 
 class Dataset:
     def __init__(self):
@@ -16,6 +16,7 @@ class Dataset:
         self.__reset()
         self.load_items()
         self.load_users()
+        self.read_in_ratings()
         self.load_ratings()     
         
         print("There are {} ratings in the trainset".format(self.num_ratings))  
@@ -55,6 +56,13 @@ class Dataset:
         # shuffle, k fod
         
     def read_in_ratings(self,  filename: str = "ratings.txt"):
+        """ Reads in the data from a ratings file."""
+        
+        ic("ds.read_in_ratings()")
+        
+        if type(filename) != str:
+            raise TypeError("load_ratings: you supplied filename = '%s' but filename must be a string" % filename)
+        
         all_ratings = []
         for line in open(self.DATA_PATH + filename):
             substrings = line.strip().split('\t')
@@ -63,21 +71,33 @@ class Dataset:
             rating = float(substrings[2])
             
             all_ratings.append({'user_id': user_id, 'movie_id': movie_id, 'rating': rating})
-
-        self.all_rating = random.shuffle(all_ratings)
+        
+        random.shuffle(all_ratings) # inplace, returns None
+        
+        self.all_ratings = all_ratings
+        #self.all_ratings = random.shuffle(all_ratings)
         
         
-    def load_ratings(self, filename: str = "ratings.txt", test_percentage: int = 20, seed: int = 42) -> None:
+    def get_ratings_as_df(self):
+        return pd.DataFrame(self.all_ratings)
+    
+    
+    def get_k_folds(self, cv):
+        o = self.all_ratings//cv
+        for k in range(0, len(self.all_ratings), o):
+            print(k)
+            itrain = self.all_ratings[::o]
+            itest = self.all_ratings[k : k + o]
+        
+        
+    def load_ratings(self, test_percentage: int = 20, seed: int = 42) -> None:
         ic("ds.load_ratings()")
 
         """
-        Reads in the data from a ratings file.
         It partitions the data randomly so that approximately test_percentage of the ratings are treated as a test set and 
         the remaining ratings are treated as the training set.
         """
-        
-        if type(filename) != str:
-            raise TypeError("load_ratings: you supplied filename = '%s' but filename must be a string" % filename)
+     
         if type(test_percentage) != int:
             raise TypeError("load_ratings: you supplied test_percentage = '%s' but test_percentage must be an integer" % test_percentage)
         if test_percentage < 0 or test_percentage > 100:
@@ -91,11 +111,12 @@ class Dataset:
         test_proportion = test_percentage / 100.0
         num_ratings = 0
         
-        for line in open(self.DATA_PATH + filename):
-            substrings = line.strip().split('\t')
-            user_id = int(substrings[0])
-            movie_id = int(substrings[1])
-            rating = float(substrings[2])
+        for entry in self.all_ratings:
+            #substrings = line.strip().split('\t')
+            user_id = entry["user_id"]
+            movie_id = entry["movie_id"]
+            rating = entry["rating"]
+            
             self.user_training_ratings.setdefault(user_id, {})
             self.movie_training_ratings.setdefault(movie_id, {})
             
@@ -109,7 +130,7 @@ class Dataset:
                 #ic(self.movie_training_ratings)
  
             else: # goes to testing
-                self.test_ratings.append({'user_id': user_id, 'movie_id': movie_id, 'rating': rating})
+                self.test_ratings.append(entry)
                 #ic(self.test_ratings)
                 
             #sleep(1)

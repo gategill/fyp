@@ -111,7 +111,7 @@ def run_item_rec_experiment(k):
             test["pred_rating"] = predicted_rating
             item_r.add_prediction(test)
             
-            #if i > 107:
+            #if i > 100:
             #    break
         
             #print(user_id, movie_id, rating, round(predicted_rating, 1))
@@ -145,13 +145,24 @@ def run_bootstrap_rec_experiment(k):
             user_id = test['user_id']
             movie_id = test['movie_id']
             rating = test['rating']
-            print(bs_r.dataset.num_ratings)
+            #print(bs_r.dataset.num_ratings)
 
             predicted_rating = bs_r.predict_rating_user_based_nn_wtd(active_user_id = user_id, candidate_movie_id = movie_id)
+            
+            
+            if predicted_rating < 0:
+                print("The rating is beyond the range: {}".format(predicted_rating))
+                predicted_rating = 0.0
+                
+            if predicted_rating > 5:
+                print("The rating is beyond the range: {}".format(predicted_rating))
+                predicted_rating = 5.0
+                
+                
             test["pred_rating"] = predicted_rating
             bs_r.add_prediction(test)
             
-            #if i > 10:
+            #if i > 50:
             #    break
         
             #print(user_id, movie_id, rating, round(predicted_rating, 1))
@@ -198,8 +209,8 @@ def run_pearlpu_rec_experiment(k):
             test["pred_rating"] = predicted_rating
             pp_r.add_prediction(test)
             
-            if i > 10000:
-                break
+            #if i > 30:
+            #    break
         
             #print(user_id, movie_id, rating, round(predicted_rating, 1))
             
@@ -258,17 +269,27 @@ def run_pearlpu_rec_experiment(k):
     #print(test)
     #print(mae)
     
-    return test, mae"""
+    return test, mae
 from sklearn.model_selection import train_test_split
 from dataset.Dataset import Dataset
+from sklearn.base import ClusterMixin
 
-
+class myUserRec(ClusterMixin):
+    def __init__(self, *args, **args):
+        self.model = UserRecommender(*args, **args)
+        
+    def fit_predict(self, X):
+        self.model.predict_rating_user_based_nn_wtd
+        
+        
 def something():
     ds = Dataset()
-    #print(ds.user_training_ratings)
-    X_train, X_test, y_train, y_test = train_test_split(ds.user_training_ratings, ds.user_test_ratings, test_size=0.2, random_state=2)
+    print(ds.get_ratings_as_df())
+    
+    
+    #X_train, X_test, y_train, y_test = train_test_split(ds.user_training_ratings, ds.user_test_ratings, test_size=0.2, random_state=2)
 
     # add entire to dataset
     # how to resolve the item and user view of the data in sklearn???
     
-#something()
+#something()"""
