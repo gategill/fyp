@@ -30,7 +30,7 @@ s3_resource = boto3.resource('s3')
 
 current_timestamp = int(time.time())
 
-def save_in_s3(da, which, current_timestamp):
+def save_in_s3_function(da, which):
     #s3_resource.Bucket("fyp-w9797878").upload_file(Filename=filename, Key=key_c)
     #txt_data = da
     object = s3.Object("fyp-w9797878", which + '.txt')
@@ -82,7 +82,7 @@ def run_experiment(k: int, which: str, save_results: bool = False, save_in_s3 = 
                 
         if save_in_s3:
             #saved_file = "{}/{}.txt".format(save_path, which)
-            save_in_s3(lines_result, which, current_timestamp)
+            save_in_s3_function(lines_result, which)
 
 
 
