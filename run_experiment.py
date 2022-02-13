@@ -32,54 +32,57 @@ current_timestamp = int(time.time())
 
 def save_in_s3(da, which, current_timestamp):
     #s3_resource.Bucket("fyp-w9797878").upload_file(Filename=filename, Key=key_c)
-    txt_data = da
-    object = s3.Object("fyp-w9797878", which + '.txt', Key = current_timestamp)
-    result = object.put(Body=txt_data)
+    #txt_data = da
+    object = s3.Object("fyp-w9797878", which + '.txt')
+    result = object.put(Body=da)
     
     
-def run_experiment(k: int, which: str, save_results: bool = False, save_in_s3 = False) -> None:
-    save_path = "./results/{}".format(current_timestamp)
-    os.mkdir(save_path)
+def run_experiment(k: int, which: str, save_results: bool = False, save_in_s3 = False, kflods = 1) -> None:
     
-    # For each rating in the test set, make a prediction using a 
-    # user-based KNN with k = 3
-    lines_result = "algorithm, mae\n"
-    if "u" in which:
-        u, mae = run_user_rec_experiment(k)
-        print(u, mae)
-        lines_result += "u_rec_k={}, {}\n".format(k, mae)
-
-    # For each rating in the test set, make a prediction using an 
-    # item-based KNN with k = 3
-    if "i" in which:
-        u, mae = run_item_rec_experiment(k)
-        print(u, mae)
-        lines_result += "i_rec_k={}, {}\n".format(k, mae)
-
-    if "b" in which:
-        u, mae = run_bootstrap_rec_experiment(k)
-        print(u, mae)
-        lines_result += "bs_rec_k={}, {}\n".format(k, mae)
-
-    if "p" in which:
-        u, mae = run_pearlpu_rec_experiment(k)
-        print(u, mae)
-        lines_result += "pp_rec_k={}, {}\n".format(k, mae)
+    
+    for i in range(kflods):
+        save_path = "./results/{}".format(current_timestamp)
+        os.mkdir(save_path)
         
-    if "c" in which:
-        u, mae = run_corec_rec_experiment(k)
-        print(u, mae)
-        lines_result += "corec_rec_k={}, {}\n".format(k, mae)
-        
-    if save_results:
-        saved_file = "{}/{}.txt".format(save_path, which)
-        
-        with open(saved_file, "w") as f:
-            f.write(lines_result)
+        # For each rating in the test set, make a prediction using a 
+        # user-based KNN with k = 3
+        lines_result = "algorithm, mae\n"
+        if "u" in which:
+            u, mae = run_user_rec_experiment(k)
+            print(u, mae)
+            lines_result += "u_rec_k={}, {}\n".format(k, mae)
+
+        # For each rating in the test set, make a prediction using an 
+        # item-based KNN with k = 3
+        if "i" in which:
+            u, mae = run_item_rec_experiment(k)
+            print(u, mae)
+            lines_result += "i_rec_k={}, {}\n".format(k, mae)
+
+        if "b" in which:
+            u, mae = run_bootstrap_rec_experiment(k)
+            print(u, mae)
+            lines_result += "bs_rec_k={}, {}\n".format(k, mae)
+
+        if "p" in which:
+            u, mae = run_pearlpu_rec_experiment(k)
+            print(u, mae)
+            lines_result += "pp_rec_k={}, {}\n".format(k, mae)
             
-    if save_in_s3:
-        saved_file = "{}/{}.txt".format(save_path, which)
-        save_in_s3(lines_result, which, current_timestamp)
+        if "c" in which:
+            u, mae = run_corec_rec_experiment(k)
+            print(u, mae)
+            lines_result += "corec_rec_k={}, {}\n".format(k, mae)
+            
+        if save_results:
+            saved_file = "{}/{}.txt".format(save_path, which)
+            
+            with open(saved_file, "w") as f:
+                f.write(lines_result)
+                
+        if save_in_s3:
+            #saved_file = "{}/{}.txt".format(save_path, which)
+            save_in_s3(lines_result, which, current_timestamp)
 
 
 
