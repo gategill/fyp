@@ -12,7 +12,7 @@ parser.add_argument("--w", type = str, default = "u")
 parser.add_argument("--k", type = int, default = 3)
 parser.add_argument("--s", type = bool, default = True)
 parser.add_argument("--s3", type = bool, default = True)
-parser.add_argument("--kfolds", type = int, default = 1)
+parser.add_argument("--kfolds", type = int, default = True)
 args = parser.parse_args()
 
 

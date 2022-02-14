@@ -40,7 +40,7 @@ def save_in_s3_function(da, which, current_timestamp):
 
     
     
-def run_experiment(k: int, which: str, save_results: bool = False, save_in_s3 = False, kfolds = 1) -> None:
+def run_experiment(k: int, which: str, save_results: bool = True, save_in_s3 = True, kfolds = 5) -> None:
     
     
     for i in range(kfolds):
@@ -71,7 +71,7 @@ def run_experiment(k: int, which: str, save_results: bool = False, save_in_s3 = 
             
             if save_in_s3:
             #saved_file = "{}/{}.txt".format(save_path, which)
-                save_in_s3_function("u_rec_k={}, {}\n".format(k, mae), "i", current_timestamp)
+                save_in_s3_function("i_rec_k={}, {}\n".format(k, mae), "i", current_timestamp)
 
 
         if "b" in which:
@@ -81,7 +81,7 @@ def run_experiment(k: int, which: str, save_results: bool = False, save_in_s3 = 
             
             if save_in_s3:
             #saved_file = "{}/{}.txt".format(save_path, which)
-                save_in_s3_function("u_rec_k={}, {}\n".format(k, mae), "b", current_timestamp)
+                save_in_s3_function("bs_rec_k={}, {}\n".format(k, mae), "b", current_timestamp)
 
 
         if "p" in which:
@@ -91,7 +91,7 @@ def run_experiment(k: int, which: str, save_results: bool = False, save_in_s3 = 
             
             if save_in_s3:
             #saved_file = "{}/{}.txt".format(save_path, which)
-                save_in_s3_function("u_rec_k={}, {}\n".format(k, mae), "p", current_timestamp)
+                save_in_s3_function("pp_rec_k={}, {}\n".format(k, mae), "p", current_timestamp)
                 
             
         if "c" in which:
@@ -101,7 +101,7 @@ def run_experiment(k: int, which: str, save_results: bool = False, save_in_s3 = 
             
             if save_in_s3:
             #saved_file = "{}/{}.txt".format(save_path, which)
-                save_in_s3_function("u_rec_k={}, {}\n".format(k, mae), "c", current_timestamp)
+                save_in_s3_function("corec_rec_k={}, {}\n".format(k, mae), "c", current_timestamp)
             
         if save_results:
             saved_file = "{}/{}.txt".format(save_path, which)

@@ -78,4 +78,28 @@ class CoRecRecommender(GenericRecommender):
         return movies_unrated
         
                 
- 
+    def get_confidence_measure(self, algorithm, user_id, item_id, prediction): 
+        trustworthiness = self.get_measure_of_trustworthiness(algorithm, user_id, item_id, prediction)
+        Nu = self.get_Nu(user_id)
+        Ni = self.get_Ni(item_id)
+        
+        return trustworthiness*Nu*Ni
+        
+        
+    def get_measure_of_trustworthiness(self, algorithm, user_id, item_id, prediction): 
+        baseline_estimate =  self.get_baseline_estimate(user_id, item_id)
+        
+        return abs(1/(baseline_estimate - prediction))
+        
+        
+    def get_baseline_estimate(user_id, item_id):
+        return 3.0
+    
+    
+    def get_Nu(self, user_id):
+        return 10
+    
+    
+    def get_Ni(self, item_id):
+        return 10
+    
