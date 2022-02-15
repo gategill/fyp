@@ -29,21 +29,21 @@ class PearlPuRecommender(UserRecommender):
             
             return self.predict_rating_user_based_nn_wtd(active_user, candidate_moive) # baseline
 
-        nns = self.get_k_nearest_users(Similarities.sim_pearson, self.k, active_user)  # no movie id, doesn't limit to just rated
+        nns = self.get_k_nearest_users(Similarities.sim_pearson, self.k, active_user)  # no item id, doesn't limit to just rated
         
         alpha = 0.0
         beta = 0.0
         
         for neighbour in nns:
             neighbour_id = neighbour["user_id"]
-            neighbour_movie_rating = self.get_user_movie_rating(neighbour_id, candidate_moive)
+            neighbour_item_rating = self.get_user_item_rating(neighbour_id, candidate_moive)
             
-            if neighbour_movie_rating is not None:
+            if neighbour_item_rating is not None:
                 sim_x_y = self.get_user_similarity(Similarities.sim_pearson, active_user, neighbour_id)
                 mean_rating_for_neighbour = self.get_user_mean_rating(neighbour_id)
                 
                 #ic(sim_x_y)
-                alpha += (neighbour_movie_rating - mean_rating_for_neighbour) * sim_x_y
+                alpha += (neighbour_item_rating - mean_rating_for_neighbour) * sim_x_y
                 beta += abs(sim_x_y)
                 
             else:

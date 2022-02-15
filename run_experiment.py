@@ -243,8 +243,8 @@ def run_bootstrap_rec_experiment(k):
             test["pred_rating"] = predicted_rating
             bs_r.add_prediction(test)
             
-            #if i > 50:
-            #    break
+            if i > 30:
+                break
         
             #print(user_id, item_id, rating, round(predicted_rating, 1))
             
@@ -290,8 +290,8 @@ def run_pearlpu_rec_experiment(k):
             test["pred_rating"] = predicted_rating
             pp_r.add_prediction(test)
             
-            #if i > 30:
-            #    break
+            if i > 30:
+                break
         
             #print(user_id, item_id, rating, round(predicted_rating, 1))
             

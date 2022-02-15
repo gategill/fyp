@@ -17,7 +17,7 @@ class Dataset:
         self.load_items()
         self.load_users()
         self.read_in_ratings()
-        self.load_ratings()     
+        self.load_ratings()    
         
         print("There are {} ratings in the trainset".format(self.num_ratings))  
         print("Sparsity of the trainset is: {}%".format(round(self.sparsity, 5)))  
@@ -81,14 +81,6 @@ class Dataset:
     def get_ratings_as_df(self):
         return pd.DataFrame(self.all_ratings)
     
-    
-    def get_k_folds(self, cv):
-        o = self.all_ratings//cv
-        for k in range(0, len(self.all_ratings), o):
-            print(k)
-            itrain = self.all_ratings[::o]
-            itest = self.all_ratings[k : k + o]
-        
         
     def load_ratings(self, test_percentage: int = 20, seed: int = 42) -> None:
         ic("ds.load_ratings()")
@@ -124,6 +116,7 @@ class Dataset:
                 self.user_training_ratings[user_id][item_id] = rating
                 self.item_training_ratings[item_id][user_id] = rating
                 self.mean_training_rating = self.mean_training_rating + rating
+                self.train_ratings.append(entry)
                 num_ratings = num_ratings + 1
                 
                 #ic(self.user_training_ratings)
@@ -173,6 +166,7 @@ class Dataset:
         
         self.update_user_training_ratings(new_recommendations)
         self.update_item_training_ratings(new_recommendations)
+        self.update_training_ratings(new_recommendations)
         self.update_user_training_means()
         self.update_item_training_means()
         self.update_mean_training_rating()
@@ -240,6 +234,15 @@ class Dataset:
             rating = recommendation["rating"]
             
             self.item_training_ratings[item_id][user_id] = rating
+            
+            
+    def update_training_ratings(self, new_recommendations: list) -> None:
+        # 
+        ic("ds.update_training_ratings()")
+        
+   
+        for recommendation in new_recommendations:            
+            self.train_ratings.append(recommendation)
                                 
         
     def update_item_training_means(self) -> None:
@@ -288,6 +291,13 @@ class Dataset:
         ic("ds.get_item_training_means()")
 
         return self.item_training_means
+    
+
+    def get_training_ratings(self) -> dict:
+        # {item_id: int : rating: float}
+        ic("ds.get_training_ratings()")
+
+        return self.train_ratings
         
 
     def get_test_ratings(self) -> list:
@@ -317,6 +327,9 @@ class Dataset:
         
         self.num_ratings += len(new_recommendations)
         
+        print("is self.num_ratings == len(self.train_ratings) ?")
+        print(self.num_ratings == len(self.train_ratings))
+        
         
     def get_user_popularity(self, user_id: int) -> int:
         """"""
@@ -342,6 +355,7 @@ class Dataset:
         self.user_training_means = {}
         self.item_training_ratings = {}
         self.item_training_means = {}
+        self.train_ratings = []
         
         self.user_test_ratings = {}
         self.item_test_ratings = {}

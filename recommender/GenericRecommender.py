@@ -31,6 +31,7 @@ class GenericRecommender:
         self.user_training_means = self.dataset.get_user_training_means()
         self.item_training_ratings = self.dataset.get_item_training_ratings()
         self.item_training_means = self.dataset.get_item_training_means()
+        self.train_ratings = self.dataset.get_training_ratings()
         
         self.user_test_ratings = self.dataset.get_user_test_ratings()
         self.item_test_ratings = self.dataset.get_item_test_ratings()
