@@ -25,15 +25,15 @@ class GenericRecommender:
             self.dataset = Dataset()
         
         self.user_ids = self.dataset.get_user_ids()
-        self.movie_ids = self.dataset.get_movie_ids()
+        self.item_ids = self.dataset.get_item_ids()
         
         self.user_training_ratings = self.dataset.get_user_training_ratings()
         self.user_training_means = self.dataset.get_user_training_means()
-        self.movie_training_ratings = self.dataset.get_movie_training_ratings()
-        self.movie_training_means = self.dataset.get_movie_training_means()
+        self.item_training_ratings = self.dataset.get_item_training_ratings()
+        self.item_training_means = self.dataset.get_item_training_means()
         
         self.user_test_ratings = self.dataset.get_user_test_ratings()
-        self.movie_test_ratings = self.dataset.get_movie_test_ratings()
+        self.item_test_ratings = self.dataset.get_item_test_ratings()
         self.test_ratings = self.dataset.get_test_ratings()
         
         self.mean_training_rating = self.dataset.get_mean_training_rating()

@@ -62,7 +62,7 @@ class Similarities:
     @staticmethod
     def sim_pearson(ratings1: dict, ratings2: dict) -> float:
         #ic("sm.sim_pearson()")
-        # {movie_id/user_id, rating}
+        # {item_id/user_id, rating}
         
         # Get co-rated
         co_rated = []
@@ -110,7 +110,7 @@ class Similarities:
     @staticmethod
     def sim_cosine(ratings1: dict, ratings2: dict) -> float:
         #ic("sm.sim_cosine()")
-        # {movie_id/user_id, rating}
+        # {item_id/user_id, rating}
 
         
         if len(ratings1) == 0 or len(ratings2) == 0:
@@ -122,7 +122,7 @@ class Similarities:
     @staticmethod
     def dot_product(ratings1: dict, ratings2: dict) -> float:
         #ic("sm.dot_product()")
-        # {movie_id/user_id, rating}
+        # {item_id/user_id, rating}
 
         dot_product = 0.0
         
@@ -137,7 +137,7 @@ class Similarities:
     @staticmethod  
     def magnitude(ratings: dict) -> float:
         #ic("sm.magnitude()")
-        # {movie_id/user_id, rating}
+        # {item_id/user_id, rating}
 
 
         sum_squares = 0.0

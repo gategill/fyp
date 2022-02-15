@@ -28,17 +28,17 @@ class Dataset:
         
         START = 5
         FINISH = -19
-        self.movie_descriptors = {}
-        movie_ids = []
+        self.item_descriptors = {}
+        item_ids = []
         
         for line in open(self.DATA_PATH + filename):
             substrings = line.strip().split('|')
-            movie_id, title, release_date, video_release_date, url = substrings[:START]
+            item_id, title, release_date, video_release_date, url = substrings[:START]
             genres = [int(genre) for genre in substrings[FINISH:]]
-            self.movie_descriptors[int(movie_id)] = {'title': title, 'release_date': release_date, 'video_release_date': video_release_date, 'url': url, 'genres': genres}
-            movie_ids.append(int(movie_id))
+            self.item_descriptors[int(item_id)] = {'title': title, 'release_date': release_date, 'video_release_date': video_release_date, 'url': url, 'genres': genres}
+            item_ids.append(int(item_id))
             
-        self.movie_ids = np.unique(movie_ids)
+        self.item_ids = np.unique(item_ids)
         
         
     def load_users(self, filename: str = "users.txt") -> None:
@@ -67,10 +67,10 @@ class Dataset:
         for line in open(self.DATA_PATH + filename):
             substrings = line.strip().split('\t')
             user_id = int(substrings[0])
-            movie_id = int(substrings[1])
+            item_id = int(substrings[1])
             rating = float(substrings[2])
             
-            all_ratings.append({'user_id': user_id, 'movie_id': movie_id, 'rating': rating})
+            all_ratings.append({'user_id': user_id, 'item_id': item_id, 'rating': rating})
         
         random.shuffle(all_ratings) # inplace, returns None
         
@@ -114,20 +114,20 @@ class Dataset:
         for entry in self.all_ratings:
             #substrings = line.strip().split('\t')
             user_id = entry["user_id"]
-            movie_id = entry["movie_id"]
+            item_id = entry["item_id"]
             rating = entry["rating"]
             
             self.user_training_ratings.setdefault(user_id, {})
-            self.movie_training_ratings.setdefault(movie_id, {})
+            self.item_training_ratings.setdefault(item_id, {})
             
             if random.random() >= test_proportion: # goes to training
-                self.user_training_ratings[user_id][movie_id] = rating
-                self.movie_training_ratings[movie_id][user_id] = rating
+                self.user_training_ratings[user_id][item_id] = rating
+                self.item_training_ratings[item_id][user_id] = rating
                 self.mean_training_rating = self.mean_training_rating + rating
                 num_ratings = num_ratings + 1
                 
                 #ic(self.user_training_ratings)
-                #ic(self.movie_training_ratings)
+                #ic(self.item_training_ratings)
  
             else: # goes to testing
                 self.test_ratings.append(entry)
@@ -138,7 +138,7 @@ class Dataset:
         self.mean_training_rating = self.mean_training_rating / num_ratings
         
         self.num_ratings = num_ratings
-        self.sparsity = 1 - self.num_ratings / (len(self.user_ids) * len(self.movie_ids))
+        self.sparsity = 1 - self.num_ratings / (len(self.user_ids) * len(self.item_ids))
         
         
         for user_id, ratings in self.user_training_ratings.items():
@@ -148,23 +148,23 @@ class Dataset:
             else:
                 self.user_training_means[user_id] = None
                 
-        for movie_id, ratings in self.movie_training_ratings.items():
+        for item_id, ratings in self.item_training_ratings.items():
             
             if len(ratings) > 0:
-                self.movie_training_means[movie_id] = sum(ratings.values()) * 1.0 / len(ratings)
+                self.item_training_means[item_id] = sum(ratings.values()) * 1.0 / len(ratings)
             else:
-                self.movie_training_means[movie_id] = None
+                self.item_training_means[item_id] = None
                 
         for val in self.test_ratings:
             user_id = val["user_id"]
-            movie_id = val["movie_id"]
+            item_id = val["item_id"]
             rating = val["rating"]
             
             self.user_test_ratings.setdefault(user_id, {})
-            self.movie_test_ratings.setdefault(movie_id, {})
+            self.item_test_ratings.setdefault(item_id, {})
             
-            self.user_test_ratings[user_id][movie_id] = rating
-            self.movie_test_ratings[movie_id][user_id] = rating
+            self.user_test_ratings[user_id][item_id] = rating
+            self.item_test_ratings[item_id][user_id] = rating
 
 
     def add_new_recommendations_to_dataset(self, new_recommendations):
@@ -172,9 +172,9 @@ class Dataset:
         ic("ds.add_new_recommendations_to_dataset()")
         
         self.update_user_training_ratings(new_recommendations)
-        self.update_movie_training_ratings(new_recommendations)
+        self.update_item_training_ratings(new_recommendations)
         self.update_user_training_means()
-        self.update_movie_training_means()
+        self.update_item_training_means()
         self.update_mean_training_rating()
         self.update_num_ratings(new_recommendations)
         
@@ -190,11 +190,11 @@ class Dataset:
         return self.user_ids
         
         
-    def get_movie_ids(self) -> list:
-        # [movie_ids]
-        ic("ds.get_movie_ids()")
+    def get_item_ids(self) -> list:
+        # [item_ids]
+        ic("ds.get_item_ids()")
         
-        return self.movie_ids
+        return self.item_ids
 
 
     def get_user_training_ratings(self) -> dict:
@@ -212,10 +212,10 @@ class Dataset:
         
         for recommendation in new_recommendations:
             user_id = recommendation["user_id"]
-            movie_id = recommendation["movie_id"]
+            item_id = recommendation["item_id"]
             rating = recommendation["rating"]
             
-            self.user_training_ratings[user_id][movie_id] = rating
+            self.user_training_ratings[user_id][item_id] = rating
                 
         
     def update_user_training_means(self) -> None:
@@ -229,35 +229,35 @@ class Dataset:
                 self.user_training_means[user_id] = None
                 
                 
-    def update_movie_training_ratings(self, new_recommendations: list) -> None:
+    def update_item_training_ratings(self, new_recommendations: list) -> None:
         # 
-        ic("ds.update_movie_training_ratings()")
+        ic("ds.update_item_training_ratings()")
         
    
         for recommendation in new_recommendations:
             user_id = recommendation["user_id"]
-            movie_id = recommendation["movie_id"]
+            item_id = recommendation["item_id"]
             rating = recommendation["rating"]
             
-            self.movie_training_ratings[movie_id][user_id] = rating
+            self.item_training_ratings[item_id][user_id] = rating
                                 
         
-    def update_movie_training_means(self) -> None:
+    def update_item_training_means(self) -> None:
         # 
-        ic("ds.update_movie_training_means()")
+        ic("ds.update_item_training_means()")
         
-        for movie_id, ratings in self.movie_training_ratings.items():
+        for item_id, ratings in self.item_training_ratings.items():
             if len(ratings) > 0:
-                self.movie_training_means[movie_id] = sum(ratings.values()) * 1.0 / len(ratings)
+                self.item_training_means[item_id] = sum(ratings.values()) * 1.0 / len(ratings)
             else:
-                self.movie_training_means[movie_id] = None
+                self.item_training_means[item_id] = None
                 
                     
     def update_mean_training_rating(self) -> None:
         # 
         ic("ds.update_mean_training_rating()")
         
-        new_mean_training_rating = np.sum(list(self.movie_training_means.values())) / len(self.movie_training_means)
+        new_mean_training_rating = np.sum(list(self.item_training_means.values())) / len(self.item_training_means)
         
         self.mean_training_rating = new_mean_training_rating
 
@@ -276,39 +276,39 @@ class Dataset:
         return self.user_training_means
     
     
-    def get_movie_training_ratings(self) -> dict:
-        # {movie_id: int : {user_id: int, rating: float}
-        ic("ds.get_movie_training_ratings()")
+    def get_item_training_ratings(self) -> dict:
+        # {item_id: int : {user_id: int, rating: float}
+        ic("ds.get_item_training_ratings()")
     
-        return self.movie_training_ratings
+        return self.item_training_ratings
     
     
-    def get_movie_training_means(self) -> dict:
-        # {movie_id: int : rating: float}
-        ic("ds.get_movie_training_means()")
+    def get_item_training_means(self) -> dict:
+        # {item_id: int : rating: float}
+        ic("ds.get_item_training_means()")
 
-        return self.movie_training_means
+        return self.item_training_means
         
 
     def get_test_ratings(self) -> list:
-        # [{movie_id: int, rating: float, user_id: int}]
+        # [{item_id: int, rating: float, user_id: int}]
         ic("ds.get_test_ratings()")
 
         return self.test_ratings
     
     
     def get_user_test_ratings(self) -> dict:
-        # {user_id : {movie_id, rating}
+        # {user_id : {item_id, rating}
         ic("ds.get_user_test_ratings()")
 
         return self.user_test_ratings
 
 
-    def get_movie_test_ratings(self) -> dict:
-        # {movie_d: int : {user_id: int, rating: float}
-        ic("ds.get_movie_test_ratingss()")
+    def get_item_test_ratings(self) -> dict:
+        # {item_d: int : {user_id: int, rating: float}
+        ic("ds.get_item_test_ratingss()")
         
-        return self.movie_test_ratings
+        return self.item_test_ratings
         
         
     def update_num_ratings(self, new_recommendations: list) -> None:
@@ -329,22 +329,22 @@ class Dataset:
         """"""
         #ic("ds.get_item_popularity()")
 
-        return len(self.movie_training_ratings[item_id])
+        return len(self.item_training_ratings[item_id])
 
     
     def __reset(self) -> None:
         ic("ds.__reset()")
         
         self.user_ids = []
-        self.movie_ids = []
+        self.item_ids = []
         
         self.user_training_ratings = {}
         self.user_training_means = {}
-        self.movie_training_ratings = {}
-        self.movie_training_means = {}
+        self.item_training_ratings = {}
+        self.item_training_means = {}
         
         self.user_test_ratings = {}
-        self.movie_test_ratings = {}
+        self.item_test_ratings = {}
         self.test_ratings = []
         
         self.mean_training_rating = 0.0

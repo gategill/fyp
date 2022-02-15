@@ -16,10 +16,10 @@ class UserRecommender(GenericRecommender):
         super().__init__(k, dataset)
 
 
-    def predict_rating_user_based_nn(self, active_user_id: int, candidate_movie_id: int) -> float:
+    def predict_rating_user_based_nn(self, active_user_id: int, candidate_item_id: int) -> float:
         ic("user_rec.predict_rating_user_based_nn()")
         
-        nns = self.get_k_nearest_users(Similarities.sim_pearson, self.k, active_user_id, candidate_movie_id)
+        nns = self.get_k_nearest_users(Similarities.sim_pearson, self.k, active_user_id, candidate_item_id)
         prediction = self.calculate_avg_rating(nns)
         
         if prediction:
@@ -33,10 +33,10 @@ class UserRecommender(GenericRecommender):
                 return self.mean_training_rating
 
 
-    def predict_rating_user_based_nn_wtd(self, active_user_id: int, candidate_movie_id: int) -> float:
+    def predict_rating_user_based_nn_wtd(self, active_user_id: int, candidate_item_id: int) -> float:
         #ic("user_rec.predict_rating_user_based_nn_wtd()")
 
-        nns = self.get_k_nearest_users(Similarities.sim_pearson, self.k, active_user_id, candidate_movie_id)
+        nns = self.get_k_nearest_users(Similarities.sim_pearson, self.k, active_user_id, candidate_item_id)
         prediction = self.calculate_wtd_avg_rating(nns)
         
         if prediction:
@@ -50,16 +50,16 @@ class UserRecommender(GenericRecommender):
                 return self.mean_training_rating
 
 
-    def get_k_nearest_users(self, similarity_function: types.FunctionType, k: int, active_user_id: int, candidate_movie_id: int = None) -> list:
+    def get_k_nearest_users(self, similarity_function: types.FunctionType, k: int, active_user_id: int, candidate_item_id: int = None) -> list:
         #ic("user_rec.get_k_nearest_users()")
         
         """
         [{user_id: int, rating: float, sim: float}]
 
         Get the k nearest users to active_user_id.
-        Optionally, if candidate_movie_id is specifies, the set of neighbours (users) is confined to those who have 
-        rated candidate_movie_id.
-        In this case, each neighbour's rating for candidate_movie_id is part of the final result.
+        Optionally, if candidate_item_id is specifies, the set of neighbours (users) is confined to those who have 
+        rated candidate_item_id.
+        In this case, each neighbour's rating for candidate_item_id is part of the final result.
         
         THIS FOR PEARL PU!!!
         """
@@ -74,11 +74,11 @@ class UserRecommender(GenericRecommender):
             raise TypeError("get_k_nearest_users: you supplied active_user_id = '%s' but active_user_id must be a positive integer" % active_user_id)
         if active_user_id not in self.user_training_ratings:
             raise ValueError("get_k_nearest_users: you supplied active_user_id = %i but this user does not exist" % active_user_id)
-        if candidate_movie_id:
-            if type(candidate_movie_id) != int or candidate_movie_id < 1:
-                raise TypeError("get_k_nearest_users: you supplied candidate_movie_id = '%s' but candidate_movie_id must be a positive integer" % candidate_movie_id)
-            if candidate_movie_id not in self.movie_training_ratings:
-                raise ValueError("get_k_nearest_users: you supplied candidate_movie_id = %i but this movie does not exist" % candidate_movie_id)     
+        if candidate_item_id:
+            if type(candidate_item_id) != int or candidate_item_id < 1:
+                raise TypeError("get_k_nearest_users: you supplied candidate_item_id = '%s' but candidate_item_id must be a positive integer" % candidate_item_id)
+            if candidate_item_id not in self.item_training_ratings:
+                raise ValueError("get_k_nearest_users: you supplied candidate_item_id = %i but this item does not exist" % candidate_item_id)     
         
         nearest_neighbours = []
         
@@ -86,15 +86,15 @@ class UserRecommender(GenericRecommender):
             
             if active_user_id == user_id:
                 continue
-            if (not candidate_movie_id is None) and (not candidate_movie_id in self.user_training_ratings[user_id]):
+            if (not candidate_item_id is None) and (not candidate_item_id in self.user_training_ratings[user_id]):
                 continue
             
             sim = self.get_user_similarity(similarity_function, active_user_id, user_id)
             
             candidate_neighbour = {'user_id': user_id, 'sim': sim}
             
-            if not candidate_movie_id is None: # if not None = if confined to users with that movie ID
-                candidate_neighbour['rating'] = self.user_training_ratings[user_id][candidate_movie_id] # what's your ID? 
+            if not candidate_item_id is None: # if not None = if confined to users with that item ID
+                candidate_neighbour['rating'] = self.user_training_ratings[user_id][candidate_item_id] # what's your ID? 
             
             nearest_neighbours.append(candidate_neighbour)
             
@@ -116,15 +116,15 @@ class UserRecommender(GenericRecommender):
         return nearest_neighbours
 
 
-    def get_thresholded_nearest_users(self, similarity_function: types.FunctionType, threshold: float, active_user_id: int, candidate_movie_id: int = None) -> list:
+    def get_thresholded_nearest_users(self, similarity_function: types.FunctionType, threshold: float, active_user_id: int, candidate_item_id: int = None) -> list:
         ic("user_rec.get_thresholded_nearest_users()")
         
         """
         [{user_id: int, rating: float, sim: float}]
 
         Get the users who are more than a threshold similar to active_user_id
-        Optionally, if movie_id is specified, the set of neighbours (users) is confined to those who have rated candidate_movie_id.
-        In this case, each neighbour's rating for candidate_movie_id is part of the final result.
+        Optionally, if item_id is specified, the set of neighbours (users) is confined to those who have rated candidate_item_id.
+        In this case, each neighbour's rating for candidate_item_id is part of the final result.
         """
         
         if type(similarity_function) != types.FunctionType:
@@ -135,11 +135,11 @@ class UserRecommender(GenericRecommender):
             raise TypeError("get_thresholded_nearest_users: you supplied active_user_id = '%s' but active_user_id must be a positive integer" % active_user_id)
         if active_user_id not in self.user_training_ratings:
             raise ValueError("get_thresholded_nearest_users: you supplied active_user_id = %i but this user does not exist" % active_user_id)
-        if candidate_movie_id:
-            if type(candidate_movie_id) != int or candidate_movie_id < 1:
-                raise TypeError("get_thresholded_nearest_users: you supplied candidate_movie_id = '%s' but candidate_movie_id must be a positive integer" % candidate_movie_id)
-            if candidate_movie_id not in self.movie_training_ratings:
-                raise ValueError("get_thresholded_nearest_users: you supplied candidate_movie_id = %i but this movie does not exist" % candidate_movie_id)     
+        if candidate_item_id:
+            if type(candidate_item_id) != int or candidate_item_id < 1:
+                raise TypeError("get_thresholded_nearest_users: you supplied candidate_item_id = '%s' but candidate_item_id must be a positive integer" % candidate_item_id)
+            if candidate_item_id not in self.item_training_ratings:
+                raise ValueError("get_thresholded_nearest_users: you supplied candidate_item_id = %i but this item does not exist" % candidate_item_id)     
         
         nearest_neighbours = []
         
@@ -148,7 +148,7 @@ class UserRecommender(GenericRecommender):
             if active_user_id == user_id:
                 continue
             
-            if (not candidate_movie_id is None) and (not candidate_movie_id in self.user_training_ratings[user_id]):
+            if (not candidate_item_id is None) and (not candidate_item_id in self.user_training_ratings[user_id]):
                 continue
             
             sim = self.get_user_similarity(similarity_function, active_user_id, user_id)
@@ -157,23 +157,23 @@ class UserRecommender(GenericRecommender):
             
             candidate_neighbour = {'user_id': user_id, 'sim': sim}
             
-            if not candidate_movie_id is None:
-                candidate_neighbour['rating'] = self.user_training_ratings[user_id][candidate_movie_id]
+            if not candidate_item_id is None:
+                candidate_neighbour['rating'] = self.user_training_ratings[user_id][candidate_item_id]
                 
             nearest_neighbours.append(candidate_neighbour)
             
         return nearest_neighbours
 
 
-    def get_k_thresholded_nearest_users(self, similarity_function: types.FunctionType, k:int, threshold: float, active_user_id: int, candidate_movie_id: int = None) -> list:
+    def get_k_thresholded_nearest_users(self, similarity_function: types.FunctionType, k:int, threshold: float, active_user_id: int, candidate_item_id: int = None) -> list:
         ic("user_rec.get_k_thresholded_nearest_users()")
         
         """
         [{user_id: int, rating: float, sim: float}]
 
         Get the k nearest users to active_user_id provided their similarity to active_user_id exceeds the threshold.
-        Optionally, if movie_id is specified, the set of neighbours (users) is confined to those who have rated candidate_movie_id.
-        In this case, each neighbour's rating for candidate_movie_id is part of the final result.
+        Optionally, if item_id is specified, the set of neighbours (users) is confined to those who have rated candidate_item_id.
+        In this case, each neighbour's rating for candidate_item_id is part of the final result.
         """
         
         if type(similarity_function) != types.FunctionType:
@@ -188,11 +188,11 @@ class UserRecommender(GenericRecommender):
             raise TypeError("get_k_thresholded_nearest_users: you supplied active_user_id = '%s' but active_user_id must be a positive integer" % active_user_id)
         if active_user_id not in self.user_training_ratings:
             raise ValueError("get_k_thresholded_nearest_users: you supplied active_user_id = %i but this user does not exist" % active_user_id)
-        if candidate_movie_id:
-            if type(candidate_movie_id) != int or candidate_movie_id < 1:
-                raise TypeError("get_k_thresholded_nearest_users: you supplied candidate_movie_id = '%s' but candidate_movie_id must be a positive integer" % candidate_movie_id)
-            if candidate_movie_id not in self.movie_training_ratings:
-                raise ValueError("get_k_thresholded_nearest_users: you supplied candidate_movie_id = %i but this movie does not exist" % candidate_movie_id)     
+        if candidate_item_id:
+            if type(candidate_item_id) != int or candidate_item_id < 1:
+                raise TypeError("get_k_thresholded_nearest_users: you supplied candidate_item_id = '%s' but candidate_item_id must be a positive integer" % candidate_item_id)
+            if candidate_item_id not in self.item_training_ratings:
+                raise ValueError("get_k_thresholded_nearest_users: you supplied candidate_item_id = %i but this item does not exist" % candidate_item_id)     
         
         nearest_neighbours = []
         
@@ -201,7 +201,7 @@ class UserRecommender(GenericRecommender):
             if active_user_id == user_id:
                 continue
             
-            if (not candidate_movie_id is None) and (not candidate_movie_id in self.user_training_ratings[user_id]):
+            if (not candidate_item_id is None) and (not candidate_item_id in self.user_training_ratings[user_id]):
                 continue
             
             sim = self.get_user_similarity(similarity_function, active_user_id, user_id)
@@ -211,8 +211,8 @@ class UserRecommender(GenericRecommender):
             
             candidate_neighbour = {'user_id': user_id, 'sim': sim}
             
-            if not candidate_movie_id is None:
-                candidate_neighbour['rating'] = self.user_training_ratings[user_id][candidate_movie_id]
+            if not candidate_item_id is None:
+                candidate_neighbour['rating'] = self.user_training_ratings[user_id][candidate_item_id]
                 
             nearest_neighbours.append(candidate_neighbour)
             
@@ -234,25 +234,25 @@ class UserRecommender(GenericRecommender):
         return nearest_neighbours
 
 
-    def get_user_movie_rating(self, user_id: int, movie_id: int) -> float:
-        ic("user_rec.get_user_movie_rating()")
+    def get_user_item_rating(self, user_id: int, item_id: int) -> float:
+        ic("user_rec.get_user_item_rating()")
         
         """
-        Gets user_id's rating for movie_id from the training set or None if this user has no rating for this movie in the
+        Gets user_id's rating for item_id from the training set or None if this user has no rating for this item in the
         training set.
         """
         
         if type(user_id) != int or user_id < 1:
-            raise TypeError("get_user_movie_rating: you supplied user_id = '%s' but user_id must be a positive integer" % user_id)
+            raise TypeError("get_user_item_rating: you supplied user_id = '%s' but user_id must be a positive integer" % user_id)
         if user_id not in self.user_training_ratings:
-            raise ValueError("get_user_movie_rating: you supplied user_id = %i but this user does not exist" % user_id)
-        if type(movie_id) != int or movie_id < 1:
-            raise TypeError("get_user_movie_rating: you supplied movie_id = '%s' but movie_id must be a positive integer" % movie_id)
-        if movie_id not in self.movie_training_ratings:
-            raise ValueError("get_user_movie_rating: you supplied movie_id = %i but this movie does not exist" % movie_id)
+            raise ValueError("get_user_item_rating: you supplied user_id = %i but this user does not exist" % user_id)
+        if type(item_id) != int or item_id < 1:
+            raise TypeError("get_user_item_rating: you supplied item_id = '%s' but item_id must be a positive integer" % item_id)
+        if item_id not in self.item_training_ratings:
+            raise ValueError("get_user_item_rating: you supplied item_id = %i but this item does not exist" % item_id)
         
-        if user_id in self.user_training_ratings and movie_id in self.user_training_ratings[user_id]:
-            return self.user_training_ratings[user_id][movie_id]
+        if user_id in self.user_training_ratings and item_id in self.user_training_ratings[user_id]:
+            return self.user_training_ratings[user_id][item_id]
         else:
             return None
             
@@ -273,7 +273,7 @@ class UserRecommender(GenericRecommender):
             raise ValueError("get_user_ratings: you supplied user_id = %i but this user does not exist" % user_id)
         
         if user_id in self.user_training_ratings:
-            return self.dataset.__d_to_dlist(self.user_training_ratings[user_id], 'movie_id', 'rating')
+            return self.dataset.__d_to_dlist(self.user_training_ratings[user_id], 'item_id', 'rating')
         else:
             return []
             
@@ -308,8 +308,8 @@ class UserRecommender(GenericRecommender):
             
             if (age is None or demographics['age'] == age) and (gender is None or demographics['gender'] == gender) and (occupation is None or demographics['occupation'] == occupation) and (zipcode is None or demographics['zipcode'] == zipcode):
                 
-                for movie_id, rating in user_ratings.items():
-                    ratings.append({'user_id': user_id, 'movie_id': movie_id, 'rating': rating})
+                for item_id, rating in user_ratings.items():
+                    ratings.append({'user_id': user_id, 'item_id': item_id, 'rating': rating})
                     
         return ratings               
 

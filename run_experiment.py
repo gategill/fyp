@@ -125,10 +125,10 @@ def run_user_rec_experiment(k):
     for i, test in enumerate(user_r.test_ratings):
         try:
             user_id = test['user_id']
-            movie_id = test['movie_id']
+            item_id = test['item_id']
             rating = test['rating']
             
-            predicted_rating = user_r.predict_rating_user_based_nn_wtd(active_user_id = user_id, candidate_movie_id = movie_id)
+            predicted_rating = user_r.predict_rating_user_based_nn_wtd(active_user_id = user_id, candidate_item_id = item_id)
             
             
               
@@ -148,7 +148,7 @@ def run_user_rec_experiment(k):
             if i > 100:
                 break
         
-            #print(user_id, movie_id, rating, round(predicted_rating, 1))
+            #print(user_id, item_id, rating, round(predicted_rating, 1))
             
         except KeyboardInterrupt:
             ic("\nStopping\n")
@@ -174,10 +174,10 @@ def run_item_rec_experiment(k):
     for i, test in enumerate(item_r.test_ratings):
         try:
             user_id = test['user_id']
-            movie_id = test['movie_id']
+            item_id = test['item_id']
             rating = test['rating']
             
-            predicted_rating = item_r.predict_rating_item_based_nn_wtd(active_user_id = user_id, candidate_movie_id = movie_id)
+            predicted_rating = item_r.predict_rating_item_based_nn_wtd(active_user_id = user_id, candidate_item_id = item_id)
             
               
             if predicted_rating < 1.0:
@@ -195,7 +195,7 @@ def run_item_rec_experiment(k):
             if i > 100:
                 break
         
-            #print(user_id, movie_id, rating, round(predicted_rating, 1))
+            #print(user_id, item_id, rating, round(predicted_rating, 1))
             
         except KeyboardInterrupt:
             ic("\nStopping\n")
@@ -224,11 +224,11 @@ def run_bootstrap_rec_experiment(k):
     for i, test in enumerate(bs_r.test_ratings):
         try:
             user_id = test['user_id']
-            movie_id = test['movie_id']
+            item_id = test['item_id']
             rating = test['rating']
             #print(bs_r.dataset.num_ratings)
 
-            predicted_rating = bs_r.predict_rating_user_based_nn_wtd(active_user_id = user_id, candidate_movie_id = movie_id)
+            predicted_rating = bs_r.predict_rating_user_based_nn_wtd(active_user_id = user_id, candidate_item_id = item_id)
             
             
             if predicted_rating < 1.0:
@@ -246,7 +246,7 @@ def run_bootstrap_rec_experiment(k):
             #if i > 50:
             #    break
         
-            #print(user_id, movie_id, rating, round(predicted_rating, 1))
+            #print(user_id, item_id, rating, round(predicted_rating, 1))
             
         except KeyboardInterrupt:
             ic("\nStopping\n")
@@ -272,10 +272,10 @@ def run_pearlpu_rec_experiment(k):
     for i, test in enumerate(pp_r.test_ratings):
         try:
             user_id = test['user_id']
-            movie_id = test['movie_id']
+            item_id = test['item_id']
             rating = test['rating']
             
-            predicted_rating = pp_r.recursive_prediction(user_id, movie_id)
+            predicted_rating = pp_r.recursive_prediction(user_id, item_id)
             #assert predicted_rating <= 5
             #assert predicted_rating >= 0
             
@@ -293,7 +293,7 @@ def run_pearlpu_rec_experiment(k):
             #if i > 30:
             #    break
         
-            #print(user_id, movie_id, rating, round(predicted_rating, 1))
+            #print(user_id, item_id, rating, round(predicted_rating, 1))
             
         except KeyboardInterrupt:
             ic("\nStopping\n")
@@ -324,10 +324,10 @@ def run_pearlpu_rec_experiment(k):
     for i, test in enumerate(cr_r.test_ratings):
         try:
             user_id = test['user_id']
-            movie_id = test['movie_id']
+            item_id = test['item_id']
             rating = test['rating']
             
-            predicted_rating = cr_r.predict_rating_item_based_nn_wtd(user_id, movie_id)
+            predicted_rating = cr_r.predict_rating_item_based_nn_wtd(user_id, item_id)
             
             test["pred_rating"] = predicted_rating
             cr_r.add_prediction(test)
@@ -335,7 +335,7 @@ def run_pearlpu_rec_experiment(k):
             #if i > 11:
             #    break
         
-            #print(user_id, movie_id, rating, round(predicted_rating, 1))
+            #print(user_id, item_id, rating, round(predicted_rating, 1))
             
         except KeyboardInterrupt:
             ic("\nStopping\n")
