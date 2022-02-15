@@ -368,7 +368,7 @@ def something():
     print(ds.get_ratings_as_df())
     
     
-    #X_train, X_test, y_train, y_test = train_test_split(ds.user_training_ratings, ds.user_test_ratings, test_size=0.2, random_state=2)
+    #X_train, X_test, y_train, y_test = train_test_split(ds.user_train_ratings, ds.user_test_ratings, test_size=0.2, random_state=2)
 
     # add entire to dataset
     # how to resolve the item and user view of the data in sklearn???

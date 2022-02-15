@@ -30,7 +30,7 @@ class ItemRecommender(GenericRecommender):
             if prediction:
                 return prediction
             else:
-                return self.mean_training_rating
+                return self.mean_train_rating
 
 
     def predict_rating_item_based_nn_wtd(self, active_user_id: int, candidate_item_id: int) -> float:
@@ -48,7 +48,7 @@ class ItemRecommender(GenericRecommender):
             if prediction:
                 return prediction
             else:
-                return self.mean_training_rating
+                return self.mean_train_rating
             
 
     def get_k_nearest_items(self, similarity_function: types.FunctionType, k: int, candidate_item_id: int, active_user_id: int = None) -> list:
@@ -66,32 +66,32 @@ class ItemRecommender(GenericRecommender):
             raise TypeError("get_k_nearest_items: you supplied similarity_function = '%s' but similarity_function must be a function" % similarity_function)
         if type(k) != int or k < 1:
             raise TypeError("get_k_nearest_items: you supplied k = '%s' but k must be a positive integer" % k)
-        if k > len(self.item_training_ratings):
+        if k > len(self.item_train_ratings):
             raise ValueError("get_k_nearest_items: you supplied k = %i but this is too large" % k)
         if type(candidate_item_id) != int or candidate_item_id < 1:
             raise TypeError("get_k_nearest_items: you supplied candidate_item_id = '%s' but candidate_item_id must be a positive integer" % candidate_item_id)
-        if candidate_item_id not in self.item_training_ratings:
+        if candidate_item_id not in self.item_train_ratings:
             raise ValueError("get_k_nearest_items: you supplied candidate_item_id = %i but this item does not exist" % candidate_item_id)
         if active_user_id:
             if type(active_user_id) != int or active_user_id < 1:
                 raise TypeError("get_k_nearest_items: you supplied active_user_id = '%s' but active_user_id must be a positive integer" % active_user_id)
-            if active_user_id not in self.user_training_ratings:
+            if active_user_id not in self.user_train_ratings:
                 raise ValueError("get_k_nearest_items: you supplied active_user_id = %i but this user does not exist" % active_user_id)     
         
         nearest_neighbours = []
         
-        for item_id in self.item_training_ratings: # what is happening here???
+        for item_id in self.item_train_ratings: # what is happening here???
             if candidate_item_id == item_id:
                 continue
             
-            if (not active_user_id is None) and (not active_user_id in self.item_training_ratings[item_id]):
+            if (not active_user_id is None) and (not active_user_id in self.item_train_ratings[item_id]):
                 continue
             
             sim = self.get_item_similarity(similarity_function, candidate_item_id, item_id)
             candidate_neighbour = {'item_id': item_id, 'sim': sim}
             
             if not active_user_id is None:
-                candidate_neighbour['rating'] = self.item_training_ratings[item_id][active_user_id]
+                candidate_neighbour['rating'] = self.item_train_ratings[item_id][active_user_id]
                 
             nearest_neighbours.append(candidate_neighbour)
             
@@ -130,21 +130,21 @@ class ItemRecommender(GenericRecommender):
             raise TypeError("get_thresholded_nearest_items: you supplied threshold = '%s' but threshold must be a floating point number" % threshold)
         if type(candidate_item_id) != int or candidate_item_id < 1:
             raise TypeError("get_thresholded_nearest_items: you supplied candidate_item_id = '%s' but candidate_item_id must be a positive integer" % candidate_item_id)
-        if candidate_item_id not in self.item_training_ratings:
+        if candidate_item_id not in self.item_train_ratings:
             raise ValueError("get_thresholded_nearest_items: you supplied candidate_item_id = %i but this item does not exist" % candidate_item_id)
         if active_user_id:
             if type(active_user_id) != int or active_user_id < 1:
                 raise TypeError("get_thresholded_nearest_items: you supplied active_user_id = '%s' but active_user_id must be a positive integer" % active_user_id)
-            if active_user_id not in self.user_training_ratings:
+            if active_user_id not in self.user_train_ratings:
                 raise ValueError("get_thresholded_nearest_items: you supplied active_user_id = %i but this user does not exist" % active_user_id)     
         
         nearest_neighbours = []
         
-        for item_id in self.item_training_ratings:
+        for item_id in self.item_train_ratings:
             if candidate_item_id == item_id:
                 continue
             
-            if (not active_user_id is None) and (not active_user_id in self.item_training_ratings[item_id]):
+            if (not active_user_id is None) and (not active_user_id in self.item_train_ratings[item_id]):
                 continue
             
             sim = self.get_item_similarity(similarity_function, candidate_item_id, item_id)
@@ -155,7 +155,7 @@ class ItemRecommender(GenericRecommender):
             candidate_neighbour = {'item_id': item_id, 'sim': sim}
             
             if not active_user_id is None:
-                candidate_neighbour['rating'] = self.item_training_ratings[item_id][active_user_id]
+                candidate_neighbour['rating'] = self.item_train_ratings[item_id][active_user_id]
                 
             nearest_neighbours.append(candidate_neighbour)
             
@@ -177,27 +177,27 @@ class ItemRecommender(GenericRecommender):
             raise TypeError("get_k_thresholded_nearest_items: you supplied similarity_function = '%s' but similarity_function must be a function" % similarity_function)
         if type(k) != int or k < 1:
             raise TypeError("get_k_thresholded_nearest_items: you supplied k = '%s' but k must be a positive integer" % k)
-        if k > len(self.item_training_ratings):
+        if k > len(self.item_train_ratings):
             raise ValueError("get_k_thresholded_nearest_items: you supplied k = %i but this is too large" % k)
         if type(threshold) != float:
             raise TypeError("get_k_thresholded_nearest_items: you supplied threshold = '%s' but threshold must be a floating point number" % threshold)            
         if type(candidate_item_id) != int or candidate_item_id < 1:
             raise TypeError("get_k_thresholded_nearest_items: you supplied candidate_item_id = '%s' but candidate_item_id must be a positive integer" % candidate_item_id)
-        if candidate_item_id not in self.item_training_ratings:
+        if candidate_item_id not in self.item_train_ratings:
             raise ValueError("get_k_thresholded_nearest_items: you supplied candidate_item_id = %i but this item does not exist" % candidate_item_id)
         if active_user_id:
             if type(active_user_id) != int or active_user_id < 1:
                 raise TypeError("get_k_thresholded_nearest_items: you supplied active_user_id = '%s' but active_user_id must be a positive integer" % active_user_id)
-            if active_user_id not in self.user_training_ratings:
+            if active_user_id not in self.user_train_ratings:
                 raise ValueError("get_k_thresholded_nearest_items: you supplied active_user_id = %i but this user does not exist" % active_user_id)     
         
         nearest_neighbours = []
         
-        for item_id in self.item_training_ratings:
+        for item_id in self.item_train_ratings:
             if candidate_item_id == item_id:
                 continue
             
-            if (not active_user_id is None) and (not active_user_id in self.item_training_ratings[item_id]):
+            if (not active_user_id is None) and (not active_user_id in self.item_train_ratings[item_id]):
                 continue
             
             sim = self.get_item_similarity(similarity_function, candidate_item_id, item_id)
@@ -208,7 +208,7 @@ class ItemRecommender(GenericRecommender):
             candidate_neighbour = {'item_id': item_id, 'sim': sim}
             
             if not active_user_id is None:
-                candidate_neighbour['rating'] = self.item_training_ratings[item_id][active_user_id]
+                candidate_neighbour['rating'] = self.item_train_ratings[item_id][active_user_id]
                 
             nearest_neighbours.append(candidate_neighbour)
             
@@ -236,17 +236,17 @@ class ItemRecommender(GenericRecommender):
         """
         [ratings: float]
         
-        Gets all of item_id's ratings from the training set as a list. If this item has no ratings in the
-        training set, an empty list is the result.
+        Gets all of item_id's ratings from the train set as a list. If this item has no ratings in the
+        train set, an empty list is the result.
         """
         
         if type(item_id) != int or item_id < 1:
             raise TypeError("get_item_ratings: you supplied item_id = '%s' but item_id must be a positive integer" % item_id)
-        if item_id not in self.item_training_ratings:
+        if item_id not in self.item_train_ratings:
             raise ValueError("get_item_ratings: you supplied item_id = %i but this item does not exist" % item_id)
         
-        if item_id in self.item_training_ratings:
-            return self.dataset.__d_to_dlist(self.item_training_ratings[item_id], 'user_id', 'rating')
+        if item_id in self.item_train_ratings:
+            return self.dataset.__d_to_dlist(self.item_train_ratings[item_id], 'user_id', 'rating')
         else:
             return []
             
@@ -255,16 +255,16 @@ class ItemRecommender(GenericRecommender):
         ic("item_rec.get_item_mean_rating()")
         
         """
-        Gets the mean of item_id's ratings from the training set. If this item has no ratings in the
-        training set, the mean is None.
+        Gets the mean of item_id's ratings from the train set. If this item has no ratings in the
+        train set, the mean is None.
         """
         
         if type(item_id) != int or item_id < 1:
             raise TypeError("get_item_mean_rating: you supplied item_id = '%s' but item_id must be a positive integer" % item_id)
-        if item_id not in self.item_training_ratings:
+        if item_id not in self.item_train_ratings:
             raise ValueError("get_item_mean_rating: you supplied item_id = %i but this item does not exist" % item_id)
         
-        return self.item_training_means[item_id]
+        return self.item_train_means[item_id]
             
             
     def get_genre_ratings(self, genre: str) -> list:
@@ -273,12 +273,12 @@ class ItemRecommender(GenericRecommender):
         """
         [ratings: float]
         
-        Gets all ratings from the training set as a list for items whose genre matches the value in the argument.
+        Gets all ratings from the train set as a list for items whose genre matches the value in the argument.
         """
         
         ratings = []
         
-        for item_id, item_ratings in self.item_training_ratings.items():
+        for item_id, item_ratings in self.item_train_ratings.items():
             genres = self.item_descriptors[item_id]['genres']
             
             if genre in self.dataset.__genre_names and genres[self.dataset.__genre_names.index(genre)] == 1:
@@ -298,7 +298,7 @@ class ItemRecommender(GenericRecommender):
         
         if type(item_id) != int or item_id < 1:
             raise TypeError("get_item_descriptors: you supplied item_id = '%s' but item_id must be a positive integer" % item_id)
-        if item_id not in self.item_training_ratings:
+        if item_id not in self.item_train_ratings:
             raise ValueError("get_item_descriptors: you supplied item_id = %i but this item does not exist" % item_id)
         
         if item_id in self.item_descriptors:
@@ -311,5 +311,5 @@ class ItemRecommender(GenericRecommender):
         """"""
         #ic("item_rec.get_item_similarity()")
         
-        return similarity_function(self.item_training_ratings[candidate_item_id], self.item_training_ratings[item_id])
+        return similarity_function(self.item_train_ratings[candidate_item_id], self.item_train_ratings[item_id])
         

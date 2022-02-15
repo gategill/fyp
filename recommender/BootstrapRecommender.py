@@ -30,7 +30,7 @@ class BootstrapRecommender(UserRecommender):
 
             new_recommendations = []
         
-            for user_id in self.user_training_ratings.keys():
+            for user_id in self.user_train_ratings.keys():
                 items_unrated = self.get_user_unrated_items(user_id, self.additions)
 
                 for mm in items_unrated:
@@ -45,14 +45,14 @@ class BootstrapRecommender(UserRecommender):
         """"""
         ic("bs_rec.get_user_unrated_items()")
         
-        value = self.user_training_ratings[user_id]
-        items_rated_in_training = set(list(value.keys()))
+        value = self.user_train_ratings[user_id]
+        items_rated_in_train = set(list(value.keys()))
         items_rated_in_test = set()
         
         if user_id in self.user_test_ratings:
             items_rated_in_test = set(list(self.user_test_ratings[user_id].keys()))
         
-        items_rated = items_rated_in_training.intersection(items_rated_in_test)
+        items_rated = items_rated_in_train.intersection(items_rated_in_test)
         items_unrated = list(set(self.item_ids).difference(items_rated))
         items_unrated = random.sample(items_unrated, k = number)
         

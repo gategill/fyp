@@ -27,17 +27,17 @@ class GenericRecommender:
         self.user_ids = self.dataset.get_user_ids()
         self.item_ids = self.dataset.get_item_ids()
         
-        self.user_training_ratings = self.dataset.get_user_training_ratings()
-        self.user_training_means = self.dataset.get_user_training_means()
-        self.item_training_ratings = self.dataset.get_item_training_ratings()
-        self.item_training_means = self.dataset.get_item_training_means()
-        self.train_ratings = self.dataset.get_training_ratings()
+        self.user_train_ratings = self.dataset.get_user_train_ratings()
+        self.user_train_means = self.dataset.get_user_train_means()
+        self.item_train_ratings = self.dataset.get_item_train_ratings()
+        self.item_train_means = self.dataset.get_item_train_means()
+        self.train_ratings = self.dataset.get_train_ratings()
         
         self.user_test_ratings = self.dataset.get_user_test_ratings()
         self.item_test_ratings = self.dataset.get_item_test_ratings()
         self.test_ratings = self.dataset.get_test_ratings()
         
-        self.mean_training_rating = self.dataset.get_mean_training_rating()
+        self.mean_train_rating = self.dataset.get_mean_train_rating()
                 
 
     def calculate_avg_rating(self, neighbours: list) -> float:

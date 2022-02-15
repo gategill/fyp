@@ -87,7 +87,7 @@ class Dataset:
 
         """
         It partitions the data randomly so that approximately test_percentage of the ratings are treated as a test set and 
-        the remaining ratings are treated as the training set.
+        the remaining ratings are treated as the train set.
         """
      
         if type(test_percentage) != int:
@@ -109,18 +109,18 @@ class Dataset:
             item_id = entry["item_id"]
             rating = entry["rating"]
             
-            self.user_training_ratings.setdefault(user_id, {})
-            self.item_training_ratings.setdefault(item_id, {})
+            self.user_train_ratings.setdefault(user_id, {})
+            self.item_train_ratings.setdefault(item_id, {})
             
-            if random.random() >= test_proportion: # goes to training
-                self.user_training_ratings[user_id][item_id] = rating
-                self.item_training_ratings[item_id][user_id] = rating
-                self.mean_training_rating = self.mean_training_rating + rating
+            if random.random() >= test_proportion: # goes to train
+                self.user_train_ratings[user_id][item_id] = rating
+                self.item_train_ratings[item_id][user_id] = rating
+                self.mean_train_rating = self.mean_train_rating + rating
                 self.train_ratings.append(entry)
                 num_ratings = num_ratings + 1
                 
-                #ic(self.user_training_ratings)
-                #ic(self.item_training_ratings)
+                #ic(self.user_train_ratings)
+                #ic(self.item_train_ratings)
  
             else: # goes to testing
                 self.test_ratings.append(entry)
@@ -128,25 +128,25 @@ class Dataset:
                 
             #sleep(1)
                 
-        self.mean_training_rating = self.mean_training_rating / num_ratings
+        self.mean_train_rating = self.mean_train_rating / num_ratings
         
         self.num_ratings = num_ratings
         self.sparsity = 1 - self.num_ratings / (len(self.user_ids) * len(self.item_ids))
         
         
-        for user_id, ratings in self.user_training_ratings.items():
+        for user_id, ratings in self.user_train_ratings.items():
             
             if len(ratings) > 0:
-                self.user_training_means[user_id] = sum(ratings.values()) * 1.0 / len(ratings)
+                self.user_train_means[user_id] = sum(ratings.values()) * 1.0 / len(ratings)
             else:
-                self.user_training_means[user_id] = None
+                self.user_train_means[user_id] = None
                 
-        for item_id, ratings in self.item_training_ratings.items():
+        for item_id, ratings in self.item_train_ratings.items():
             
             if len(ratings) > 0:
-                self.item_training_means[item_id] = sum(ratings.values()) * 1.0 / len(ratings)
+                self.item_train_means[item_id] = sum(ratings.values()) * 1.0 / len(ratings)
             else:
-                self.item_training_means[item_id] = None
+                self.item_train_means[item_id] = None
                 
         for val in self.test_ratings:
             user_id = val["user_id"]
@@ -164,12 +164,12 @@ class Dataset:
         # 
         ic("ds.add_new_recommendations_to_dataset()")
         
-        self.update_user_training_ratings(new_recommendations)
-        self.update_item_training_ratings(new_recommendations)
-        self.update_training_ratings(new_recommendations)
-        self.update_user_training_means()
-        self.update_item_training_means()
-        self.update_mean_training_rating()
+        self.update_user_train_ratings(new_recommendations)
+        self.update_item_train_ratings(new_recommendations)
+        self.update_train_ratings(new_recommendations)
+        self.update_user_train_means()
+        self.update_item_train_means()
+        self.update_mean_train_rating()
         self.update_num_ratings(new_recommendations)
         
         # will have to update these !!!
@@ -191,16 +191,16 @@ class Dataset:
         return self.item_ids
 
 
-    def get_user_training_ratings(self) -> dict:
+    def get_user_train_ratings(self) -> dict:
         # {user_id: int : {moive_id: int : rating: float}
-        ic("ds.get_user_training_ratings()")
+        ic("ds.get_user_train_ratings()")
     
-        return self.user_training_ratings
+        return self.user_train_ratings
 
 
-    def update_user_training_ratings(self, new_recommendations: list) -> None:
+    def update_user_train_ratings(self, new_recommendations: list) -> None:
         # 
-        ic("ds.update_user_training_ratings()")
+        ic("ds.update_user_train_ratings()")
         
         #self.num_ratings += len(new_recommendations)
         
@@ -209,23 +209,23 @@ class Dataset:
             item_id = recommendation["item_id"]
             rating = recommendation["rating"]
             
-            self.user_training_ratings[user_id][item_id] = rating
+            self.user_train_ratings[user_id][item_id] = rating
                 
         
-    def update_user_training_means(self) -> None:
+    def update_user_train_means(self) -> None:
         # 
-        ic("ds.update_user_training_means()")
+        ic("ds.update_user_train_means()")
         
-        for user_id, ratings in self.user_training_ratings.items():
+        for user_id, ratings in self.user_train_ratings.items():
             if len(ratings) > 0:
-                self.user_training_means[user_id] = sum(ratings.values()) * 1.0 / len(ratings)
+                self.user_train_means[user_id] = sum(ratings.values()) * 1.0 / len(ratings)
             else:
-                self.user_training_means[user_id] = None
+                self.user_train_means[user_id] = None
                 
                 
-    def update_item_training_ratings(self, new_recommendations: list) -> None:
+    def update_item_train_ratings(self, new_recommendations: list) -> None:
         # 
-        ic("ds.update_item_training_ratings()")
+        ic("ds.update_item_train_ratings()")
         
    
         for recommendation in new_recommendations:
@@ -233,69 +233,69 @@ class Dataset:
             item_id = recommendation["item_id"]
             rating = recommendation["rating"]
             
-            self.item_training_ratings[item_id][user_id] = rating
+            self.item_train_ratings[item_id][user_id] = rating
             
             
-    def update_training_ratings(self, new_recommendations: list) -> None:
+    def update_train_ratings(self, new_recommendations: list) -> None:
         # 
-        ic("ds.update_training_ratings()")
+        ic("ds.update_train_ratings()")
         
    
         for recommendation in new_recommendations:            
             self.train_ratings.append(recommendation)
                                 
         
-    def update_item_training_means(self) -> None:
+    def update_item_train_means(self) -> None:
         # 
-        ic("ds.update_item_training_means()")
+        ic("ds.update_item_train_means()")
         
-        for item_id, ratings in self.item_training_ratings.items():
+        for item_id, ratings in self.item_train_ratings.items():
             if len(ratings) > 0:
-                self.item_training_means[item_id] = sum(ratings.values()) * 1.0 / len(ratings)
+                self.item_train_means[item_id] = sum(ratings.values()) * 1.0 / len(ratings)
             else:
-                self.item_training_means[item_id] = None
+                self.item_train_means[item_id] = None
                 
                     
-    def update_mean_training_rating(self) -> None:
+    def update_mean_train_rating(self) -> None:
         # 
-        ic("ds.update_mean_training_rating()")
+        ic("ds.update_mean_train_rating()")
         
-        new_mean_training_rating = np.sum(list(self.item_training_means.values())) / len(self.item_training_means)
+        new_mean_train_rating = np.sum(list(self.item_train_means.values())) / len(self.item_train_means)
         
-        self.mean_training_rating = new_mean_training_rating
+        self.mean_train_rating = new_mean_train_rating
 
                 
-    def get_mean_training_rating(self) -> float:
+    def get_mean_train_rating(self) -> float:
         # 
-        ic("ds.get_mean_training_rating()")
+        ic("ds.get_mean_train_rating()")
 
-        return self.mean_training_rating
+        return self.mean_train_rating
 
 
-    def get_user_training_means(self) -> dict:
+    def get_user_train_means(self) -> dict:
         # {user_id: int, rating: float}
-        ic("ds.get_user_training_means()")
+        ic("ds.get_user_train_means()")
     
-        return self.user_training_means
+        return self.user_train_means
     
     
-    def get_item_training_ratings(self) -> dict:
+    def get_item_train_ratings(self) -> dict:
         # {item_id: int : {user_id: int, rating: float}
-        ic("ds.get_item_training_ratings()")
+        ic("ds.get_item_train_ratings()")
     
-        return self.item_training_ratings
+        return self.item_train_ratings
     
     
-    def get_item_training_means(self) -> dict:
+    def get_item_train_means(self) -> dict:
         # {item_id: int : rating: float}
-        ic("ds.get_item_training_means()")
+        ic("ds.get_item_train_means()")
 
-        return self.item_training_means
+        return self.item_train_means
     
 
-    def get_training_ratings(self) -> dict:
+    def get_train_ratings(self) -> dict:
         # {item_id: int : rating: float}
-        ic("ds.get_training_ratings()")
+        ic("ds.get_train_ratings()")
 
         return self.train_ratings
         
@@ -327,22 +327,22 @@ class Dataset:
         
         self.num_ratings += len(new_recommendations)
         
-        print("is self.num_ratings == len(self.train_ratings) ?")
-        print(self.num_ratings == len(self.train_ratings))
+        #print("is self.num_ratings == len(self.train_ratings) ?")
+        #print(self.num_ratings == len(self.train_ratings))
         
         
     def get_user_popularity(self, user_id: int) -> int:
         """"""
         #ic("ds.get_user_popularity()")
 
-        return len(self.user_training_ratings[user_id])
+        return len(self.user_train_ratings[user_id])
 
         
     def get_item_popularity(self, item_id: int) -> int:
         """"""
         #ic("ds.get_item_popularity()")
 
-        return len(self.item_training_ratings[item_id])
+        return len(self.item_train_ratings[item_id])
 
     
     def __reset(self) -> None:
@@ -351,17 +351,17 @@ class Dataset:
         self.user_ids = []
         self.item_ids = []
         
-        self.user_training_ratings = {}
-        self.user_training_means = {}
-        self.item_training_ratings = {}
-        self.item_training_means = {}
+        self.user_train_ratings = {}
+        self.user_train_means = {}
+        self.item_train_ratings = {}
+        self.item_train_means = {}
         self.train_ratings = []
         
         self.user_test_ratings = {}
         self.item_test_ratings = {}
         self.test_ratings = []
         
-        self.mean_training_rating = 0.0
+        self.mean_train_rating = 0.0
         
         self.transactions = 0
         self.sparsity = 0.0

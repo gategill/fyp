@@ -30,17 +30,17 @@ class CoRecRecommender(GenericRecommender):
     def co_rec_algorithm(self, X, M):
         items_unrated = {}
         # step 1
-        for user_id in self.user_training_ratings.keys():
+        for user_id in self.user_train_ratings.keys():
             items_unrated[user_id] = self.get_user_unrated_items(user_id, self.additions)
         
         # steps 2
-        training_labelled_user = copy.deepcopy(self.user_training_ratings)
-        training_labelled_item = copy.deepcopy(self.item_training_ratings)
+        train_labelled_user = copy.deepcopy(self.user_train_ratings)
+        train_labelled_item = copy.deepcopy(self.item_train_ratings)
         
-        training_unlabelled_user = copy.deepcopy(items_unrated)
-        training_unlabelled_item = copy.deepcopy(items_unrated) # need to switch
+        train_unlabelled_user = copy.deepcopy(items_unrated)
+        train_unlabelled_item = copy.deepcopy(items_unrated) # need to switch
         
-        while (not training_unlabelled_user) and (not training_unlabelled_item):     
+        while (not train_unlabelled_user) and (not train_unlabelled_item):     
                
             pass
         
@@ -49,7 +49,7 @@ class CoRecRecommender(GenericRecommender):
         
         new_recommendations = []
     
-        for user_id in self.user_training_ratings.keys():
+        for user_id in self.user_train_ratings.keys():
             items_unrated = self.get_user_unrated_items(user_id, self.additions)
 
             for mm in items_unrated:
@@ -64,14 +64,14 @@ class CoRecRecommender(GenericRecommender):
         """"""
         ic("bs_rec.get_user_unrated_items()")
         
-        value = self.user_training_ratings[user_id]
-        items_rated_in_training = set(list(value.keys()))
+        value = self.user_train_ratings[user_id]
+        items_rated_in_train = set(list(value.keys()))
         items_rated_in_test = set()
         
         if user_id in self.user_test_ratings:
             items_rated_in_test = set(list(self.user_test_ratings[user_id].keys()))
         
-        items_rated = items_rated_in_training.intersection(items_rated_in_test)
+        items_rated = items_rated_in_train.intersection(items_rated_in_test)
         items_unrated = list(set(self.item_ids).difference(items_rated))
         items_unrated = random.sample(items_unrated, k = number)
         
