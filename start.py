@@ -22,5 +22,4 @@ ic(args.s)
 ic(args.s3)
 ic(args.kfolds)
 
-
-run_experiment(k = args.k, which = args.w, save_results = args.s, save_in_s3=args.s3, kfolds = args.kfolds)
+run_experiment(k = args.k, which = args.w, save_results = args.s, save_in_s3 = args.s3, kfolds = args.kfolds)

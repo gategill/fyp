@@ -92,7 +92,7 @@ class CoRecRecommender(GenericRecommender):
         return abs(1/(baseline_estimate - prediction))
         
         
-    def get_baseline_estimate(user_id, item_id):
+    def get_baseline_estimate(self, user_id, item_id):
         return 3.0
     
     

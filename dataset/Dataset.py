@@ -105,7 +105,7 @@ class Dataset:
         if not seed is None and type(seed) != int:
             raise TypeError("load_ratings: you supplied seed = '%s' but seed, if supplied at all, must be an integer" % seed)
         
-        #random.seed(seed) # removed seed
+        random.seed(seed) # removed seed
         
         #self.__reset()
         test_proportion = test_percentage / 100.0
@@ -316,6 +316,20 @@ class Dataset:
         ic("ds.update_num_ratings()")
         
         self.num_ratings += len(new_recommendations)
+        
+        
+    def get_user_popularity(self, user_id: int) -> int:
+        """"""
+        #ic("ds.get_user_popularity()")
+
+        return len(self.user_training_ratings[user_id])
+
+        
+    def get_item_popularity(self, item_id: int) -> int:
+        """"""
+        #ic("ds.get_item_popularity()")
+
+        return len(self.movie_training_ratings[item_id])
 
     
     def __reset(self) -> None:

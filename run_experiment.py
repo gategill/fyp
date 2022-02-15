@@ -40,9 +40,9 @@ def save_in_s3_function(da, which, current_timestamp):
 
     
     
-def run_experiment(k: int, which: str, save_results: bool = True, save_in_s3 = True, kfolds = 5) -> None:
+def run_experiment(k: int, which: str, save_results: bool, kfolds: int, save_in_s3: bool) -> None:
     
-    
+    save_in_s3 = False
     for i in range(kfolds):
         
         current_timestamp = int(time.time())
@@ -57,6 +57,7 @@ def run_experiment(k: int, which: str, save_results: bool = True, save_in_s3 = T
             print(u, mae)
             lines_result += "u_rec_k={}, {}\n".format(k, mae)
             
+            #print(save_in_s3)
             if save_in_s3:
             #saved_file = "{}/{}.txt".format(save_path, which)
                 save_in_s3_function("u_rec_k={}, {}\n".format(k, mae), "u", current_timestamp)
@@ -144,8 +145,8 @@ def run_user_rec_experiment(k):
             test["pred_rating"] = predicted_rating
             user_r.add_prediction(test)
             
-            #if i > 100:
-            #    break
+            if i > 100:
+                break
         
             #print(user_id, movie_id, rating, round(predicted_rating, 1))
             
@@ -191,8 +192,8 @@ def run_item_rec_experiment(k):
             test["pred_rating"] = predicted_rating
             item_r.add_prediction(test)
             
-            #if i > 100:
-            #    break
+            if i > 100:
+                break
         
             #print(user_id, movie_id, rating, round(predicted_rating, 1))
             
