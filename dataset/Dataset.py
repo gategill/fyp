@@ -329,6 +329,7 @@ class Dataset:
         
     def update_num_ratings(self, new_recommendations: list) -> None:
         """"""
+        # TODO should I replace this???
         ic("ds.update_num_ratings()")
         
         self.num_ratings += len(new_recommendations)

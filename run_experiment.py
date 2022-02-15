@@ -334,26 +334,19 @@ def run_corec_rec_experiment(k):
             user_predicted_rating = co_rec_r.predict_co_rec_user(user_id, item_id)
             item_predicted_rating = co_rec_r.predict_co_rec_item(user_id, item_id)
             
-            
-            test["pred_rating"] = user_predicted_rating
+            test["user_pred_rating"] = user_predicted_rating
+            test["item_pred_rating"] = item_predicted_rating
             co_rec_r.add_prediction(test)
-            
+
             if i > 10:
                 break
-        
-            #print(user_id, item_id, rating, round(predicted_rating, 1))
-            
+                    
         except KeyboardInterrupt:
             ic("\nStopping\n")
             ic(i)
-            #sleep(1)
             break
         
-    mae = Evaluation.mean_absolute_error(co_rec_r.predictions)
-    mae = round(mae, 5)
-    test["pred_rating"] = round(test["pred_rating"], 2)
+        
+    mae_user, mae_item = Evaluation.mean_absolute_error(co_rec_r.predictions)
     
-    #print(test)
-    #print(mae)
-    
-    return test, mae
+    return test, [mae_user, mae_item]

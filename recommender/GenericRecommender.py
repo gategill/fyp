@@ -97,13 +97,14 @@ class GenericRecommender:
         return rating
     
     
-    def add_new_recommendations(self, new_recommendations) -> None:
-        # 
+    def add_new_recommendations(self, new_recommendations: list) -> None:
+        """recommendation*s* = list if dicts"""
         ic("gen_rec.add_new_recommendations()")
         
         self.dataset.add_new_recommendations_to_dataset(new_recommendations)
 
     
     def add_prediction(self, prediction: dict) -> None:
+        """a single dict entry"""
         self.predictions.append(prediction)
 

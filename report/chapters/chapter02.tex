@@ -1,16 +1,28 @@
-Related Work
-other approaches, describe problems, metrics old to new, 
+There is a wealth of research on recommender systems
 
+\section{Collaborative and Content-based approaches}
+Different approaches exist, such as collaborative and content-based approaches. In collaborative approaches, we assume that users who agreed in the past will agree in the future and by grouping a user with others with similar tastes we can score items unseen to the user and provide a recommendation. In content-based approaches, ()
 
-\section{Section 1 of Chapter 2}
-Different approaches exist, such as collaborative and content-based approaches. In collaborative approaches, we assume that users who agreed in the past will agree in the future and by grouping a user with others with similar tastes we can score items unseen to the user and provide a recommendation. In content-based approaches, AAA
+\section{Problems and limitations}
 The most commonly addressed problems in the literature are sparsity and cold start. Within a recommender system, the number of items is very large and most users would interact with a small subset of the items. This means that only a small percentage of items will be rated by users. This presents a problem as there isn’t enough information to train a model accurately.  
 
-because any learner system needs sufficient data to perform optimally, otherwise it runs into the risk of overfitting and capturing noise instead of the true underlying pattern. Sparsity is a common problem for collaborative recommenders. To fix it, a human would have to label thousands and perhaps millions of points manually. Because of this, we observe a tail distribution of ratings[]. Co-training aims to fix this by making two recommenders train each other by adding their most confident predictions on the unlabelled data to the training set iteratively.
+Because any learner system needs sufficient data to perform optimally, otherwise it runs into the risk of overfitting and capturing noise instead of the true underlying pattern. Sparsity is a common problem for collaborative recommenders. To fix it, a human would have to label thousands and perhaps millions of points manually. Co-training aims to fix this by making two recommenders train each other by adding their most confident predictions on the unlabelled data to the training set iteratively.
+
+DESCRIBE RELATED RESEARCH THAT HAS BEEN DONE IN: SPARSITY, COLD START, PEARL PU, METRICS, BASELINE, CONTENT BASED, COLLABORATIVE FILTERING, CO-TRAINING, NEAREST NEIGHBOURS, ELLIOT
+
+EG THIS STUDY RESEARCHED X, SHOWED THAT Y, EXPLAIN HOW RELEVANT
+
+Because of this, we observe a tail distribution of ratings[].
 
 
 Cold starts refer to the difficulty in providing an accurate recommendation for a new item or user. 
 
  There are several ways it has been approached.  for example[] 
 
-The methods of evaluating recommender systems have also evolved. Instead of trying to predict a rating that a user might assign to an item and measuring the mean absolute error, an entire fan of new methods is used to better evaluate models. Instead of focusing on predicting a rating, they try to <sort> items. This way, we can evaluate novelty, diversity, top N, NG 
+
+\section{other approaches}
+mention pearl pu
+
+\section{metrics old and new}
+The methods of evaluating recommender systems have also evolved. Instead of trying to predict a rating that a user might assign to an item and measuring the mean absolute error, an entire fan of new methods is used to better evaluate models.
+Instead of focusing on predicting a rating, they try to <sort> items. This way, we can evaluate novelty, diversity, top N, NDCG 

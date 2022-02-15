@@ -97,7 +97,6 @@ class CoRecRecommender(GenericRecommender):
             print(top_m_item_predictions)
             
             
-            
             # get union of top_m_confident_user_predictions and top_m_confident_item_predictions
             # TODO what if duplicate???
             top_m_predictions = top_m_user_predictions + top_m_item_predictions
@@ -108,15 +107,16 @@ class CoRecRecommender(GenericRecommender):
             top_m_predictions_df.drop(columns=["confidence", "pred_rating"], inplace = True)
             partial_top_m_predictions = top_m_predictions_df.T.to_dict().values() # does this work ???
                 
+            print(len(train_unlabelled_users))
+            print(len(partial_top_m_predictions))
             train_unlabelled_users = list(set(train_unlabelled_users) - set(partial_top_m_predictions))
             train_unlabelled_items = list(set(train_unlabelled_items) - set(partial_top_m_predictions))
-            
-            # update labelled datasets to include the most confidents results of the other trainset
-            self.user_rec.add_new_recommendations(top_m_item_predictions) # is this the right function???, is this the right form????
-            self.item_rec.add_new_recommendations(top_m_user_predictions) # is this the right function???, is this the right form????
-        
-        self.trained_user_rec = user_rec    
+            print(len(train_unlabelled_users))
 
+            # update labelled datasets to include the most confidents results of the other trainset
+            self.user_rec.add_new_recommendations(top_m_item_predictions)
+            self.item_rec.add_new_recommendations(top_m_user_predictions)
+        
 
     def predict_co_rec_for_users(self, user_id, item_id):
         """step 3: Recommendation Task for Users"""
