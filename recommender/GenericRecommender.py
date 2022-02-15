@@ -56,8 +56,16 @@ class GenericRecommender:
         if denominator <= 0.0:
             return None
         
-        return numerator / denominator
-
+        rating = numerator / denominator
+        
+        if rating < 1.0:
+            rating = 1.0
+            
+        if rating > 5:
+            rating = 5.0
+                
+        return rating
+    
 
     def calculate_wtd_avg_rating(self, neighbours: list) -> float:
         # weighted, introduces similarity
@@ -78,7 +86,16 @@ class GenericRecommender:
         if denominator <= 0.0:
             return None
         
-        return numerator / denominator
+        rating = numerator / denominator
+    
+        if rating < 1.0:
+            rating = 1.0
+            
+        if rating > 5:
+            rating = 5.0
+                
+        return rating
+    
     
     def add_new_recommendations(self, new_recommendations) -> None:
         # 

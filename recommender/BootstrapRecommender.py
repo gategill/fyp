@@ -35,6 +35,13 @@ class BootstrapRecommender(UserRecommender):
 
                 for mm in items_unrated:
                     predicted_rating = self.predict_rating_user_based_nn_wtd(user_id, int(mm))
+                    
+                    if predicted_rating < 1.0:
+                        predicted_rating = 1.0
+                        
+                    if predicted_rating > 5:
+                        predicted_rating = 5.0
+     
                     r = round(predicted_rating, 2)
                     new_recommendations.append({"user_id" : int(user_id) , "item_id" : int(mm) ,"rating" : float(r)})
                 

@@ -6,7 +6,7 @@
 class Evaluation:
     def __init__(self):
         pass
-        #self.training_data = training_data
+        #self.train_data = train_data
         
     @staticmethod
     def mean_absolute_error(predictions: list) -> float:

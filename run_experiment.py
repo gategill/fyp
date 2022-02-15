@@ -232,11 +232,11 @@ def run_bootstrap_rec_experiment(k):
             
             
             if predicted_rating < 1.0:
-                print("The rating is beyond the range: {}".format(predicted_rating))
+                #print("The rating is beyond the range: {}".format(predicted_rating))
                 predicted_rating = 1.0
                 
             if predicted_rating > 5:
-                print("The rating is beyond the range: {}".format(predicted_rating))
+                #print("The rating is beyond the range: {}".format(predicted_rating))
                 predicted_rating = 5.0
                 
                 
@@ -316,24 +316,30 @@ def run_pearlpu_rec_experiment(k):
     return test, mae     
 
 
-"""def run_corec_rec_experiment(k):
-    cr_r = CoRecRecommender(k)
+def run_corec_rec_experiment(k):
+    co_rec_r = CoRecRecommender(k)
 
     print("\nRunning Co Rec Recommender\n")
+    
+    # train
+    co_rec_r.train_co_rec()
 
-    for i, test in enumerate(cr_r.test_ratings):
+    # predict and test
+    for i, test in enumerate(co_rec_r.test_ratings):
         try:
             user_id = test['user_id']
             item_id = test['item_id']
             rating = test['rating']
             
-            predicted_rating = cr_r.predict_rating_item_based_nn_wtd(user_id, item_id)
+            user_predicted_rating = co_rec_r.predict_co_rec_user(user_id, item_id)
+            item_predicted_rating = co_rec_r.predict_co_rec_item(user_id, item_id)
             
-            test["pred_rating"] = predicted_rating
-            cr_r.add_prediction(test)
             
-            #if i > 11:
-            #    break
+            test["pred_rating"] = user_predicted_rating
+            co_rec_r.add_prediction(test)
+            
+            if i > 10:
+                break
         
             #print(user_id, item_id, rating, round(predicted_rating, 1))
             
@@ -343,7 +349,7 @@ def run_pearlpu_rec_experiment(k):
             #sleep(1)
             break
         
-    mae = Evaluation.mean_absolute_error(cr_r.predictions)
+    mae = Evaluation.mean_absolute_error(co_rec_r.predictions)
     mae = round(mae, 5)
     test["pred_rating"] = round(test["pred_rating"], 2)
     
@@ -351,26 +357,3 @@ def run_pearlpu_rec_experiment(k):
     #print(mae)
     
     return test, mae
-from sklearn.model_selection import train_test_split
-from dataset.Dataset import Dataset
-from sklearn.base import ClusterMixin
-
-class myUserRec(ClusterMixin):
-    def __init__(self, *args, **args):
-        self.model = UserRecommender(*args, **args)
-        
-    def fit_predict(self, X):
-        self.model.predict_rating_user_based_nn_wtd
-        
-        
-def something():
-    ds = Dataset()
-    print(ds.get_ratings_as_df())
-    
-    
-    #X_train, X_test, y_train, y_test = train_test_split(ds.user_train_ratings, ds.user_test_ratings, test_size=0.2, random_state=2)
-
-    # add entire to dataset
-    # how to resolve the item and user view of the data in sklearn???
-    
-#something()"""

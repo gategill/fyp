@@ -70,6 +70,12 @@ class Dataset:
             item_id = int(substrings[1])
             rating = float(substrings[2])
             
+            if rating < 1.0:
+                rating = 1.0
+                
+            if rating > 5:
+                rating = 5.0
+                                
             all_ratings.append({'user_id': user_id, 'item_id': item_id, 'rating': rating})
         
         random.shuffle(all_ratings) # inplace, returns None

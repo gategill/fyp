@@ -64,4 +64,12 @@ class PearlPuRecommender(UserRecommender):
         if beta == 0.0:
             return mean_rating_for_active_user
         else:
-            return mean_rating_for_active_user + (alpha/beta)
+            prediction = mean_rating_for_active_user + (alpha/beta)
+            
+            if prediction < 1.0:
+                prediction = 1.0
+                
+            if prediction > 5:
+                prediction = 5.0
+    
+            return prediction

@@ -23,7 +23,14 @@ class ItemRecommender(GenericRecommender):
         prediction = self.calculate_avg_rating(nns)
         
         if prediction:
+            
+            if prediction < 1.0:
+                prediction = 1.0
+                
+            if prediction > 5:
+                prediction = 5.0
             return prediction
+        
         else:
             prediction = self.get_item_mean_rating(candidate_item_id)
             
@@ -41,6 +48,12 @@ class ItemRecommender(GenericRecommender):
         prediction = self.calculate_wtd_avg_rating(nns)
         
         if prediction:
+            
+            if prediction < 1.0:
+                prediction = 1.0
+                
+            if prediction > 5:
+                prediction = 5.0
             return prediction
         else:
             prediction = self.get_item_mean_rating(candidate_item_id)
