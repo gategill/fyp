@@ -16,29 +16,14 @@ import time
 import os
 import boto3
 
-
-#session = boto3.Session()
-#s3 = session.resource('s3')
-s3 = boto3.client('s3')
-
-
-
-
 ic.disable()
-#ic.configureOutput(includeContext=True)
-s3_resource = boto3.resource('s3')
-
-
+s3 = boto3.client('s3')
+#s3_resource = boto3.resource('s3')
 
 
 def save_in_s3_function(da, which, current_timestamp):
-    #s3_resource.Bucket("fyp-w9797878").upload_file(Filename=filename, Key=key_c)
-    #txt_data = da
-    #object = s3.Object(BucketName ="fyp-w9797878", File_Key = str(current_timestamp) + "/"+ which + '.txt')
-    #result = object.put(Body=da)
     s3.put_object(Body = da, Bucket = "fyp-w9797878", Key = str(current_timestamp) + "/"+ which + '.txt')
 
-    
     
 def run_experiment(k: int, which: str, save_results: bool, kfolds: int, save_in_s3: bool) -> None:
     
@@ -51,58 +36,73 @@ def run_experiment(k: int, which: str, save_results: bool, kfolds: int, save_in_
         
         # For each rating in the test set, make a prediction using a 
         # user-based KNN with k = 3
-        lines_result = "algorithm, mae\n"
+        lines_result = "algorithm, mae, time_elapsed\n"
         if "u" in which:
+            tic = time.time()
             u, mae = run_user_rec_experiment(k)
-            print(u, mae)
-            lines_result += "u_rec_k={}, {}\n".format(k, mae)
+            toc = time.time()
+            time_elapsed = toc - tic
             
-            #print(save_in_s3)
+            print(u, mae, time_elapsed)
+            lines_result += "u_rec_k={}, {}, {}\n".format(k, mae, time_elapsed)
+            
             if save_in_s3:
-            #saved_file = "{}/{}.txt".format(save_path, which)
-                save_in_s3_function("u_rec_k={}, {}\n".format(k, mae), "u", current_timestamp)
+                save_in_s3_function("u_rec_k={}, {}, {}\n".format(k, mae, time_elapsed), "u", current_timestamp)
 
 
         # For each rating in the test set, make a prediction using an 
         # item-based KNN with k = 3
         if "i" in which:
+            tic = time.time()
             u, mae = run_item_rec_experiment(k)
-            print(u, mae)
-            lines_result += "i_rec_k={}, {}\n".format(k, mae)
+            toc = time.time()
+            time_elapsed = toc - tic
+            
+            print(u, mae, time_elapsed)
+            lines_result += "i_rec_k={}, {}, {}\n".format(k, mae, time_elapsed)
             
             if save_in_s3:
-            #saved_file = "{}/{}.txt".format(save_path, which)
-                save_in_s3_function("i_rec_k={}, {}\n".format(k, mae), "i", current_timestamp)
+                save_in_s3_function("i_rec_k={}, {}, {}\n".format(k, mae, time_elapsed), "i", current_timestamp)
 
 
         if "b" in which:
+            tic = time.time()
             u, mae = run_bootstrap_rec_experiment(k)
-            print(u, mae)
-            lines_result += "bs_rec_k={}, {}\n".format(k, mae)
+            toc = time.time()
+            time_elapsed = toc - tic
+            
+            print(u, mae, time_elapsed)
+            lines_result += "bs_rec_k={}, {}, {}\n".format(k, mae, time_elapsed)
             
             if save_in_s3:
-            #saved_file = "{}/{}.txt".format(save_path, which)
-                save_in_s3_function("bs_rec_k={}, {}\n".format(k, mae), "b", current_timestamp)
+                save_in_s3_function("bs_rec_k={}, {}, {}\n".format(k, mae, time_elapsed), "b", current_timestamp)
 
 
         if "p" in which:
+            tic = time.time()
             u, mae = run_pearlpu_rec_experiment(k)
-            print(u, mae)
-            lines_result += "pp_rec_k={}, {}\n".format(k, mae)
+            toc = time.time()
+            time_elapsed = toc - tic
+            
+            print(u, mae, time_elapsed)
+            lines_result += "pp_rec_k={}, {}, {}\n".format(k, mae, time_elapsed)
             
             if save_in_s3:
-            #saved_file = "{}/{}.txt".format(save_path, which)
-                save_in_s3_function("pp_rec_k={}, {}\n".format(k, mae), "p", current_timestamp)
+                save_in_s3_function("pp_rec_k={}, {}, {}\n".format(k, mae, time_elapsed), "p", current_timestamp)
                 
             
         if "c" in which:
+            tic = time.time()
             u, mae = run_corec_rec_experiment(k)
-            print(u, mae)
-            lines_result += "corec_rec_k={}, {}\n".format(k, mae)
+            toc = time.time()
+            time_elapsed = toc - tic
+            
+            print(u, mae, time_elapsed)
+            lines_result += "corec_rec_k={}, {}, {}\n".format(k, mae, time_elapsed)
             
             if save_in_s3:
-            #saved_file = "{}/{}.txt".format(save_path, which)
-                save_in_s3_function("corec_rec_k={}, {}\n".format(k, mae), "c", current_timestamp)
+                save_in_s3_function("corec_rec_k={}, {}, {}\n".format(k, mae, time_elapsed), "c", current_timestamp)
+            
             
         if save_results:
             saved_file = "{}/{}.txt".format(save_path, which)
@@ -111,7 +111,6 @@ def run_experiment(k: int, which: str, save_results: bool, kfolds: int, save_in_
                 f.write(lines_result)
                 
         if save_in_s3:
-            #saved_file = "{}/{}.txt".format(save_path, which)
             save_in_s3_function(lines_result, which, current_timestamp)
 
 
@@ -129,27 +128,19 @@ def run_user_rec_experiment(k):
             rating = test['rating']
             
             predicted_rating = user_r.predict_rating_user_based_nn_wtd(active_user_id = user_id, candidate_item_id = item_id)
-            
-            
               
             if predicted_rating < 1.0:
-                #print("The rating is beyond the range: {}".format(predicted_rating))
                 predicted_rating = 1.0
                 
             if predicted_rating > 5:
-                #print("The rating is beyond the range: {}".format(predicted_rating))
                 predicted_rating = 5.0
-                
-                
                 
             test["pred_rating"] = predicted_rating
             user_r.add_prediction(test)
             
             if i > 100:
                 break
-        
-            #print(user_id, item_id, rating, round(predicted_rating, 1))
-            
+                    
         except KeyboardInterrupt:
             ic("\nStopping\n")
             ic(i)
@@ -159,9 +150,6 @@ def run_user_rec_experiment(k):
     mae = Evaluation.mean_absolute_error(user_r.predictions)
     mae = round(mae, 5)
     test["pred_rating"] = round(test["pred_rating"], 2)
-    
-    #print(test)
-    #print(mae)
     
     return test, mae     
 
@@ -179,24 +167,18 @@ def run_item_rec_experiment(k):
             
             predicted_rating = item_r.predict_rating_item_based_nn_wtd(active_user_id = user_id, candidate_item_id = item_id)
             
-              
             if predicted_rating < 1.0:
-                #print("The rating is beyond the range: {}".format(predicted_rating))
                 predicted_rating = 1.0
                 
             if predicted_rating > 5:
-                #print("The rating is beyond the range: {}".format(predicted_rating))
                 predicted_rating = 5.0
-                
                 
             test["pred_rating"] = predicted_rating
             item_r.add_prediction(test)
             
             if i > 100:
                 break
-        
-            #print(user_id, item_id, rating, round(predicted_rating, 1))
-            
+                    
         except KeyboardInterrupt:
             ic("\nStopping\n")
             ic(i)
@@ -206,9 +188,6 @@ def run_item_rec_experiment(k):
     mae = Evaluation.mean_absolute_error(item_r.predictions)
     mae = round(mae, 5)
     test["pred_rating"] = round(test["pred_rating"], 2)
-    
-    #print(test)
-    #print(mae)
     
     return test, mae        
 
@@ -226,17 +205,13 @@ def run_bootstrap_rec_experiment(k):
             user_id = test['user_id']
             item_id = test['item_id']
             rating = test['rating']
-            #print(bs_r.dataset.num_ratings)
 
             predicted_rating = bs_r.predict_rating_user_based_nn_wtd(active_user_id = user_id, candidate_item_id = item_id)
             
-            
             if predicted_rating < 1.0:
-                #print("The rating is beyond the range: {}".format(predicted_rating))
                 predicted_rating = 1.0
                 
             if predicted_rating > 5:
-                #print("The rating is beyond the range: {}".format(predicted_rating))
                 predicted_rating = 5.0
                 
                 
@@ -246,7 +221,6 @@ def run_bootstrap_rec_experiment(k):
             if i > 30:
                 break
         
-            #print(user_id, item_id, rating, round(predicted_rating, 1))
             
         except KeyboardInterrupt:
             ic("\nStopping\n")
@@ -257,10 +231,7 @@ def run_bootstrap_rec_experiment(k):
     mae = Evaluation.mean_absolute_error(bs_r.predictions)
     mae = round(mae, 5)
     test["pred_rating"] = round(test["pred_rating"], 2)
-    
-    #print(test)
-    #print(mae)
-    
+
     return test, mae     
 
 
@@ -276,8 +247,6 @@ def run_pearlpu_rec_experiment(k):
             rating = test['rating']
             
             predicted_rating = pp_r.recursive_prediction(user_id, item_id)
-            #assert predicted_rating <= 5
-            #assert predicted_rating >= 0
             
             if predicted_rating < 1.0:
                 print("The rating is beyond the range: {}".format(predicted_rating))
@@ -292,9 +261,7 @@ def run_pearlpu_rec_experiment(k):
             
             if i > 30:
                 break
-        
-            #print(user_id, item_id, rating, round(predicted_rating, 1))
-            
+                    
         except KeyboardInterrupt:
             ic("\nStopping\n")
             ic(i)
@@ -310,14 +277,11 @@ def run_pearlpu_rec_experiment(k):
     mae = round(mae, 5)
     test["pred_rating"] = round(test["pred_rating"], 2)
     
-    #print(test)
-    #print(mae)
-    
     return test, mae     
 
 
 def run_corec_rec_experiment(k):
-    co_rec_r = CoRecRecommender(k)
+    co_rec_r = CoRecRecommender(k, 10, 50)
 
     print("\nRunning Co Rec Recommender\n")
     
@@ -331,8 +295,8 @@ def run_corec_rec_experiment(k):
             item_id = test['item_id']
             rating = test['rating']
             
-            user_predicted_rating = co_rec_r.predict_co_rec_user(user_id, item_id)
-            item_predicted_rating = co_rec_r.predict_co_rec_item(user_id, item_id)
+            user_predicted_rating = co_rec_r.predict_co_rec_for_users(user_id, item_id)
+            item_predicted_rating = co_rec_r.predict_co_rec_for_items(user_id, item_id)
             
             test["user_pred_rating"] = user_predicted_rating
             test["item_pred_rating"] = item_predicted_rating

@@ -16,7 +16,7 @@ import pandas as pd
 
 
 class CoRecRecommender(GenericRecommender):
-    def __init__(self, k: int, additions: int, top_m: int, dataset) -> None:
+    def __init__(self, k: int, additions: int, top_m: int, dataset = None) -> None:
         ic("cr_rec.__init__()")
         
         super().__init__(k, dataset)
@@ -118,18 +118,32 @@ class CoRecRecommender(GenericRecommender):
             self.item_rec.add_new_recommendations(top_m_user_predictions)
         
 
-    def predict_co_rec_for_users(self, user_id, item_id):
+    def predict_co_rec_for_users(self, user_id, item_id) -> float:
         """step 3: Recommendation Task for Users"""
         
         predicted_rating = self.user_rec.predict_rating_user_based_nn_wtd(active_user_id = user_id, candidate_item_id = item_id)
-        return predicted_rating
+        
+        if predicted_rating < 1.0:
+            predicted_rating = 1.0
+                
+        if predicted_rating > 5.0:
+            predicted_rating = 5.0
+            
+        return round(predicted_rating, 2)
     
     
     def predict_co_rec_for_items(self, user_id, item_id):
         """step 3: Recommendation Task for Items"""
         
         predicted_rating = self.item_rec.predict_rating_item_based_nn_wtd(active_user_id = user_id, candidate_item_id = item_id)
-        return predicted_rating
+        
+        if predicted_rating < 1.0:
+            predicted_rating = 1.0
+                
+        if predicted_rating > 5.0:
+            predicted_rating = 5.0
+            
+        return round(predicted_rating, 2)
     
 
     def get_user_unrated_items(self, user_id: int,  number: int) -> list:

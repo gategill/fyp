@@ -25,7 +25,7 @@ class Evaluation:
             
             return mae
 
-        if ("user_pred_rating" in predictions[0]) and ("item_pred_rating" in prediction[0]):
+        if ("user_pred_rating" in predictions[0]) and ("item_pred_rating" in predictions[0]):
             mae_user = 0
             mae_item = 0
             for prediction in predictions:
