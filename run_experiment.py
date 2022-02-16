@@ -44,7 +44,7 @@ def run_experiment(k: int, which: str, save_results: bool, kfolds: int, save_in_
             time_elapsed = toc - tic
             
             print(u, mae, time_elapsed)
-            lines_result += "u_rec_k={}, {}, {}\n".format(k, mae, time_elapsed)
+            lines_result += "u_rec_k={}, {}, {} \n".format(k, mae, time_elapsed)
             
             if save_in_s3:
                 save_in_s3_function("u_rec_k={}, {}, {}\n".format(k, mae, time_elapsed), "u", current_timestamp)

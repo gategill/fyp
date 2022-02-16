@@ -50,7 +50,7 @@ class CoRecRecommender(GenericRecommender):
                 item_id = entry['item_id']
                 
                 print("\nRunning USER Recommender for CoRec\n")          
-                predicted_rating = self.user_rec.predict_rating_user_based_nn_wtd(active_user_id = user_id, candidate_item_id = item_id)
+                predicted_rating = self.user_rec.predict_rating_user_based_nn_wtd(active_user_id = user_id, candidate_item_id = item_id, similarity_function = Similarities.sim_sim)
                 
                 
                 if predicted_rating < 1.0:
@@ -76,7 +76,7 @@ class CoRecRecommender(GenericRecommender):
                 item_id = entry['item_id']
                 
                 print("\nRunning ITEM Recommender for CoRec\n")          
-                predicted_rating = self.item_rec.predict_rating_item_based_nn_wtd(active_user_id = user_id, candidate_item_id = item_id)
+                predicted_rating = self.item_rec.predict_rating_item_based_nn_wtd(active_user_id = user_id, candidate_item_id = item_id, similarity_fuction = Similarities.sim_sim)
                 
                 if predicted_rating < 1.0:
                     predicted_rating = 1.0

@@ -4,6 +4,7 @@
 
 
 from icecream import ic
+import types
 from recommender.UserRecommender import UserRecommender
 from recommender.Similarities import Similarities
 
@@ -19,7 +20,7 @@ class PearlPuRecommender(UserRecommender):
         #self.test_ratings = self.user_rec.test_ratings
         
         
-    def recursive_prediction(self, active_user: int, candidate_moive: int, recursion_level: int = 1) -> float:
+    def recursive_prediction(self, active_user: int, candidate_moive: int, recursion_level: int = 1, similarity_function: types.FunctionType = Similarities.sim_pearson) -> float:
         """"""
         ic("pp_rec.recursive_prediction()")
         ic(recursion_level)
@@ -29,7 +30,7 @@ class PearlPuRecommender(UserRecommender):
             
             return self.predict_rating_user_based_nn_wtd(active_user, candidate_moive) # baseline
 
-        nns = self.get_k_nearest_users(Similarities.sim_pearson, self.k, active_user)  # no item id, doesn't limit to just rated
+        nns = self.get_k_nearest_users(similarity_function, self.k, active_user)  # no item id, doesn't limit to just rated
         
         alpha = 0.0
         beta = 0.0
@@ -39,7 +40,7 @@ class PearlPuRecommender(UserRecommender):
             neighbour_item_rating = self.get_user_item_rating(neighbour_id, candidate_moive)
             
             if neighbour_item_rating is not None:
-                sim_x_y = self.get_user_similarity(Similarities.sim_pearson, active_user, neighbour_id)
+                sim_x_y = self.get_user_similarity(similarity_function, active_user, neighbour_id)
                 mean_rating_for_neighbour = self.get_user_mean_rating(neighbour_id)
                 
                 #ic(sim_x_y)
@@ -48,7 +49,7 @@ class PearlPuRecommender(UserRecommender):
                 
             else:
                 rec_pred = self.recursive_prediction(neighbour_id, candidate_moive, recursion_level + 1)
-                sim_x_y = self.get_user_similarity(Similarities.sim_pearson, active_user, neighbour_id)
+                sim_x_y = self.get_user_similarity(similarity_function, active_user, neighbour_id)
                 #ic(sim_x_y)
                 mean_rating_for_neighbour = self.get_user_mean_rating(neighbour_id)
                 

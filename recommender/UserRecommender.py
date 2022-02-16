@@ -16,10 +16,10 @@ class UserRecommender(GenericRecommender):
         super().__init__(k, dataset)
 
 
-    def predict_rating_user_based_nn(self, active_user_id: int, candidate_item_id: int) -> float:
+    def predict_rating_user_based_nn(self, active_user_id: int, candidate_item_id: int, similarity_function: types.FunctionType = Similarities.sim_pearson) -> float:
         ic("user_rec.predict_rating_user_based_nn()")
         
-        nns = self.get_k_nearest_users(Similarities.sim_pearson, self.k, active_user_id, candidate_item_id)
+        nns = self.get_k_nearest_users(similarity_function, self.k, active_user_id, candidate_item_id)
         prediction = self.calculate_avg_rating(nns)
         
         if prediction:
@@ -41,10 +41,10 @@ class UserRecommender(GenericRecommender):
                 return self.mean_train_rating
 
 
-    def predict_rating_user_based_nn_wtd(self, active_user_id: int, candidate_item_id: int) -> float:
+    def predict_rating_user_based_nn_wtd(self, active_user_id: int, candidate_item_id: int, similarity_function: types.FunctionType = Similarities.sim_pearson) -> float:
         #ic("user_rec.predict_rating_user_based_nn_wtd()")
 
-        nns = self.get_k_nearest_users(Similarities.sim_pearson, self.k, active_user_id, candidate_item_id)
+        nns = self.get_k_nearest_users(similarity_function, self.k, active_user_id, candidate_item_id)
         prediction = self.calculate_wtd_avg_rating(nns)
         
         if prediction:

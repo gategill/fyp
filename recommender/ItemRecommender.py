@@ -16,10 +16,10 @@ class ItemRecommender(GenericRecommender):
         super().__init__(k, dataset)
     
     
-    def predict_rating_item_based_nn(self, active_user_id: int, candidate_item_id: int) -> float:
+    def predict_rating_item_based_nn(self, active_user_id: int, candidate_item_id: int, similarity_function: types.FunctionType = Similarities.sim_cosine) -> float:
         ic("item_rec.predict_rating_item_based_nn()")
         
-        nns = self.get_k_thresholded_nearest_items(Similarities.sim_cosine, self.k, 0.0, candidate_item_id, active_user_id)
+        nns = self.get_k_thresholded_nearest_items(similarity_function, self.k, 0.0, candidate_item_id, active_user_id)
         prediction = self.calculate_avg_rating(nns)
         
         if prediction:
@@ -40,11 +40,10 @@ class ItemRecommender(GenericRecommender):
                 return self.mean_train_rating
 
 
-    def predict_rating_item_based_nn_wtd(self, active_user_id: int, candidate_item_id: int) -> float:
+    def predict_rating_item_based_nn_wtd(self, active_user_id: int, candidate_item_id: int, similarity_function: types.FunctionType = Similarities.sim_cosine) -> float:
         ic("item_rec.predict_rating_item_based_nn_wtd()")
         
-        #nns = self.get_k_thresholded_nearest_items(Similarities.sim_cosine, self.k, 0.0, candidate_item_id, active_user_id)
-        nns = self.get_k_nearest_items(Similarities.sim_cosine, self.k, candidate_item_id, active_user_id)
+        nns = self.get_k_nearest_items(similarity_function, self.k, candidate_item_id, active_user_id)
         prediction = self.calculate_wtd_avg_rating(nns)
         
         if prediction:
