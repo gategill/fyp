@@ -24,7 +24,6 @@ class Similarities:
                 
         n = len(co_rated)
         
-        
         if n == 0: 
             return 0.0
         
