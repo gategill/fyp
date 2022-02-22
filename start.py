@@ -8,7 +8,7 @@ from run_experiment import run_experiment
 
 
 parser = argparse.ArgumentParser(description = "Run User and Item KNN")
-parser.add_argument("--w", type = str, default = "u")
+parser.add_argument("--w", type = str, default = "c")
 parser.add_argument("--k", type = int, default = 3)
 parser.add_argument("--s", type = bool, default = True)
 parser.add_argument("--s3", type = bool, default = True)

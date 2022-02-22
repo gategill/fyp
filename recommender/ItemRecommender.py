@@ -17,7 +17,7 @@ class ItemRecommender(GenericRecommender):
     
     
     def predict_rating_item_based_nn(self, active_user_id: int, candidate_item_id: int, similarity_function: types.FunctionType = Similarities.sim_cosine) -> float:
-        ic("item_rec.predict_rating_item_based_nn()")
+        #ic("item_rec.predict_rating_item_based_nn()")
         
         nns = self.get_k_thresholded_nearest_items(similarity_function, self.k, 0.0, candidate_item_id, active_user_id)
         prediction = self.calculate_avg_rating(nns)
@@ -41,7 +41,7 @@ class ItemRecommender(GenericRecommender):
 
 
     def predict_rating_item_based_nn_wtd(self, active_user_id: int, candidate_item_id: int, similarity_function: types.FunctionType = Similarities.sim_cosine) -> float:
-        ic("item_rec.predict_rating_item_based_nn_wtd()")
+        #ic("item_rec.predict_rating_item_based_nn_wtd()")
         
         nns = self.get_k_nearest_items(similarity_function, self.k, candidate_item_id, active_user_id)
         prediction = self.calculate_wtd_avg_rating(nns)
@@ -64,7 +64,7 @@ class ItemRecommender(GenericRecommender):
             
 
     def get_k_nearest_items(self, similarity_function: types.FunctionType, k: int, candidate_item_id: int, active_user_id: int = None) -> list:
-        ic("item_rec.get_k_nearest_items()")
+        #ic("item_rec.get_k_nearest_items()")
         
         """
         [{item_id: int, rating: float, sim: float}]
@@ -126,7 +126,7 @@ class ItemRecommender(GenericRecommender):
 
 
     def get_thresholded_nearest_items(self, similarity_function: types.FunctionType, threshold: float, candidate_item_id: int, active_user_id: int = None) -> list:
-        ic("item_rec.get_thresholded_nearest_items()")
+        #ic("item_rec.get_thresholded_nearest_items()")
         
         """
         [{item_id: int, rating: float, sim: float}]
@@ -175,7 +175,7 @@ class ItemRecommender(GenericRecommender):
 
 
     def get_k_thresholded_nearest_items(self, similarity_function: types.FunctionType, k: int, threshold: float, candidate_item_id: int, active_user_id: int = None) -> list:
-        ic("item_rec.get_k_thresholded_nearest_items()")
+        #ic("item_rec.get_k_thresholded_nearest_items()")
         
         """
         [{item_id: int, rating: float, sim: float}]
@@ -243,7 +243,7 @@ class ItemRecommender(GenericRecommender):
     
     
     def get_item_ratings(self, item_id: int) -> list:
-        ic("item_rec.get_item_ratings()")
+        #ic("item_rec.get_item_ratings()")
         
         """
         [ratings: float]
@@ -264,7 +264,7 @@ class ItemRecommender(GenericRecommender):
             
             
     def get_item_mean_rating(self, item_id: int) -> float:
-        ic("item_rec.get_item_mean_rating()")
+        #ic("item_rec.get_item_mean_rating()")
         
         """
         Gets the mean of item_id's ratings from the train set. If this item has no ratings in the
@@ -280,7 +280,7 @@ class ItemRecommender(GenericRecommender):
             
             
     def get_genre_ratings(self, genre: str) -> list:
-        ic("item_rec.get_genre_ratings()")
+        #ic("item_rec.get_genre_ratings()")
         
         """
         [ratings: float]
@@ -302,7 +302,7 @@ class ItemRecommender(GenericRecommender):
 
 
     def get_item_descriptors(self, item_id: int) -> dict:
-        ic("item_rec.get_item_descriptors()")
+        #ic("item_rec.get_item_descriptors()")
         
         """
         Gets all of item_id's descriptors as a dictionary.
@@ -321,7 +321,7 @@ class ItemRecommender(GenericRecommender):
         
     def get_item_similarity(self, similarity_function: types.FunctionType, candidate_item_id: int, item_id: int) -> float:
         """"""
-        #ic("item_rec.get_item_similarity()")
+        ##ic("item_rec.get_item_similarity()")
         
         return similarity_function(self.item_train_ratings[candidate_item_id], self.item_train_ratings[item_id])
         

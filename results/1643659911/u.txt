@@ -1,2 +1,0 @@
-algorithm, mae
-u_rec_k=3, 0.89046

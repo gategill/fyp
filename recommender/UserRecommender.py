@@ -17,7 +17,7 @@ class UserRecommender(GenericRecommender):
 
 
     def predict_rating_user_based_nn(self, active_user_id: int, candidate_item_id: int, similarity_function: types.FunctionType = Similarities.sim_pearson) -> float:
-        ic("user_rec.predict_rating_user_based_nn()")
+        #ic("user_rec.predict_rating_user_based_nn()")
         
         nns = self.get_k_nearest_users(similarity_function, self.k, active_user_id, candidate_item_id)
         prediction = self.calculate_avg_rating(nns)
@@ -42,7 +42,7 @@ class UserRecommender(GenericRecommender):
 
 
     def predict_rating_user_based_nn_wtd(self, active_user_id: int, candidate_item_id: int, similarity_function: types.FunctionType = Similarities.sim_pearson) -> float:
-        #ic("user_rec.predict_rating_user_based_nn_wtd()")
+        ##ic("user_rec.predict_rating_user_based_nn_wtd()")
 
         nns = self.get_k_nearest_users(similarity_function, self.k, active_user_id, candidate_item_id)
         prediction = self.calculate_wtd_avg_rating(nns)
@@ -64,7 +64,7 @@ class UserRecommender(GenericRecommender):
 
 
     def get_k_nearest_users(self, similarity_function: types.FunctionType, k: int, active_user_id: int, candidate_item_id: int = None) -> list:
-        #ic("user_rec.get_k_nearest_users()")
+        ##ic("user_rec.get_k_nearest_users()")
         
         """
         [{user_id: int, rating: float, sim: float}]
@@ -130,7 +130,7 @@ class UserRecommender(GenericRecommender):
 
 
     def get_thresholded_nearest_users(self, similarity_function: types.FunctionType, threshold: float, active_user_id: int, candidate_item_id: int = None) -> list:
-        ic("user_rec.get_thresholded_nearest_users()")
+        #ic("user_rec.get_thresholded_nearest_users()")
         
         """
         [{user_id: int, rating: float, sim: float}]
@@ -179,7 +179,7 @@ class UserRecommender(GenericRecommender):
 
 
     def get_k_thresholded_nearest_users(self, similarity_function: types.FunctionType, k:int, threshold: float, active_user_id: int, candidate_item_id: int = None) -> list:
-        ic("user_rec.get_k_thresholded_nearest_users()")
+        #ic("user_rec.get_k_thresholded_nearest_users()")
         
         """
         [{user_id: int, rating: float, sim: float}]
@@ -248,7 +248,7 @@ class UserRecommender(GenericRecommender):
 
 
     def get_user_item_rating(self, user_id: int, item_id: int) -> float:
-        ic("user_rec.get_user_item_rating()")
+        #ic("user_rec.get_user_item_rating()")
         
         """
         Gets user_id's rating for item_id from the train set or None if this user has no rating for this item in the
@@ -271,7 +271,7 @@ class UserRecommender(GenericRecommender):
             
             
     def get_user_ratings(self, user_id: int) -> list:
-        ic("user_rec.get_user_ratings()")
+        #ic("user_rec.get_user_ratings()")
          
         """
         [ratings: float]
@@ -292,7 +292,7 @@ class UserRecommender(GenericRecommender):
             
             
     def get_user_mean_rating(self, user_id: int) -> float:
-        #ic("user_rec.get_user_mean_rating()")
+        ##ic("user_rec.get_user_mean_rating()")
          
         """
         Gets the mean of user_id's ratings from the train set. If this user has no ratings in the
@@ -308,7 +308,7 @@ class UserRecommender(GenericRecommender):
     
            
     def get_demographic_ratings(self, age = None, gender = None, occupation = None, zipcode = None) -> list:
-        ic("user_rec.get_demographic_ratings()")
+        #ic("user_rec.get_demographic_ratings()")
         
         """
         Gets all ratings from the train set as a list for users whose demographics matches the values in the arguments.
@@ -328,7 +328,7 @@ class UserRecommender(GenericRecommender):
 
 
     def get_user_demographics(self, user_id: int) -> dict:
-        ic("user_rec.get_user_demographics()")
+        #ic("user_rec.get_user_demographics()")
         
         """
         Gets all of user_id's demographic data as a dictionary.
@@ -347,7 +347,7 @@ class UserRecommender(GenericRecommender):
         
     def get_user_similarity(self, similarity_function: types.FunctionType, active_user_id: int, user_id: int) -> float:
         """"""
-        #ic("user_rec.get_user_similarity()")
+        ##ic("user_rec.get_user_similarity()")
         
         sim = similarity_function(self.user_train_ratings[active_user_id], self.user_train_ratings[user_id])
         

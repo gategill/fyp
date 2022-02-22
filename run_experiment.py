@@ -16,7 +16,7 @@ import time
 import os
 import boto3
 
-ic.disable()
+#ic.disable()
 s3 = boto3.client('s3')
 #s3_resource = boto3.resource('s3')
 
@@ -26,7 +26,6 @@ def save_in_s3_function(da, which, current_timestamp):
 
     
 def run_experiment(k: int, which: str, save_results: bool, kfolds: int, save_in_s3: bool) -> None:
-    
     save_in_s3 = False
     for i in range(kfolds):
         
@@ -302,7 +301,7 @@ def run_corec_rec_experiment(k):
             test["item_pred_rating"] = item_predicted_rating
             co_rec_r.add_prediction(test)
 
-            if i > 10:
+            if i > 100:
                 break
                     
         except KeyboardInterrupt:

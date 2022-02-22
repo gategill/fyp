@@ -10,7 +10,7 @@ from dataset.Dataset import Dataset
 
 class GenericRecommender:
     def __init__(self, k: int, dataset = None) -> None:
-        ic("gen_rec.__init__()")
+        #ic("gen_rec.__init__()")
         
         self.k = k
         self.dataset = dataset
@@ -19,7 +19,7 @@ class GenericRecommender:
         
 
     def load_dataset(self) -> None:
-        ic("gen_load_dataset()")
+        #ic("gen_load_dataset()")
         
         if self.dataset is None:
             self.dataset = Dataset()
@@ -41,7 +41,7 @@ class GenericRecommender:
                 
 
     def calculate_avg_rating(self, neighbours: list) -> float:
-        ic("gen_rec.calculate_avg_rating()")
+        #ic("gen_rec.calculate_avg_rating()")
         # [{sim, user_id, rating}]
         
         if len(neighbours) == 0:
@@ -70,7 +70,7 @@ class GenericRecommender:
     def calculate_wtd_avg_rating(self, neighbours: list) -> float:
         # weighted, introduces similarity
         # [{sim, user_id, rating}]
-        #ic("gen_rec.calculate_wtd_avg_rating()")
+        ##ic("gen_rec.calculate_wtd_avg_rating()")
         
         if len(neighbours) == 0:
             return None
@@ -99,7 +99,7 @@ class GenericRecommender:
     
     def add_new_recommendations(self, new_recommendations: list) -> None:
         """recommendation*s* = list if dicts"""
-        ic("gen_rec.add_new_recommendations()")
+        #ic("gen_rec.add_new_recommendations()")
         
         self.dataset.add_new_recommendations_to_dataset(new_recommendations)
 

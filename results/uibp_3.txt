@@ -1,5 +1,0 @@
-algorithm, mae
-user_rec, 0.89046
-item_rec, 0.7907
-bootstrap_rec, 0.89065
-pearlpu_rec, 13693793015.74412

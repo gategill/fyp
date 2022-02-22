@@ -98,12 +98,6 @@ class Similarities:
         if sum_squares1 == 0 or sum_squares2 == 0:
             return 0.0
         
-        # Calculate Pearson correlation
-        
-        #ic(sum_prods)
-        
-        #ic(sum_prods / (math.sqrt(sum_squares1) * math.sqrt(sum_squares2)))
-        
         return sum_prods / (math.sqrt(sum_squares1) * math.sqrt(sum_squares2))
 
 

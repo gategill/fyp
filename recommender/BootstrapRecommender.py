@@ -14,7 +14,7 @@ from recommender.UserRecommender import UserRecommender
 
 class BootstrapRecommender(UserRecommender):
     def __init__(self, k: int, iterations: int = 5, additions: int = 10, dataset = None) -> None:
-        ic("bs_rec.__init__()")
+        #ic("bs_rec.__init__()")
         
         super().__init__(k, dataset)
         self.iterations = iterations
@@ -22,7 +22,7 @@ class BootstrapRecommender(UserRecommender):
         
         
     def enrich(self) -> None:
-        ic("bs_rec.enhance()")
+        #ic("bs_rec.enhance()")
         
         for iteration in range(1, self.iterations + 1):
             print("\n")
@@ -50,7 +50,7 @@ class BootstrapRecommender(UserRecommender):
             
     def get_user_unrated_items(self, user_id: int,  number: int) -> list:
         """"""
-        ic("bs_rec.get_user_unrated_items()")
+        #ic("bs_rec.get_user_unrated_items()")
         
         value = self.user_train_ratings[user_id]
         items_rated_in_train = set(list(value.keys()))

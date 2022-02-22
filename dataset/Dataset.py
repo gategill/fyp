@@ -11,7 +11,7 @@ import pandas as pd
 
 class Dataset:
     def __init__(self):
-        ic("ds.__init__()")
+        #ic("ds.__init__()")
         self.DATA_PATH = "./data/derek/"
         self.__reset()
         self.load_items()
@@ -24,7 +24,7 @@ class Dataset:
     
         
     def load_items(self, filename: str = "movies.txt") -> None:
-        ic("ds.load_items()")
+        #ic("ds.load_items()")
         
         START = 5
         FINISH = -19
@@ -42,7 +42,7 @@ class Dataset:
         
         
     def load_users(self, filename: str = "users.txt") -> None:
-        ic("ds.load_users()")
+        #ic("ds.load_users()")
 
         user_ids = []
         self.user_demographics = {}
@@ -58,7 +58,7 @@ class Dataset:
     def read_in_ratings(self,  filename: str = "ratings.txt"):
         """ Reads in the data from a ratings file."""
         
-        ic("ds.read_in_ratings()")
+        #ic("ds.read_in_ratings()")
         
         if type(filename) != str:
             raise TypeError("load_ratings: you supplied filename = '%s' but filename must be a string" % filename)
@@ -89,7 +89,7 @@ class Dataset:
     
         
     def load_ratings(self, test_percentage: int = 20, seed: int = 42) -> None:
-        ic("ds.load_ratings()")
+        #ic("ds.load_ratings()")
 
         """
         It partitions the data randomly so that approximately test_percentage of the ratings are treated as a test set and 
@@ -168,7 +168,7 @@ class Dataset:
 
     def add_new_recommendations_to_dataset(self, new_recommendations):
         # 
-        ic("ds.add_new_recommendations_to_dataset()")
+        #ic("ds.add_new_recommendations_to_dataset()")
         
         self.update_user_train_ratings(new_recommendations)
         self.update_item_train_ratings(new_recommendations)
@@ -185,28 +185,28 @@ class Dataset:
                 
     def get_user_ids(self) -> list:
         # [user_ids]
-        ic("ds.get_user_ids()")
+        #ic("ds.get_user_ids()")
         
         return self.user_ids
         
         
     def get_item_ids(self) -> list:
         # [item_ids]
-        ic("ds.get_item_ids()")
+        #ic("ds.get_item_ids()")
         
         return self.item_ids
 
 
     def get_user_train_ratings(self) -> dict:
         # {user_id: int : {moive_id: int : rating: float}
-        ic("ds.get_user_train_ratings()")
+        #ic("ds.get_user_train_ratings()")
     
         return self.user_train_ratings
 
 
     def update_user_train_ratings(self, new_recommendations: list) -> None:
         # 
-        ic("ds.update_user_train_ratings()")
+        #ic("ds.update_user_train_ratings()")
         
         #self.num_ratings += len(new_recommendations)
         
@@ -220,7 +220,7 @@ class Dataset:
         
     def update_user_train_means(self) -> None:
         # 
-        ic("ds.update_user_train_means()")
+        #ic("ds.update_user_train_means()")
         
         for user_id, ratings in self.user_train_ratings.items():
             if len(ratings) > 0:
@@ -231,7 +231,7 @@ class Dataset:
                 
     def update_item_train_ratings(self, new_recommendations: list) -> None:
         # 
-        ic("ds.update_item_train_ratings()")
+        #ic("ds.update_item_train_ratings()")
         
    
         for recommendation in new_recommendations:
@@ -244,7 +244,7 @@ class Dataset:
             
     def update_train_ratings(self, new_recommendations: list) -> None:
         # 
-        ic("ds.update_train_ratings()")
+        #ic("ds.update_train_ratings()")
         
    
         for recommendation in new_recommendations:            
@@ -253,7 +253,7 @@ class Dataset:
         
     def update_item_train_means(self) -> None:
         # 
-        ic("ds.update_item_train_means()")
+        #ic("ds.update_item_train_means()")
         
         for item_id, ratings in self.item_train_ratings.items():
             if len(ratings) > 0:
@@ -264,7 +264,7 @@ class Dataset:
                     
     def update_mean_train_rating(self) -> None:
         # 
-        ic("ds.update_mean_train_rating()")
+        #ic("ds.update_mean_train_rating()")
         
         new_mean_train_rating = np.sum(list(self.item_train_means.values())) / len(self.item_train_means)
         
@@ -273,56 +273,56 @@ class Dataset:
                 
     def get_mean_train_rating(self) -> float:
         # 
-        ic("ds.get_mean_train_rating()")
+        #ic("ds.get_mean_train_rating()")
 
         return self.mean_train_rating
 
 
     def get_user_train_means(self) -> dict:
         # {user_id: int, rating: float}
-        ic("ds.get_user_train_means()")
+        #ic("ds.get_user_train_means()")
     
         return self.user_train_means
     
     
     def get_item_train_ratings(self) -> dict:
         # {item_id: int : {user_id: int, rating: float}
-        ic("ds.get_item_train_ratings()")
+        #ic("ds.get_item_train_ratings()")
     
         return self.item_train_ratings
     
     
     def get_item_train_means(self) -> dict:
         # {item_id: int : rating: float}
-        ic("ds.get_item_train_means()")
+        #ic("ds.get_item_train_means()")
 
         return self.item_train_means
     
 
     def get_train_ratings(self) -> dict:
         # {item_id: int : rating: float}
-        ic("ds.get_train_ratings()")
+        #ic("ds.get_train_ratings()")
 
         return self.train_ratings
         
 
     def get_test_ratings(self) -> list:
         # [{item_id: int, rating: float, user_id: int}]
-        ic("ds.get_test_ratings()")
+        #ic("ds.get_test_ratings()")
 
         return self.test_ratings
     
     
     def get_user_test_ratings(self) -> dict:
         # {user_id : {item_id, rating}
-        ic("ds.get_user_test_ratings()")
+        #ic("ds.get_user_test_ratings()")
 
         return self.user_test_ratings
 
 
     def get_item_test_ratings(self) -> dict:
         # {item_d: int : {user_id: int, rating: float}
-        ic("ds.get_item_test_ratingss()")
+        #ic("ds.get_item_test_ratingss()")
         
         return self.item_test_ratings
         
@@ -330,7 +330,7 @@ class Dataset:
     def update_num_ratings(self, new_recommendations: list) -> None:
         """"""
         # TODO should I replace this???
-        ic("ds.update_num_ratings()")
+        #ic("ds.update_num_ratings()")
         
         self.num_ratings += len(new_recommendations)
         
@@ -340,20 +340,20 @@ class Dataset:
         
     def get_user_popularity(self, user_id: int) -> int:
         """"""
-        #ic("ds.get_user_popularity()")
+        ##ic("ds.get_user_popularity()")
 
         return len(self.user_train_ratings[user_id])
 
         
     def get_item_popularity(self, item_id: int) -> int:
         """"""
-        #ic("ds.get_item_popularity()")
+        ##ic("ds.get_item_popularity()")
 
         return len(self.item_train_ratings[item_id])
 
     
     def __reset(self) -> None:
-        ic("ds.__reset()")
+        #ic("ds.__reset()")
         
         self.user_ids = []
         self.item_ids = []
@@ -376,7 +376,7 @@ class Dataset:
 
     @staticmethod
     def __d_to_dlist(dict: dict, keykey: int, valkey: int) -> list:
-        ic("ds.__d_to_dlist()")
+        #ic("ds.__d_to_dlist()")
         ic(keykey)
         ic(valkey)
         

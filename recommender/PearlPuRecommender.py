@@ -11,7 +11,7 @@ from recommender.Similarities import Similarities
 
 class PearlPuRecommender(UserRecommender):
     def __init__(self, k: int = 5,  weight_threshold: float = 1.0, recursion_threshold: int = 3, dataset = None) -> None:
-        ic("pp_rec.__init__()")
+        #ic("pp_rec.__init__()")
 
         super().__init__(k, dataset)
         self.weight_threshold = weight_threshold
@@ -22,11 +22,11 @@ class PearlPuRecommender(UserRecommender):
         
     def recursive_prediction(self, active_user: int, candidate_moive: int, recursion_level: int = 1, similarity_function: types.FunctionType = Similarities.sim_pearson) -> float:
         """"""
-        ic("pp_rec.recursive_prediction()")
+        #ic("pp_rec.recursive_prediction()")
         ic(recursion_level)
         
         if recursion_level > self.recursion_threshold:
-            ic("Reached Recursion Limit - Using Baseline")
+            #ic("Reached Recursion Limit - Using Baseline")
             
             return self.predict_rating_user_based_nn_wtd(active_user, candidate_moive) # baseline
 
