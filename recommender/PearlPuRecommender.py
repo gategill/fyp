@@ -10,27 +10,26 @@ from recommender.Similarities import Similarities
 
 
 class PearlPuRecommender(UserRecommender):
-    def __init__(self, k: int = 5,  weight_threshold: float = 1.0, recursion_threshold: int = 3, dataset = None) -> None:
+    def __init__(self, dataset = None, **kwargs) -> None:
         #ic("pp_rec.__init__()")
 
-        super().__init__(k, dataset)
-        self.weight_threshold = weight_threshold
-        self.recursion_threshold = recursion_threshold
-        #self.user_rec = UserRecommender(self.k)
-        #self.test_ratings = self.user_rec.test_ratings
+        super().__init__(dataset, **kwargs)
+        self.weight_threshold = kwargs["run_params"]["weight_threshold"]
+        self.recursion_threshold = kwargs["run_params"]["recursion_threshold"]
         
         
-    def recursive_prediction(self, active_user: int, candidate_moive: int, recursion_level: int = 1, similarity_function: types.FunctionType = Similarities.sim_pearson) -> float:
+    def recursive_prediction(self, active_user: int, candidate_moive: int, recursion_level: int = 1) -> float:
         """"""
         #ic("pp_rec.recursive_prediction()")
         ic(recursion_level)
+        # starts at 1
         
         if recursion_level > self.recursion_threshold:
             #ic("Reached Recursion Limit - Using Baseline")
             
             return self.predict_rating_user_based_nn_wtd(active_user, candidate_moive) # baseline
 
-        nns = self.get_k_nearest_users(similarity_function, self.k, active_user)  # no item id, doesn't limit to just rated
+        nns = self.get_k_nearest_users(self.similarity_function, self.k, active_user)  # no item id, doesn't limit to just rated
         
         alpha = 0.0
         beta = 0.0
@@ -40,7 +39,7 @@ class PearlPuRecommender(UserRecommender):
             neighbour_item_rating = self.get_user_item_rating(neighbour_id, candidate_moive)
             
             if neighbour_item_rating is not None:
-                sim_x_y = self.get_user_similarity(similarity_function, active_user, neighbour_id)
+                sim_x_y = self.get_user_similarity(self.similarity_function, active_user, neighbour_id)
                 mean_rating_for_neighbour = self.get_user_mean_rating(neighbour_id)
                 
                 #ic(sim_x_y)
@@ -49,7 +48,7 @@ class PearlPuRecommender(UserRecommender):
                 
             else:
                 rec_pred = self.recursive_prediction(neighbour_id, candidate_moive, recursion_level + 1)
-                sim_x_y = self.get_user_similarity(similarity_function, active_user, neighbour_id)
+                sim_x_y = self.get_user_similarity(self.similarity_function, active_user, neighbour_id)
                 #ic(sim_x_y)
                 mean_rating_for_neighbour = self.get_user_mean_rating(neighbour_id)
                 

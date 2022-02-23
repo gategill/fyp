@@ -15,7 +15,7 @@ class GenericRecommender:
     def __init__(self, dataset = None, **kwargs) -> None:
         #ic("gen_rec.__init__()")
         self.kwargs = kwargs        
-        self.k = self.kwargs["exp_setup"]["neighbours"]
+        self.k = self.kwargs["run_params"]["neighbours"]
         self.similarity_function = self.get_similarity_function()
         self.dataset = dataset
         self.load_dataset(**self.kwargs["dataset_config"])
@@ -23,7 +23,7 @@ class GenericRecommender:
         
 
     def get_similarity_function(self):
-        s = self.kwargs["exp_setup"]["similarity"]
+        s = self.kwargs["run_params"]["similarity"]
         
         if s == "sim_sim":
             return Similarities.sim_sim

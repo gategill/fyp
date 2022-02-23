@@ -18,13 +18,13 @@ import pandas as pd
 ic.disable()
 
 class CoRecRecommender(GenericRecommender):
-    def __init__(self, k: int, additions: int, top_m: int, dataset = None) -> None:
+    def __init__(self, dataset = None, **kwargs) -> None:
         ic("cr_rec.__init__()")
         
-        super().__init__(k, dataset)
+        super().__init__(dataset, **kwargs)
         
-        self.additions = additions
-        self.top_m = top_m
+        self.additions = kwargs["run_params"]["additions"]
+        self.top_m = kwargs["run_params"]["top_m"]
         
         
     def train_co_rec(self):
@@ -39,8 +39,8 @@ class CoRecRecommender(GenericRecommender):
         
         #ic(null_entries)
         # step 2: co-training
-        self.user_rec = UserRecommender(self.k, copy.deepcopy(self.dataset))    
-        self.item_rec = ItemRecommender(self.k, copy.deepcopy(self.dataset))        
+        self.user_rec = UserRecommender(copy.deepcopy(self.dataset), **self.kwargs)    
+        self.item_rec = ItemRecommender(copy.deepcopy(self.dataset), **self.kwargs)        
         
         train_unlabelled_users = copy.deepcopy(null_entries)
         train_unlabelled_items = copy.deepcopy(null_entries)
@@ -56,57 +56,68 @@ class CoRecRecommender(GenericRecommender):
             print("Running USER Recommender for CoRec")          
             # train item rec, predict and get confident results
             for i, entry in enumerate(train_unlabelled_users):
-                user_id = int(entry["user_id"])
-                item_id = int(entry["item_id"])
+                try:
+                    user_id = int(entry["user_id"])
+                    item_id = int(entry["item_id"])
 
-                
-                predicted_rating = self.user_rec.predict_rating_user_based_nn_wtd(active_user_id = user_id, candidate_item_id = item_id, similarity_function = Similarities.sim_sim)
-                
-                if predicted_rating < 1.0:
-                    predicted_rating = 1.0
                     
-                if predicted_rating > 5:
-                    predicted_rating = 5.0
+                    predicted_rating = self.user_rec.predict_rating_user_based_nn_wtd(active_user_id = user_id, candidate_item_id = item_id)
+                    
+                    if predicted_rating < 1.0:
+                        predicted_rating = 1.0
+                        
+                    if predicted_rating > 5:
+                        predicted_rating = 5.0
+                    
+                    entry["rating"] = round(predicted_rating, 2)
+                    confidence = self.get_confidence_measure("user", user_id, item_id, predicted_rating)
+                    entry["confidence"] = confidence
+                    predicted_user_ratings.append(entry)
+                    
+                    if self.kwargs["exp_config"]["early_stop"]:
+                        if i > 100:
+                            break
                 
-                entry["rating"] = round(predicted_rating, 2)
-                confidence = self.get_confidence_measure("user", user_id, item_id, predicted_rating)
-                entry["confidence"] = confidence
-                predicted_user_ratings.append(entry)
-                
-                #if i > 100:
-                #    break
-                
+                except KeyboardInterrupt:
+                    ic("\nStopping\n")
+                    ic(i)
+                    break
+            
             top_m_user_predictions = sorted(predicted_user_ratings, key = lambda d: d["confidence"])[-self.top_m:] # get top m confident predictions
             #ic(top_m_user_predictions)
         
             print("Running ITEM Recommender for CoRec")          
             # train item rec, predict and get confident results
             for i, entry in enumerate(train_unlabelled_items):
-                user_id = int(entry["user_id"])
-                item_id = int(entry["item_id"])
-                
-                predicted_rating = self.item_rec.predict_rating_item_based_nn_wtd(active_user_id = user_id, candidate_item_id = item_id, similarity_function = Similarities.sim_sim)
-                
-                if predicted_rating < 1.0:
-                    predicted_rating = 1.0
+                try:
+                    user_id = int(entry["user_id"])
+                    item_id = int(entry["item_id"])
                     
-                if predicted_rating > 5:
-                    predicted_rating = 5.0
-                
-                entry["rating"] = round(predicted_rating,2)
-                confidence = self.get_confidence_measure("item", user_id, item_id, predicted_rating)
-                entry["confidence"] = confidence
-                predicted_item_ratings.append(entry)
-                
-                #if i > 100:
-                #    break
-                
+                    predicted_rating = self.item_rec.predict_rating_item_based_nn_wtd(active_user_id = user_id, candidate_item_id = item_id)
+                    
+                    if predicted_rating < 1.0:
+                        predicted_rating = 1.0
+                        
+                    if predicted_rating > 5:
+                        predicted_rating = 5.0
+                    
+                    entry["rating"] = round(predicted_rating,2)
+                    confidence = self.get_confidence_measure("item", user_id, item_id, predicted_rating)
+                    entry["confidence"] = confidence
+                    predicted_item_ratings.append(entry)
+                    
+                    if self.kwargs["exp_config"]["early_stop"]:
+                        if i > 100:
+                            break
+                    
+                except KeyboardInterrupt:
+                    ic("\nStopping\n")
+                    ic(i)
+                    break
                 
             top_m_item_predictions = sorted(predicted_item_ratings, key = lambda d: d["confidence"])[-self.top_m:] # get top m confident predictions
             
-            
             # get union of top_m_confident_user_predictions and top_m_confident_item_predictions
-            # TODO what if duplicate???
             top_m_predictions = top_m_user_predictions + top_m_item_predictions
                       
             for i in top_m_predictions:
@@ -121,7 +132,6 @@ class CoRecRecommender(GenericRecommender):
             #ic(top_m_predictions)
 
             # update unlabelled datasets train_unlabelled_users and train_unlabelled_items
-            # TODO fix
             print("There are " + str(len(train_unlabelled_users)) + " ratings left in train_unlabelled_users")
             if len(train_unlabelled_users):
                 train_unlabelled_users_df = pd.DataFrame(train_unlabelled_users)

@@ -13,12 +13,12 @@ from recommender.UserRecommender import UserRecommender
 
 
 class BootstrapRecommender(UserRecommender):
-    def __init__(self, k: int, iterations: int = 5, additions: int = 10, dataset = None) -> None:
+    def __init__(self, dataset = None, **kwargs) -> None:
         #ic("bs_rec.__init__()")
         
-        super().__init__(k, dataset)
-        self.iterations = iterations
-        self.additions = additions
+        super().__init__(dataset, **kwargs)
+        self.iterations = kwargs["run_params"]["iterations"]
+        self.additions = kwargs["run_params"]["additions"]
         
         
     def enrich(self) -> None:
