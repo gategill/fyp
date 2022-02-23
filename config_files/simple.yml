@@ -1,0 +1,15 @@
+experiment:
+  dataset: "given"
+  seed: 42
+  prefiltering: {"user_k_core" : 25}
+  save_in_s3: True
+  kfolds: 1
+  save_results: True
+  test_splitting_ratio: 0.2
+
+  models:
+    UserKNN:
+      neighbours: 5
+      similarity: sim_sim
+
+

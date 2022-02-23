@@ -2,3 +2,4 @@ icecream
 numpy
 pandas
 boto3
+pyyaml

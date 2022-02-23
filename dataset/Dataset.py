@@ -125,9 +125,13 @@ class Dataset:
                 print(f"The transactions after filtering are {len(data)}")
                 print(f"The users after filtering are {data['user_id'].nunique()}")
                 
+                data["user_id"] = data["user_id"].astype(int)
+                data["item_id"] = data["item_id"].astype(int)
+                
                 df = data
-                self.user_ids = np.unique(df["user_id"].to_list())
-                self.item_ids = np.unique(df["item_id"].to_list())
+                #print(df.head(10))
+                self.user_ids = list(map(int, np.unique(df["user_id"].to_list())))
+                self.item_ids = list(map(int, np.unique(df["item_id"].to_list())))
                 
                 print("df.shape AFTER user_k_core: " + str(df.shape))
 
@@ -146,9 +150,12 @@ class Dataset:
                 print(f"The transactions after filtering are {len(data)}")
                 print(f"The items after filtering are {data['item_id'].nunique()}")
                 
+                data["user_id"] = data["user_id"].astype(int)
+                data["item_id"] = data["item_id"].astype(int)
+                
                 df = data
-                self.user_ids = np.unique(df["user_id"].to_list())
-                self.item_ids = np.unique(df["item_id"].to_list())
+                self.user_ids = list(map(int, np.unique(df["user_id"].to_list())))
+                self.item_ids = list(map(int, np.unique(df["item_id"].to_list())))
                 
                 print("df.shape AFTER item_k_core: " + str(df.shape))
                 
@@ -165,14 +172,19 @@ class Dataset:
                 
                 print(f"The transactions after filtering are {len(data)}")
                 print(f"The users after filtering are {data['user_id'].nunique()}")
+                #data["user_id"] = df["user_id"].apply(lambda x)
+                data["user_id"] = data["user_id"].astype(int)
+                data["item_id"] = data["item_id"].astype(int)
                 
                 df = data
-                self.user_ids = np.unique(df["user_id"].to_list())
-                self.item_ids = np.unique(df["item_id"].to_list())
+                self.user_ids = list(map(int, np.unique(df["user_id"].to_list())))
+                self.item_ids = list(map(int, np.unique(df["item_id"].to_list())))
                 
                 print("df.shape AFTER cold_users: " + str(df.shape))
                 
         reduced_all_ratings = list(df.T.to_dict().values())
+        #print(reduced_all_ratings[:10])
+        #input("thtrh")
         self.all_ratings = reduced_all_ratings
           
           
@@ -198,6 +210,7 @@ class Dataset:
         num_ratings = 0
         
         for entry in self.all_ratings:
+            #print(entry)
             #substrings = line.strip().split('\t')
             user_id = int(entry["user_id"])
             item_id = int(entry["item_id"])
@@ -217,6 +230,8 @@ class Dataset:
                 #ic(self.item_train_ratings)
  
             else: # goes to testing
+                entry["user_id"] = int(entry["user_id"])
+                entry["item_id"] = int(entry["item_id"])
                 self.test_ratings.append(entry)
                 #ic(self.test_ratings)
                 

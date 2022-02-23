@@ -15,17 +15,33 @@ from evaluation.Evaluation import Evaluation
 import time
 import os
 import boto3
+import yaml
 
 #ic.disable()
 s3 = boto3.client('s3')
 #s3_resource = boto3.resource('s3')
 
 
-def save_in_s3_function(da, which, current_timestamp):
-    s3.put_object(Body = da, Bucket = "fyp-w9797878", Key = str(current_timestamp) + "/"+ which + '.txt')
+def save_in_s3_function(data, which, current_timestamp):
+    s3.put_object(Body = data, Bucket = "fyp-w9797878", Key = str(current_timestamp) + "/"+ which + '.txt')
 
+
+def read_in_yaml_file(config_path):
+    with open(config_path) as f:
+        config_data = yaml.load(f, Loader = yaml.FullLoader)
+    return config_data
+
+def run_experiment_yaml(config_path: str):
+    global config_data
+    config_data = read_in_yaml_file(config_path)
+    print(config_data)
     
+    run_experiment(config_data)
+    pass
+
 def run_experiment(k: int, which: str, save_results: bool, kfolds: int, save_in_s3: bool) -> None:
+    
+    
     save_in_s3 = False
     for i in range(kfolds):
         
@@ -43,10 +59,11 @@ def run_experiment(k: int, which: str, save_results: bool, kfolds: int, save_in_
             time_elapsed = toc - tic
             
             print(u, mae, time_elapsed)
-            lines_result += "u_rec_k={}, {}, {} \n".format(k, mae, time_elapsed)
+            experiment_result = "u_rec_k={}, {}, {} \n".format(k, mae, time_elapsed)
+            lines_result += experiment_result
             
             if save_in_s3:
-                save_in_s3_function("u_rec_k={}, {}, {}\n".format(k, mae, time_elapsed), "u", current_timestamp)
+                save_in_s3_function(experiment_result, "u", current_timestamp)
 
 
         # For each rating in the test set, make a prediction using an 
@@ -58,10 +75,11 @@ def run_experiment(k: int, which: str, save_results: bool, kfolds: int, save_in_
             time_elapsed = toc - tic
             
             print(u, mae, time_elapsed)
-            lines_result += "i_rec_k={}, {}, {}\n".format(k, mae, time_elapsed)
+            experiment_result = "i_rec_k={}, {}, {} \n".format(k, mae, time_elapsed)
+            lines_result += experiment_result
             
             if save_in_s3:
-                save_in_s3_function("i_rec_k={}, {}, {}\n".format(k, mae, time_elapsed), "i", current_timestamp)
+                save_in_s3_function(experiment_result, "i", current_timestamp)
 
 
         if "b" in which:
@@ -71,10 +89,11 @@ def run_experiment(k: int, which: str, save_results: bool, kfolds: int, save_in_
             time_elapsed = toc - tic
             
             print(u, mae, time_elapsed)
-            lines_result += "bs_rec_k={}, {}, {}\n".format(k, mae, time_elapsed)
+            experiment_result = "bs_rec_k={}, {}, {} \n".format(k, mae, time_elapsed)
+            lines_result += experiment_result
             
             if save_in_s3:
-                save_in_s3_function("bs_rec_k={}, {}, {}\n".format(k, mae, time_elapsed), "b", current_timestamp)
+                save_in_s3_function(experiment_result, "b", current_timestamp)
 
 
         if "p" in which:
@@ -84,10 +103,11 @@ def run_experiment(k: int, which: str, save_results: bool, kfolds: int, save_in_
             time_elapsed = toc - tic
             
             print(u, mae, time_elapsed)
-            lines_result += "pp_rec_k={}, {}, {}\n".format(k, mae, time_elapsed)
+            experiment_result = "pp_rec_k={}, {}, {} \n".format(k, mae, time_elapsed)
+            lines_result += experiment_result
             
             if save_in_s3:
-                save_in_s3_function("pp_rec_k={}, {}, {}\n".format(k, mae, time_elapsed), "p", current_timestamp)
+                save_in_s3_function(experiment_result, "p", current_timestamp)
                 
             
         if "c" in which:
@@ -97,10 +117,11 @@ def run_experiment(k: int, which: str, save_results: bool, kfolds: int, save_in_
             time_elapsed = toc - tic
             
             print(u, mae, time_elapsed)
-            lines_result += "corec_rec_k={}, {}, {}\n".format(k, mae, time_elapsed)
+            experiment_result = "corec_rec_k={}, {}, {} \n".format(k, mae, time_elapsed)
+            lines_result += experiment_result
             
             if save_in_s3:
-                save_in_s3_function("corec_rec_k={}, {}, {}\n".format(k, mae, time_elapsed), "c", current_timestamp)
+                save_in_s3_function(experiment_result, "c", current_timestamp)
             
             
         if save_results:
