@@ -15,6 +15,7 @@ import random
 import copy
 import pandas as pd
 
+ic.disable()
 
 class CoRecRecommender(GenericRecommender):
     def __init__(self, k: int, additions: int, top_m: int, dataset = None) -> None:
@@ -34,7 +35,7 @@ class CoRecRecommender(GenericRecommender):
         
         for user_id in self.user_train_ratings.keys():
             for unseen_item in self.get_user_unrated_items(user_id, self.additions):
-                null_entries.append({"user_id": user_id, "unseen_item_id": unseen_item})            
+                null_entries.append({"user_id": user_id, "item_id": unseen_item})            
         
         #ic(null_entries)
         # step 2: co-training
@@ -45,15 +46,18 @@ class CoRecRecommender(GenericRecommender):
         train_unlabelled_items = copy.deepcopy(null_entries)
         
         while (train_unlabelled_users) and (train_unlabelled_items): 
-            ic("here") 
+            #ic("here") 
+            print("There are {} ratings in the USER dataset".format(self.user_rec.dataset.num_ratings))
+            print("There are {} ratings in the ITEM dataset".format(self.item_rec.dataset.num_ratings))
+                        
             predicted_user_ratings = []
             predicted_item_ratings = []
             
-            print("\nRunning USER Recommender for CoRec\n")          
+            print("Running USER Recommender for CoRec")          
             # train item rec, predict and get confident results
             for i, entry in enumerate(train_unlabelled_users):
                 user_id = int(entry["user_id"])
-                item_id = int(entry["unseen_item_id"])
+                item_id = int(entry["item_id"])
 
                 
                 predicted_rating = self.user_rec.predict_rating_user_based_nn_wtd(active_user_id = user_id, candidate_item_id = item_id, similarity_function = Similarities.sim_sim)
@@ -64,22 +68,22 @@ class CoRecRecommender(GenericRecommender):
                 if predicted_rating > 5:
                     predicted_rating = 5.0
                 
-                entry["pred_rating"] = round(predicted_rating, 2)
+                entry["rating"] = round(predicted_rating, 2)
                 confidence = self.get_confidence_measure("user", user_id, item_id, predicted_rating)
                 entry["confidence"] = confidence
                 predicted_user_ratings.append(entry)
                 
-                if i > 100:
-                    break
+                #if i > 100:
+                #    break
                 
             top_m_user_predictions = sorted(predicted_user_ratings, key = lambda d: d["confidence"])[-self.top_m:] # get top m confident predictions
             #ic(top_m_user_predictions)
         
-            print("\nRunning ITEM Recommender for CoRec\n")          
+            print("Running ITEM Recommender for CoRec")          
             # train item rec, predict and get confident results
             for i, entry in enumerate(train_unlabelled_items):
                 user_id = int(entry["user_id"])
-                item_id = int(entry["unseen_item_id"])
+                item_id = int(entry["item_id"])
                 
                 predicted_rating = self.item_rec.predict_rating_item_based_nn_wtd(active_user_id = user_id, candidate_item_id = item_id, similarity_function = Similarities.sim_sim)
                 
@@ -89,13 +93,13 @@ class CoRecRecommender(GenericRecommender):
                 if predicted_rating > 5:
                     predicted_rating = 5.0
                 
-                entry["pred_rating"] = round(predicted_rating,2)
+                entry["rating"] = round(predicted_rating,2)
                 confidence = self.get_confidence_measure("item", user_id, item_id, predicted_rating)
                 entry["confidence"] = confidence
                 predicted_item_ratings.append(entry)
                 
-                if i > 100:
-                    break
+                #if i > 100:
+                #    break
                 
                 
             top_m_item_predictions = sorted(predicted_item_ratings, key = lambda d: d["confidence"])[-self.top_m:] # get top m confident predictions
@@ -104,8 +108,7 @@ class CoRecRecommender(GenericRecommender):
             # get union of top_m_confident_user_predictions and top_m_confident_item_predictions
             # TODO what if duplicate???
             top_m_predictions = top_m_user_predictions + top_m_item_predictions
-            
-            print(len(train_unlabelled_users))            
+                      
             for i in top_m_predictions:
                 if i in train_unlabelled_users:
                     train_unlabelled_users.remove(i)
@@ -119,59 +122,40 @@ class CoRecRecommender(GenericRecommender):
 
             # update unlabelled datasets train_unlabelled_users and train_unlabelled_items
             # TODO fix
-            #top_m_predictions_df = pd.DataFrame(top_m_predictions)
-            #ic(top_m_predictions_df.shape)
+            print("There are " + int(len(train_unlabelled_users)) + "ratings left in train_unlabelled_users")
+            if len(train_unlabelled_users):
+                train_unlabelled_users_df = pd.DataFrame(train_unlabelled_users)
+                train_unlabelled_users_df.drop(columns=["confidence", "rating"], inplace = True)
+                train_unlabelled_users = list(train_unlabelled_users_df.T.to_dict().values()) # does this work ???
+                #ic(train_unlabelled_users[:10])
+            else:
+                ic("Length of train_unlabelled_users is 0")  
+                          
+            print("There are " + int(len(train_unlabelled_items)) + "ratings left in train_unlabelled_items")
+            if len(train_unlabelled_items) > 0:
+                train_unlabelled_items_df = pd.DataFrame(train_unlabelled_items)
+                train_unlabelled_items_df.drop(columns=["confidence", "rating"], inplace = True)
+                train_unlabelled_items = list(train_unlabelled_items_df.T.to_dict().values()) # does this work ???
+            else:
+                ic("Length of train_unlabelled_items is 0")
+                
+            top_m_user_predictions_df = pd.DataFrame(top_m_user_predictions)
+            max_user_confidence = top_m_user_predictions_df["confidence"].max()
+            top_m_user_predictions_df.drop(columns=["confidence"], inplace = True)
+            top_m_user_predictions_df.drop_duplicates(inplace = True)
+            top_m_user_predictions = list(top_m_user_predictions_df.T.to_dict().values()) # does this work ???
+            
+            top_m_item_predictions_df = pd.DataFrame(top_m_item_predictions)
+            max_item_confidence = top_m_item_predictions_df["confidence"].max()
 
-            #train_unlabelled_users_df = pd.DataFrame(train_unlabelled_users)
-            #ic(train_unlabelled_users_df.shape)
+            top_m_item_predictions_df.drop(columns=["confidence"], inplace = True)
+            top_m_item_predictions_df.drop_duplicates(inplace = True)
+            top_m_item_predictions = list(top_m_item_predictions_df.T.to_dict().values()) # does this work ???
 
-            # fiddling with dataframes
-            # if y,y, is present, remove it
+            self.max_user_confidence = max_user_confidence
+            self.max_item_confidence = max_item_confidence
             
-            #inner_df = pd.merge(train_unlabelled_users_df, top_m_predictions_df, on=["user_id", "unseen_item_id", "pred_rating", "confidence"], how = "left")
-            #inner_df = pd.concat([train_unlabelled_users_df, top_m_predictions_df])
-            #inner_df = inner_df.drop_duplicates(keep=False)
-            
-            
-            #df = train_unlabelled_users_df.drop_duplicates().merge(top_m_predictions_df.drop_duplicates(), on=top_m_predictions_df.columns.to_list(), 
-            #       how='left', indicator=True)
-            #df.loc[df._merge=='left_only',df.columns!='_merge']
-            #df = df[df._merge == "left_only"]
-            # get where na in columns 2, dropna((subset=['pred_rating_y', 'confidence_y'], inplace = True)
-            # exclude not na
-            #inner_df.dropna(subset=['pred_rating_y', 'confidence_y'], inplace = True)
-            #inner_df = train_unlabelled_users_df[~train_unlabelled_users_df.isin(top_m_predictions_df)].dropna()
-
-    
-            #ic(df.head(50))
-            #ic(df.shape)
-            
-                            
-            #inner_df.drop(columns = {"pred_rating_y", "confidence_y"}, inplace = True)
-            #inner_df.rename(columns= {"pred_rating_x" : "pred_rating", "confidence_x" : "confidence"}, inplace = True)
-            #inner_df.dropna(inplace = True)
-            
-            #inner_df = train_unlabelled_users_df[~train_unlabelled_users_df.isin(top_m_predictions_df)].dropna()
-
-            #ic(inner_df.head())
-            #ic(inner_df.shape)
-            #top_m_predictions_df.drop(columns=["confidence", "pred_rating"], inplace = True)
-            #ic(top_m_predictions_df.head())
-            #train_unlabelled_users = inner_df.T.to_dict().values() # does this work ???
-            #train_unlabelled_items = inner_df.T.to_dict().values() # does this work ???
-            #ic(partial_top_m_predictions)
-            #ic(len(train_unlabelled_users))
-            #ic(len(partial_top_m_predictions))
-            #train_unlabelled_users = list(set(train_unlabelled_users) - set(partial_top_m_predictions))
-            #train_unlabelled_items = list(set(train_unlabelled_items) - set(partial_top_m_predictions))
-            
-            #print(len(top_m_predictions))
-            #print(len(train_unlabelled_users))
-
-            # update labelled datasets to include the most confidents results of the other trainset
-            #ic(top_m_item_predictions)
             self.user_rec.add_new_recommendations(top_m_item_predictions)
-            
             self.item_rec.add_new_recommendations(top_m_user_predictions)
         
 
@@ -239,8 +223,13 @@ class CoRecRecommender(GenericRecommender):
         #ic("cr_rec.get_measure_of_trustworthiness()")
         epsilon = 0.01
         baseline_estimate =  self.get_baseline_estimate(user_id, item_id)
-   
-        return abs(1/(baseline_estimate - prediction + epsilon))
+        
+        if baseline_estimate - prediction == 0.0:
+            #print("DIVIDING BY 0")
+            return abs(1/epsilon)
+
+        else:
+            return abs(1/(baseline_estimate - prediction))
         
 
     def get_baseline_estimate(self, user_id, item_id):
@@ -249,17 +238,12 @@ class CoRecRecommender(GenericRecommender):
         bu = self.user_rec.get_user_mean_rating(user_id)
         bi = self.item_rec.get_item_mean_rating(item_id)
         
-        #ic(bu)
-        #ic(bi)
-        
         if bu is None:
             bu = 0.0
             
         if bi is None:
             bi = 0.0
-        
-        #ic( mu + bu + bi)
-        
+
         return mu # + bu + bi
     
     

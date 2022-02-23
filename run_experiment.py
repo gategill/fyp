@@ -301,8 +301,8 @@ def run_corec_rec_experiment(k):
             test["item_pred_rating"] = item_predicted_rating
             co_rec_r.add_prediction(test)
 
-            if i > 100:
-                break
+            #if i > 10000:
+            #    break
                     
         except KeyboardInterrupt:
             ic("\nStopping\n")
