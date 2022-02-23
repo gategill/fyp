@@ -122,7 +122,7 @@ class CoRecRecommender(GenericRecommender):
 
             # update unlabelled datasets train_unlabelled_users and train_unlabelled_items
             # TODO fix
-            print("There are " + int(len(train_unlabelled_users)) + "ratings left in train_unlabelled_users")
+            print("There are " + str(len(train_unlabelled_users)) + " ratings left in train_unlabelled_users")
             if len(train_unlabelled_users):
                 train_unlabelled_users_df = pd.DataFrame(train_unlabelled_users)
                 train_unlabelled_users_df.drop(columns=["confidence", "rating"], inplace = True)
@@ -131,7 +131,7 @@ class CoRecRecommender(GenericRecommender):
             else:
                 ic("Length of train_unlabelled_users is 0")  
                           
-            print("There are " + int(len(train_unlabelled_items)) + "ratings left in train_unlabelled_items")
+            print("There are " + str(len(train_unlabelled_items)) + " ratings left in train_unlabelled_items")
             if len(train_unlabelled_items) > 0:
                 train_unlabelled_items_df = pd.DataFrame(train_unlabelled_items)
                 train_unlabelled_items_df.drop(columns=["confidence", "rating"], inplace = True)

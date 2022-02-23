@@ -17,7 +17,7 @@ class Dataset:
         self.load_items()
         self.load_users()
         self.read_in_ratings()
-        self.prefilter_ratings({"user_k_core": 5, "item_k_core": 5})
+        self.prefilter_ratings({"user_k_core" : 25, "item_k_core": 10})
         self.load_ratings()    
         
         print("There are {} ratings in the trainset".format(self.num_ratings))  
@@ -111,31 +111,66 @@ class Dataset:
         
 
             if strategy == "user_k_core":
+                data = df.copy()
+                
                 print(f"\nPrefiltering with user {threshold}-core")
-                print(f"The transactions before filtering are {len(df)}")
-                print(f"The users before filtering are {df['user_id'].nunique()}")
-                user_groups = df.groupby(['user_id'])
-                df = user_groups.filter(lambda x: len(x) >= threshold)
-                print(f"The transactions after filtering are {len(df)}")
-                print(f"The users after filtering are {df['user_id'].nunique()}")
+                print("df.shape BEFORE user_k_core: " + str(df.shape))
+
+                print(f"The transactions before filtering are {len(data)}")
+                print(f"The users before filtering are {data['user_id'].nunique()}")
+                
+                user_groups = data.groupby(['user_id'])
+                data = user_groups.filter(lambda x: len(x) >= threshold)
+                
+                print(f"The transactions after filtering are {len(data)}")
+                print(f"The users after filtering are {data['user_id'].nunique()}")
+                
+                df = data
+                self.user_ids = np.unique(df["user_id"].to_list())
+                self.item_ids = np.unique(df["item_id"].to_list())
+                
+                print("df.shape AFTER user_k_core: " + str(df.shape))
+
                 
             if strategy == "item_k_core":
+                data = df.copy()
+                
                 print(f"\nPrefiltering with item {threshold}-core")
-                print(f"The transactions before filtering are {len(df)}")
-                print(f"The items before filtering are {df['item_id'].nunique()}")
-                item_groups = df.groupby(['item_id'])
-                df = item_groups.filter(lambda x: len(x) >= threshold)
-                print(f"The transactions after filtering are {len(df)}")
-                print(f"The items after filtering are {df['item_id'].nunique()}")
+                print("df.shape BEFORE item_k_core: " + str(df.shape))
+                print(f"The transactions before filtering are {len(data)}")
+                print(f"The items before filtering are {data['item_id'].nunique()}")
+                
+                item_groups = data.groupby(['item_id'])
+                data = item_groups.filter(lambda x: len(x) >= threshold)
+                
+                print(f"The transactions after filtering are {len(data)}")
+                print(f"The items after filtering are {data['item_id'].nunique()}")
+                
+                df = data
+                self.user_ids = np.unique(df["user_id"].to_list())
+                self.item_ids = np.unique(df["item_id"].to_list())
+                
+                print("df.shape AFTER item_k_core: " + str(df.shape))
                 
             if strategy == "cold_users":
+                data = df.copy()
+
                 print(f"\nPrefiltering retaining cold users with {threshold} or less ratings")
-                print(f"The transactions before filtering are {len(df)}")
-                print(f"The users before filtering are {df['user_id'].nunique()}")
-                user_groups = df.groupby(['user_id'])
-                df = user_groups.filter(lambda x: len(x) <= threshold)
-                print(f"The transactions after filtering are {len(df)}")
-                print(f"The users after filtering are {df['user_id'].nunique()}")
+                print("df.shape BEFORE cold_users: " + str(df.shape))
+                print(f"The transactions before filtering are {len(data)}")
+                print(f"The users before filtering are {data['user_id'].nunique()}")
+                
+                user_groups = data.groupby(['user_id'])
+                data = user_groups.filter(lambda x: len(x) <= threshold)
+                
+                print(f"The transactions after filtering are {len(data)}")
+                print(f"The users after filtering are {data['user_id'].nunique()}")
+                
+                df = data
+                self.user_ids = np.unique(df["user_id"].to_list())
+                self.item_ids = np.unique(df["item_id"].to_list())
+                
+                print("df.shape AFTER cold_users: " + str(df.shape))
                 
         reduced_all_ratings = list(df.T.to_dict().values())
         self.all_ratings = reduced_all_ratings
