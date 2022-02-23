@@ -6,23 +6,40 @@
 #from time import sleep
 from icecream import ic
 from dataset.Dataset import Dataset
+from recommender.Similarities import Similarities
+
 
 
 class GenericRecommender:
-    def __init__(self, k: int, dataset = None) -> None:
+    #def __init__(self, k: int, dataset = None) -> None:
+    def __init__(self, dataset = None, **kwargs) -> None:
         #ic("gen_rec.__init__()")
-        
-        self.k = k
+        self.kwargs = kwargs        
+        self.k = self.kwargs["exp_setup"]["neighbours"]
+        self.similarity_function = self.get_similarity_function()
         self.dataset = dataset
-        self.load_dataset()
+        self.load_dataset(**self.kwargs["dataset_config"])
         self.predictions = []
         
 
-    def load_dataset(self) -> None:
+    def get_similarity_function(self):
+        s = self.kwargs["exp_setup"]["similarity"]
+        
+        if s == "sim_sim":
+            return Similarities.sim_sim
+        
+        if s == "sim_pearson":
+            return Similarities.sim_pearson
+        
+        if s == "sim_cosine":
+            return Similarities.sim_cosine
+        
+        
+    def load_dataset(self, **kwargs) -> None:
         #ic("gen_load_dataset()")
         
         if self.dataset is None:
-            self.dataset = Dataset()
+            self.dataset = Dataset(**kwargs)
         
         self.user_ids = self.dataset.get_user_ids()
         self.item_ids = self.dataset.get_item_ids()

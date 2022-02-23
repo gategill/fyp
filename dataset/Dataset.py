@@ -10,15 +10,16 @@ import numpy as np
 import pandas as pd
 
 class Dataset:
-    def __init__(self):
+    def __init__(self, **kwargs):
         #ic("ds.__init__()")
-        self.DATA_PATH = "./data/given/"
+        self.kwargs = kwargs
+        self.DATA_PATH = self.kwargs["dataset_path"]
         self.__reset()
         self.load_items()
         self.load_users()
         self.read_in_ratings()
-        self.prefilter_ratings({"user_k_core" : 25, "item_k_core": 10})
-        self.load_ratings()    
+        self.prefilter_ratings(self.kwargs["prefiltering"])
+        self.load_ratings(self.kwargs["test_splitting_ratio"])    
         
         print("There are {} ratings in the trainset".format(self.num_ratings))  
         print("Sparsity of the trainset is: {}%".format(round(self.sparsity, 5)))  
@@ -188,26 +189,22 @@ class Dataset:
         self.all_ratings = reduced_all_ratings
           
           
-    def load_ratings(self, test_percentage: int = 20) -> None:
+    def load_ratings(self, test_splitting_ratio: float = 0.2) -> None:
         #ic("ds.load_ratings()")
 
         """
-        It partitions the data randomly so that approximately test_percentage of the ratings are treated as a test set and 
+        It partitions the data randomly so that approximately test_splitting_ratio of the ratings are treated as a test set and 
         the remaining ratings are treated as the train set.
         """
      
-        if type(test_percentage) != int:
-            raise TypeError("load_ratings: you supplied test_percentage = '%s' but test_percentage must be an integer" % test_percentage)
-        if test_percentage < 0 or test_percentage > 100:
-            raise ValueError("load_ratings: you supplied test_percentage = '%i' but test_percentage must be between 0 and 100 inclusive" % test_percentage)
+        if type(test_splitting_ratio) != float:
+            raise TypeError("load_ratings: you supplied test_splitting_ratio = '%s' but test_splitting_ratio must be a float" % test_splitting_ratio)
+        if test_splitting_ratio < 0.0 or test_splitting_ratio > 1.0:
+            raise ValueError("load_ratings: you supplied test_splitting_ratio = '%f' but test_splitting_ratio must be between 0.0 and 1.0 inclusive" % test_splitting_ratio)
         
-        #self.__reset()
-        test_proportion = test_percentage / 100.0
         num_ratings = 0
         
         for entry in self.all_ratings:
-            #print(entry)
-            #substrings = line.strip().split('\t')
             user_id = int(entry["user_id"])
             item_id = int(entry["item_id"])
             rating = entry["rating"]
@@ -215,22 +212,18 @@ class Dataset:
             self.user_train_ratings.setdefault(user_id, {})
             self.item_train_ratings.setdefault(item_id, {})
             
-            if random.random() >= test_proportion: # goes to train
+            if random.random() >= test_splitting_ratio: # goes to train
                 self.user_train_ratings[user_id][item_id] = rating
                 self.item_train_ratings[item_id][user_id] = rating
                 self.mean_train_rating = self.mean_train_rating + rating
                 self.train_ratings.append(entry)
                 num_ratings = num_ratings + 1
-                
-                #ic(self.user_train_ratings)
-                #ic(self.item_train_ratings)
+
  
             else: # goes to testing
                 entry["user_id"] = int(entry["user_id"])
                 entry["item_id"] = int(entry["item_id"])
-                self.test_ratings.append(entry)
-                #ic(self.test_ratings)
-                
+                self.test_ratings.append(entry)                
             #sleep(1)
                 
         self.mean_train_rating = self.mean_train_rating / num_ratings
@@ -244,24 +237,13 @@ class Dataset:
                 self.user_train_means[user_id] = sum(ratings.values()) * 1.0 / len(ratings)
             else:
                 self.user_train_means[user_id] = None
-                #ic(user_id)
-                
-        #ic(self.user_train_ratings)
-        #th = input("type here")
                 
         for item_id, ratings in self.item_train_ratings.items():
             if len(ratings) > 0:
                 self.item_train_means[item_id] = sum(ratings.values()) * 1.0 / len(ratings)
             else:
                 self.item_train_means[item_id] = None
-                #ic(item_id)
-                
-        #th = input("type here")
-                
-        #ic(self.item_train_ratings)
-        #th = input("type here 2")
 
-                
         for val in self.test_ratings:
             user_id = int(val["user_id"])
             item_id = int(val["item_id"])

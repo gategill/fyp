@@ -19,7 +19,7 @@ class Similarities:
         
         for id in ratings1: 
             
-            if id in ratings2:  # TODO is this right???
+            if id in ratings2: 
                 co_rated.append(id)
                 
         n = len(co_rated)

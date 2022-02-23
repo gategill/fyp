@@ -1,16 +1,17 @@
-experiment:
-  dataset: "given"
-  seed: 42
+dataset_config:
+  dataset_path: "./data/given/"
   prefiltering: {"user_k_core" : 25}
-  save_in_s3: True
-  kfolds: 1
-  early_stop: True
-  save_results: True
   test_splitting_ratio: 0.2
 
-  models:
-    UserKNN:
-      neighbours: 5
-      similarity: sim_sim
+seed: 42
+save_in_s3: False
+kfolds: 1
+early_stop: True
+save_results: True
+
+models:
+  UserKNN:
+    neighbours: 5
+    similarity: sim_sim
 
 

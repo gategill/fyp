@@ -17,6 +17,7 @@ import os
 import boto3
 import yaml
 import random
+import shutil
 
 #ic.disable()
 s3 = boto3.client('s3')
@@ -34,37 +35,39 @@ def read_in_yaml_file(config_path):
 
 
 def run_experiment_yaml(config_path: str):
-    global config_data
-    config_data = read_in_yaml_file(config_path)
-    print(config_data)
+    kwargs = read_in_yaml_file(config_path)
+    kwargs["config_path"] = config_path
     
-    run_experiment(config_data)
+    #print(config_data)
+    
+    run_experiment(**kwargs)
 
 
-def run_experiment(**config_data) -> None:
-    random.seed(config_data["seed"])
-    save_in_s3 = config_data["save_in_s3"]
-    save_results = config_data["save_results"]
-    all_models =  "_".join(list(config_data["models"].keys()))
+def run_experiment(**kwargs) -> None:
+    random.seed(kwargs["seed"])
+    save_in_s3 = kwargs["save_in_s3"]
+    save_results = kwargs["save_results"]
+    all_models =  "_".join(list(kwargs["models"].keys()))
     
-    for i in range(config_data["kfolds"]):
+    for i in range(kwargs["kfolds"]):
         
         current_timestamp = int(time.time())
         save_path = "./results/{}".format(current_timestamp)
         os.mkdir(save_path)
         
-        models = config_data["models"]
+        models = kwargs["models"]
         
         # For each rating in the test set, make a prediction using a 
         # user-based KNN with k = 3
         lines_result = "algorithm, mae, time_elapsed\n"
         if "UserKNN" in models:
+            k = models["UserKNN"]["neighbours"]
+
             try:
                 tic = time.time()
-                u, mae = run_user_rec_experiment(config_data)
+                u, mae = run_user_rec_experiment(**kwargs)
                 toc = time.time()
                 time_elapsed = toc - tic
-                k = models["UserKNN"]["neighbours"]
                 
                 print(u, mae, time_elapsed)
                 experiment_result = "u_rec_k={}, {}, {} \n".format(k, mae, time_elapsed)
@@ -74,7 +77,7 @@ def run_experiment(**config_data) -> None:
                     save_in_s3_function(experiment_result, "u", current_timestamp)
                     
             except Exception as e:
-                line_error += "error performing experiment, u_rec; k = {}, error = {}".format(k, e)
+                line_error = "error performing experiment, u_rec; k = {}, error = {}".format(k, e)
                 print(line_error)
                 
                 if save_in_s3:
@@ -97,7 +100,7 @@ def run_experiment(**config_data) -> None:
                     save_in_s3_function(experiment_result, "i", current_timestamp)
 
             except Exception as e:
-                line_error += "error performing experiment, i_rec; k = {}, error = {}".format(k, e)
+                line_error = "error performing experiment, i_rec; k = {}, error = {}".format(k, e)
                 print(line_error)
                 
                 if save_in_s3:
@@ -118,7 +121,7 @@ def run_experiment(**config_data) -> None:
                     save_in_s3_function(experiment_result, "b", current_timestamp)
                     
             except Exception as e:
-                line_error += "error performing experiment, bs_rec; k = {}, error = {}".format(k, e)
+                line_error = "error performing experiment, bs_rec; k = {}, error = {}".format(k, e)
                 print(line_error)
                 
                 if save_in_s3:
@@ -141,7 +144,7 @@ def run_experiment(**config_data) -> None:
                     save_in_s3_function(experiment_result, "p", current_timestamp)
                 
             except Exception as e:
-                line_error += "error performing experiment, p_rec; k = {}, error = {}".format(k, e)
+                line_error = "error performing experiment, p_rec; k = {}, error = {}".format(k, e)
                 print(line_error)
                 
                 if save_in_s3:
@@ -163,7 +166,7 @@ def run_experiment(**config_data) -> None:
                     save_in_s3_function(experiment_result, "c", current_timestamp)
                     
             except Exception as e:
-                line_error += "error performing experiment, c_rec; k = {}, error = {}".format(k, e)
+                line_error = "error performing experiment, c_rec; k = {}, error = {}".format(k, e)
                 print(line_error)
                 
                 if save_in_s3:
@@ -171,19 +174,26 @@ def run_experiment(**config_data) -> None:
             
             
         if save_results:
-            saved_file = "{}/{}.txt".format(save_path, all_models)
+            saved_file_results = "{}/{}.txt".format(save_path, all_models)
             
-            with open(saved_file, "w") as f:
+            with open(saved_file_results, "w") as f:
                 f.write(lines_result)
                 
+            #saved_file_config = "{}/{}.yml".format(save_path, kwargs["config_path"])
+            src = kwargs["config_path"]
+            dst = save_path + "/config.yml"
+            shutil.copyfile(src, dst)           
+                 
         if save_in_s3:
             save_in_s3_function(lines_result, all_models, current_timestamp)
+            with open(kwargs["config_path"], "rb") as f:
+                s3.upload_fileobj(f, Bucket = "fyp-w9797878",  Key = str(current_timestamp) + "/config_file.yml")
 
 
-
-def run_user_rec_experiment(**config_data):
-    user_r = UserRecommender(config_data)
-    
+def run_user_rec_experiment(**kwargs):
+    kwargs["exp_setup"] = kwargs["models"]["UserKNN"]
+    user_r = UserRecommender(**kwargs)
+        
     print("\nRunning User Recommender\n")
     print(len(user_r.test_ratings))
 
@@ -204,7 +214,7 @@ def run_user_rec_experiment(**config_data):
             test["pred_rating"] = predicted_rating
             user_r.add_prediction(test)
             
-            if early_stop:
+            if kwargs["early_stop"]:
                 if i > 100:
                     break
                     
