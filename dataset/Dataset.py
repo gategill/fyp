@@ -212,8 +212,22 @@ class Dataset:
         
         for recommendation in new_recommendations:
             user_id = recommendation["user_id"]
-            item_id = recommendation["item_id"]
-            rating = recommendation["rating"]
+            
+            if "item_id" in recommendation:
+                item_id = recommendation["item_id"]
+            elif "unseen_item_id" in recommendation:
+                item_id = recommendation["unseen_item_id"]
+            else:
+                raise KeyError
+
+                
+            if "rating" in recommendation:
+                rating = recommendation["rating"]
+                
+            elif "pred_rating" in recommendation:
+                rating = recommendation["pred_rating"]
+            else:
+                raise KeyError
             
             self.user_train_ratings[user_id][item_id] = rating
                 
@@ -227,6 +241,7 @@ class Dataset:
                 self.user_train_means[user_id] = sum(ratings.values()) * 1.0 / len(ratings)
             else:
                 self.user_train_means[user_id] = None
+                print("IT's none here")
                 
                 
     def update_item_train_ratings(self, new_recommendations: list) -> None:
@@ -235,9 +250,28 @@ class Dataset:
         
    
         for recommendation in new_recommendations:
+            #ic(recommendation)
             user_id = recommendation["user_id"]
-            item_id = recommendation["item_id"]
-            rating = recommendation["rating"]
+  
+            if "item_id" in recommendation:
+                item_id = recommendation["item_id"]
+            elif "unseen_item_id" in recommendation:
+                item_id = recommendation["unseen_item_id"]
+            else:
+                raise KeyError
+
+                
+            if "rating" in recommendation:
+                rating = recommendation["rating"]
+                
+            elif "pred_rating" in recommendation:
+                rating = recommendation["pred_rating"]
+            else:
+                raise KeyError
+            
+            #ic(user_id)
+            #ic(item_id)
+            #ic(rating)
             
             self.item_train_ratings[item_id][user_id] = rating
             
@@ -247,7 +281,14 @@ class Dataset:
         #ic("ds.update_train_ratings()")
         
    
-        for recommendation in new_recommendations:            
+        for recommendation in new_recommendations: 
+            
+            
+            #if "unseen_item_id" in recommendation:
+            #    recommendation["item_id"] = recommendation.pop("unseen_item_id")     
+                
+            #if "pred_rating" in recommendation:
+            #    recommendation["rating"] = recommendation.pop("pred_rating")         
             self.train_ratings.append(recommendation)
                                 
         
@@ -260,12 +301,15 @@ class Dataset:
                 self.item_train_means[item_id] = sum(ratings.values()) * 1.0 / len(ratings)
             else:
                 self.item_train_means[item_id] = None
+                print("IT's none here item")
+
                 
                     
     def update_mean_train_rating(self) -> None:
         # 
         #ic("ds.update_mean_train_rating()")
-        
+        #ic(list(self.item_train_means.values()))
+        ic(len(self.item_train_means))
         new_mean_train_rating = np.sum(list(self.item_train_means.values())) / len(self.item_train_means)
         
         self.mean_train_rating = new_mean_train_rating

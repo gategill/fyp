@@ -104,40 +104,74 @@ class CoRecRecommender(GenericRecommender):
             # get union of top_m_confident_user_predictions and top_m_confident_item_predictions
             # TODO what if duplicate???
             top_m_predictions = top_m_user_predictions + top_m_item_predictions
+            
+            print(len(train_unlabelled_users))            
+            for i in top_m_predictions:
+                if i in train_unlabelled_users:
+                    train_unlabelled_users.remove(i)
+                    
+                    
+            for i in top_m_predictions:
+                if i in train_unlabelled_items:
+                    train_unlabelled_items.remove(i)
+                    
             #ic(top_m_predictions)
 
             # update unlabelled datasets train_unlabelled_users and train_unlabelled_items
             # TODO fix
-            top_m_predictions_df = pd.DataFrame(top_m_predictions)
-            ic(top_m_predictions_df.shape)
+            #top_m_predictions_df = pd.DataFrame(top_m_predictions)
+            #ic(top_m_predictions_df.shape)
 
-            train_unlabelled_users_df = pd.DataFrame(train_unlabelled_users)
-            ic(train_unlabelled_users_df.shape)
+            #train_unlabelled_users_df = pd.DataFrame(train_unlabelled_users)
+            #ic(train_unlabelled_users_df.shape)
 
             # fiddling with dataframes
-            inner_df = pd.merge(train_unlabelled_users_df, top_m_predictions_df, on=["user_id", "unseen_item_id"], how = "left")
-            inner_df.drop(columns = {"pred_rating_y", "confidence_y"}, inplace = True)
-            inner_df.rename(columns= {"pred_rating_x" : "pred_rating", "confidence_x" : "confidence"}, inplace = True)
+            # if y,y, is present, remove it
+            
+            #inner_df = pd.merge(train_unlabelled_users_df, top_m_predictions_df, on=["user_id", "unseen_item_id", "pred_rating", "confidence"], how = "left")
+            #inner_df = pd.concat([train_unlabelled_users_df, top_m_predictions_df])
+            #inner_df = inner_df.drop_duplicates(keep=False)
+            
+            
+            #df = train_unlabelled_users_df.drop_duplicates().merge(top_m_predictions_df.drop_duplicates(), on=top_m_predictions_df.columns.to_list(), 
+            #       how='left', indicator=True)
+            #df.loc[df._merge=='left_only',df.columns!='_merge']
+            #df = df[df._merge == "left_only"]
+            # get where na in columns 2, dropna((subset=['pred_rating_y', 'confidence_y'], inplace = True)
+            # exclude not na
+            #inner_df.dropna(subset=['pred_rating_y', 'confidence_y'], inplace = True)
+            #inner_df = train_unlabelled_users_df[~train_unlabelled_users_df.isin(top_m_predictions_df)].dropna()
+
+    
+            #ic(df.head(50))
+            #ic(df.shape)
+            
+                            
+            #inner_df.drop(columns = {"pred_rating_y", "confidence_y"}, inplace = True)
+            #inner_df.rename(columns= {"pred_rating_x" : "pred_rating", "confidence_x" : "confidence"}, inplace = True)
             #inner_df.dropna(inplace = True)
             
             #inner_df = train_unlabelled_users_df[~train_unlabelled_users_df.isin(top_m_predictions_df)].dropna()
 
-            ic(inner_df.head())
-            ic(inner_df.shape)
+            #ic(inner_df.head())
+            #ic(inner_df.shape)
             #top_m_predictions_df.drop(columns=["confidence", "pred_rating"], inplace = True)
             #ic(top_m_predictions_df.head())
-            train_unlabelled_users = inner_df.T.to_dict().values() # does this work ???
-            train_unlabelled_items = inner_df.T.to_dict().values() # does this work ???
+            #train_unlabelled_users = inner_df.T.to_dict().values() # does this work ???
+            #train_unlabelled_items = inner_df.T.to_dict().values() # does this work ???
             #ic(partial_top_m_predictions)
-            
             #ic(len(train_unlabelled_users))
             #ic(len(partial_top_m_predictions))
             #train_unlabelled_users = list(set(train_unlabelled_users) - set(partial_top_m_predictions))
             #train_unlabelled_items = list(set(train_unlabelled_items) - set(partial_top_m_predictions))
-            print(len(train_unlabelled_users))
+            
+            #print(len(top_m_predictions))
+            #print(len(train_unlabelled_users))
 
             # update labelled datasets to include the most confidents results of the other trainset
+            #ic(top_m_item_predictions)
             self.user_rec.add_new_recommendations(top_m_item_predictions)
+            
             self.item_rec.add_new_recommendations(top_m_user_predictions)
         
 
