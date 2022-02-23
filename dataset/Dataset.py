@@ -188,7 +188,7 @@ class Dataset:
         self.all_ratings = reduced_all_ratings
           
           
-    def load_ratings(self, test_percentage: int = 20, seed: int = 42) -> None:
+    def load_ratings(self, test_percentage: int = 20) -> None:
         #ic("ds.load_ratings()")
 
         """
@@ -200,10 +200,6 @@ class Dataset:
             raise TypeError("load_ratings: you supplied test_percentage = '%s' but test_percentage must be an integer" % test_percentage)
         if test_percentage < 0 or test_percentage > 100:
             raise ValueError("load_ratings: you supplied test_percentage = '%i' but test_percentage must be between 0 and 100 inclusive" % test_percentage)
-        if not seed is None and type(seed) != int:
-            raise TypeError("load_ratings: you supplied seed = '%s' but seed, if supplied at all, must be an integer" % seed)
-        
-        random.seed(seed) # removed seed
         
         #self.__reset()
         test_proportion = test_percentage / 100.0

@@ -16,14 +16,15 @@ import time
 import os
 import boto3
 import yaml
+import random
 
 #ic.disable()
 s3 = boto3.client('s3')
 #s3_resource = boto3.resource('s3')
 
 
-def save_in_s3_function(data, which, current_timestamp):
-    s3.put_object(Body = data, Bucket = "fyp-w9797878", Key = str(current_timestamp) + "/"+ which + '.txt')
+def save_in_s3_function(data, which_model, current_timestamp):
+    s3.put_object(Body = data, Bucket = "fyp-w9797878", Key = str(current_timestamp) + "/"+ which_model + '.txt')
 
 
 def read_in_yaml_file(config_path):
@@ -31,120 +32,165 @@ def read_in_yaml_file(config_path):
         config_data = yaml.load(f, Loader = yaml.FullLoader)
     return config_data
 
+
 def run_experiment_yaml(config_path: str):
     global config_data
     config_data = read_in_yaml_file(config_path)
     print(config_data)
     
     run_experiment(config_data)
-    pass
 
-def run_experiment(k: int, which: str, save_results: bool, kfolds: int, save_in_s3: bool) -> None:
+
+def run_experiment(**config_data) -> None:
+    random.seed(config_data["seed"])
+    save_in_s3 = config_data["save_in_s3"]
+    save_results = config_data["save_results"]
+    all_models =  "_".join(list(config_data["models"].keys()))
     
-    
-    save_in_s3 = False
-    for i in range(kfolds):
+    for i in range(config_data["kfolds"]):
         
         current_timestamp = int(time.time())
         save_path = "./results/{}".format(current_timestamp)
         os.mkdir(save_path)
         
+        models = config_data["models"]
+        
         # For each rating in the test set, make a prediction using a 
         # user-based KNN with k = 3
         lines_result = "algorithm, mae, time_elapsed\n"
-        if "u" in which:
-            tic = time.time()
-            u, mae = run_user_rec_experiment(k)
-            toc = time.time()
-            time_elapsed = toc - tic
-            
-            print(u, mae, time_elapsed)
-            experiment_result = "u_rec_k={}, {}, {} \n".format(k, mae, time_elapsed)
-            lines_result += experiment_result
-            
-            if save_in_s3:
-                save_in_s3_function(experiment_result, "u", current_timestamp)
-
+        if "UserKNN" in models:
+            try:
+                tic = time.time()
+                u, mae = run_user_rec_experiment(config_data)
+                toc = time.time()
+                time_elapsed = toc - tic
+                k = models["UserKNN"]["neighbours"]
+                
+                print(u, mae, time_elapsed)
+                experiment_result = "u_rec_k={}, {}, {} \n".format(k, mae, time_elapsed)
+                lines_result += experiment_result
+                
+                if save_in_s3:
+                    save_in_s3_function(experiment_result, "u", current_timestamp)
+                    
+            except Exception as e:
+                line_error += "error performing experiment, u_rec; k = {}, error = {}".format(k, e)
+                print(line_error)
+                
+                if save_in_s3:
+                    save_in_s3_function(line_error, "u", current_timestamp)
 
         # For each rating in the test set, make a prediction using an 
         # item-based KNN with k = 3
-        if "i" in which:
-            tic = time.time()
-            u, mae = run_item_rec_experiment(k)
-            toc = time.time()
-            time_elapsed = toc - tic
-            
-            print(u, mae, time_elapsed)
-            experiment_result = "i_rec_k={}, {}, {} \n".format(k, mae, time_elapsed)
-            lines_result += experiment_result
-            
-            if save_in_s3:
-                save_in_s3_function(experiment_result, "i", current_timestamp)
-
-
-        if "b" in which:
-            tic = time.time()
-            u, mae = run_bootstrap_rec_experiment(k)
-            toc = time.time()
-            time_elapsed = toc - tic
-            
-            print(u, mae, time_elapsed)
-            experiment_result = "bs_rec_k={}, {}, {} \n".format(k, mae, time_elapsed)
-            lines_result += experiment_result
-            
-            if save_in_s3:
-                save_in_s3_function(experiment_result, "b", current_timestamp)
-
-
-        if "p" in which:
-            tic = time.time()
-            u, mae = run_pearlpu_rec_experiment(k)
-            toc = time.time()
-            time_elapsed = toc - tic
-            
-            print(u, mae, time_elapsed)
-            experiment_result = "pp_rec_k={}, {}, {} \n".format(k, mae, time_elapsed)
-            lines_result += experiment_result
-            
-            if save_in_s3:
-                save_in_s3_function(experiment_result, "p", current_timestamp)
+        if "ItemKNN" in models:
+            try:
+                tic = time.time()
+                u, mae = run_item_rec_experiment(k)
+                toc = time.time()
+                time_elapsed = toc - tic
                 
-            
-        if "c" in which:
-            tic = time.time()
-            u, mae = run_corec_rec_experiment(k)
-            toc = time.time()
-            time_elapsed = toc - tic
-            
-            print(u, mae, time_elapsed)
-            experiment_result = "corec_rec_k={}, {}, {} \n".format(k, mae, time_elapsed)
-            lines_result += experiment_result
-            
-            if save_in_s3:
-                save_in_s3_function(experiment_result, "c", current_timestamp)
+                print(u, mae, time_elapsed)
+                experiment_result = "i_rec_k={}, {}, {} \n".format(k, mae, time_elapsed)
+                lines_result += experiment_result
+                
+                if save_in_s3:
+                    save_in_s3_function(experiment_result, "i", current_timestamp)
+
+            except Exception as e:
+                line_error += "error performing experiment, i_rec; k = {}, error = {}".format(k, e)
+                print(line_error)
+                
+                if save_in_s3:
+                    save_in_s3_function(line_error, "i", current_timestamp)
+
+        if "Bootstrap" in models:
+            try:
+                tic = time.time()
+                u, mae = run_bootstrap_rec_experiment(k)
+                toc = time.time()
+                time_elapsed = toc - tic
+                
+                print(u, mae, time_elapsed)
+                experiment_result = "bs_rec_k={}, {}, {} \n".format(k, mae, time_elapsed)
+                lines_result += experiment_result
+                
+                if save_in_s3:
+                    save_in_s3_function(experiment_result, "b", current_timestamp)
+                    
+            except Exception as e:
+                line_error += "error performing experiment, bs_rec; k = {}, error = {}".format(k, e)
+                print(line_error)
+                
+                if save_in_s3:
+                    save_in_s3_function(line_error, "bs", current_timestamp)
+
+
+
+        if "PearlPu" in models:
+            try:
+                tic = time.time()
+                u, mae = run_pearlpu_rec_experiment(k)
+                toc = time.time()
+                time_elapsed = toc - tic
+                
+                print(u, mae, time_elapsed)
+                experiment_result = "pp_rec_k={}, {}, {} \n".format(k, mae, time_elapsed)
+                lines_result += experiment_result
+                
+                if save_in_s3:
+                    save_in_s3_function(experiment_result, "p", current_timestamp)
+                
+            except Exception as e:
+                line_error += "error performing experiment, p_rec; k = {}, error = {}".format(k, e)
+                print(line_error)
+                
+                if save_in_s3:
+                    save_in_s3_function(line_error, "p", current_timestamp)
+
+
+        if "CoRec" in models:
+            try:
+                tic = time.time()
+                u, mae = run_corec_rec_experiment(k)
+                toc = time.time()
+                time_elapsed = toc - tic
+                
+                print(u, mae, time_elapsed)
+                experiment_result = "corec_rec_k={}, {}, {} \n".format(k, mae, time_elapsed)
+                lines_result += experiment_result
+                
+                if save_in_s3:
+                    save_in_s3_function(experiment_result, "c", current_timestamp)
+                    
+            except Exception as e:
+                line_error += "error performing experiment, c_rec; k = {}, error = {}".format(k, e)
+                print(line_error)
+                
+                if save_in_s3:
+                    save_in_s3_function(line_error, "c", current_timestamp)
             
             
         if save_results:
-            saved_file = "{}/{}.txt".format(save_path, which)
+            saved_file = "{}/{}.txt".format(save_path, all_models)
             
             with open(saved_file, "w") as f:
                 f.write(lines_result)
                 
         if save_in_s3:
-            save_in_s3_function(lines_result, which, current_timestamp)
+            save_in_s3_function(lines_result, all_models, current_timestamp)
 
 
 
-def run_user_rec_experiment(k):
-    user_r = UserRecommender(k)
+def run_user_rec_experiment(**config_data):
+    user_r = UserRecommender(config_data)
     
     print("\nRunning User Recommender\n")
     print(len(user_r.test_ratings))
 
     for i, test in enumerate(user_r.test_ratings):
         try:
-            user_id = test['user_id']
-            item_id = test['item_id']
+            user_id = int(test['user_id'])
+            item_id = int(test['item_id'])
             rating = test['rating']
             
             predicted_rating = user_r.predict_rating_user_based_nn_wtd(active_user_id = user_id, candidate_item_id = item_id)
@@ -158,13 +204,13 @@ def run_user_rec_experiment(k):
             test["pred_rating"] = predicted_rating
             user_r.add_prediction(test)
             
-            if i > 100:
-                break
+            if early_stop:
+                if i > 100:
+                    break
                     
         except KeyboardInterrupt:
             ic("\nStopping\n")
             ic(i)
-            #sleep(1)
             break
         
     mae = Evaluation.mean_absolute_error(user_r.predictions)
@@ -181,8 +227,8 @@ def run_item_rec_experiment(k):
 
     for i, test in enumerate(item_r.test_ratings):
         try:
-            user_id = test['user_id']
-            item_id = test['item_id']
+            user_id = int(test['user_id'])
+            item_id = int(test['item_id'])
             rating = test['rating']
             
             predicted_rating = item_r.predict_rating_item_based_nn_wtd(active_user_id = user_id, candidate_item_id = item_id)
@@ -222,8 +268,8 @@ def run_bootstrap_rec_experiment(k):
     
     for i, test in enumerate(bs_r.test_ratings):
         try:
-            user_id = test['user_id']
-            item_id = test['item_id']
+            user_id = int(test['user_id'])
+            item_id = int(test['item_id'])
             rating = test['rating']
 
             predicted_rating = bs_r.predict_rating_user_based_nn_wtd(active_user_id = user_id, candidate_item_id = item_id)
@@ -240,12 +286,10 @@ def run_bootstrap_rec_experiment(k):
             
             if i > 30:
                 break
-        
             
         except KeyboardInterrupt:
             ic("\nStopping\n")
             ic(i)
-            #sleep(1)
             break
         
     mae = Evaluation.mean_absolute_error(bs_r.predictions)
@@ -262,8 +306,8 @@ def run_pearlpu_rec_experiment(k):
 
     for i, test in enumerate(pp_r.test_ratings):
         try:
-            user_id = test['user_id']
-            item_id = test['item_id']
+            user_id = int(test['user_id'])
+            item_id = int(test['item_id'])
             rating = test['rating']
             
             predicted_rating = pp_r.recursive_prediction(user_id, item_id)
@@ -285,13 +329,7 @@ def run_pearlpu_rec_experiment(k):
         except KeyboardInterrupt:
             ic("\nStopping\n")
             ic(i)
-            #sleep(1)
             break
-        
-        
-        except AssertionError:
-            print("The rating is beyond the range: {}".format(predicted_rating))
-            continue
         
     mae = Evaluation.mean_absolute_error(pp_r.predictions)
     mae = round(mae, 5)
@@ -311,8 +349,8 @@ def run_corec_rec_experiment(k):
     # predict and test
     for i, test in enumerate(co_rec_r.test_ratings):
         try:
-            user_id = test['user_id']
-            item_id = test['item_id']
+            user_id = int(test['user_id'])
+            item_id = int(test['item_id'])
             rating = test['rating']
             
             user_predicted_rating = co_rec_r.predict_co_rec_for_users(user_id, item_id)
@@ -322,14 +360,13 @@ def run_corec_rec_experiment(k):
             test["item_pred_rating"] = item_predicted_rating
             co_rec_r.add_prediction(test)
 
-            #if i > 10000:
-            #    break
+            if i > 1000:
+                break
                     
         except KeyboardInterrupt:
             ic("\nStopping\n")
             ic(i)
             break
-        
         
     mae_user, mae_item = Evaluation.mean_absolute_error(co_rec_r.predictions)
     

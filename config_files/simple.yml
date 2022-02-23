@@ -4,6 +4,7 @@ experiment:
   prefiltering: {"user_k_core" : 25}
   save_in_s3: True
   kfolds: 1
+  early_stop: True
   save_results: True
   test_splitting_ratio: 0.2
 
