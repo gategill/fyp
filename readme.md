@@ -2,10 +2,10 @@
 
 
 ## To Run
-To run, execute the following command in the terminal with the disired parameters:
+Create a `example_config.yml` file with the desired parameters and run the following command in the terminal:
 
-`python start.py --w=ui --k=10 --kfolds=5`
+`python start.py --config="example_config"`
 
 ## Disclaimer
 I was given everything in the first commit by my supervisor.
-Everytihg afterwards is my work.
+Everything afterwards is my work.

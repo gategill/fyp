@@ -32,7 +32,6 @@ models:
     weight_threshold: 1.0
     recursion_threshold: 3
 
- 
   CoRec:
     neighbours: 15
     similarity: sim_pearson
