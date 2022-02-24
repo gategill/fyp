@@ -3,19 +3,14 @@
 """
 
 
-#from time import sleep
 from icecream import ic
-#from dataset.Dataset import Dataset
 from recommender.GenericRecommender import GenericRecommender
 from recommender.UserRecommender import UserRecommender
 from recommender.ItemRecommender import ItemRecommender
-from recommender.Similarities import Similarities
-from evaluation.Evaluation import Evaluation
 import random
 import copy
 import pandas as pd
 
-ic.disable()
 
 class CoRecRecommender(GenericRecommender):
     def __init__(self, dataset = None, **kwargs) -> None:
@@ -37,7 +32,6 @@ class CoRecRecommender(GenericRecommender):
             for unseen_item in self.get_user_unrated_items(user_id, self.additions):
                 null_entries.append({"user_id": user_id, "item_id": unseen_item})            
         
-        #ic(null_entries)
         # step 2: co-training
         self.user_rec = UserRecommender(copy.deepcopy(self.dataset), **self.kwargs)    
         self.item_rec = ItemRecommender(copy.deepcopy(self.dataset), **self.kwargs)        
@@ -46,14 +40,14 @@ class CoRecRecommender(GenericRecommender):
         train_unlabelled_items = copy.deepcopy(null_entries)
         
         while (train_unlabelled_users) and (train_unlabelled_items): 
-            #ic("here") 
             print("There are {} ratings in the USER dataset".format(self.user_rec.dataset.num_ratings))
             print("There are {} ratings in the ITEM dataset".format(self.item_rec.dataset.num_ratings))
                         
             predicted_user_ratings = []
             predicted_item_ratings = []
             
-            print("Running USER Recommender for CoRec")          
+            print("Running USER Recommender for CoRec")         
+             
             # train item rec, predict and get confident results
             for i, entry in enumerate(train_unlabelled_users):
                 try:
@@ -74,7 +68,7 @@ class CoRecRecommender(GenericRecommender):
                     entry["confidence"] = confidence
                     predicted_user_ratings.append(entry)
                     
-                    if self.kwargs["exp_config"]["early_stop"]:
+                    if self.kwargs["experiment_config"]["early_stop"]:
                         if i > 100:
                             break
                 
@@ -84,9 +78,9 @@ class CoRecRecommender(GenericRecommender):
                     break
             
             top_m_user_predictions = sorted(predicted_user_ratings, key = lambda d: d["confidence"])[-self.top_m:] # get top m confident predictions
-            #ic(top_m_user_predictions)
         
             print("Running ITEM Recommender for CoRec")          
+            
             # train item rec, predict and get confident results
             for i, entry in enumerate(train_unlabelled_items):
                 try:
@@ -106,7 +100,7 @@ class CoRecRecommender(GenericRecommender):
                     entry["confidence"] = confidence
                     predicted_item_ratings.append(entry)
                     
-                    if self.kwargs["exp_config"]["early_stop"]:
+                    if self.kwargs["experiment_config"]["early_stop"]:
                         if i > 100:
                             break
                     
@@ -129,15 +123,12 @@ class CoRecRecommender(GenericRecommender):
                 if i in train_unlabelled_items:
                     train_unlabelled_items.remove(i)
                     
-            #ic(top_m_predictions)
-
             # update unlabelled datasets train_unlabelled_users and train_unlabelled_items
             print("There are " + str(len(train_unlabelled_users)) + " ratings left in train_unlabelled_users")
             if len(train_unlabelled_users):
                 train_unlabelled_users_df = pd.DataFrame(train_unlabelled_users)
                 train_unlabelled_users_df.drop(columns=["confidence", "rating"], inplace = True)
-                train_unlabelled_users = list(train_unlabelled_users_df.T.to_dict().values()) # does this work ???
-                #ic(train_unlabelled_users[:10])
+                train_unlabelled_users = list(train_unlabelled_users_df.T.to_dict().values()) 
             else:
                 ic("Length of train_unlabelled_users is 0")  
                           
@@ -145,7 +136,7 @@ class CoRecRecommender(GenericRecommender):
             if len(train_unlabelled_items) > 0:
                 train_unlabelled_items_df = pd.DataFrame(train_unlabelled_items)
                 train_unlabelled_items_df.drop(columns=["confidence", "rating"], inplace = True)
-                train_unlabelled_items = list(train_unlabelled_items_df.T.to_dict().values()) # does this work ???
+                train_unlabelled_items = list(train_unlabelled_items_df.T.to_dict().values()) 
             else:
                 ic("Length of train_unlabelled_items is 0")
                 
@@ -153,14 +144,14 @@ class CoRecRecommender(GenericRecommender):
             max_user_confidence = top_m_user_predictions_df["confidence"].max()
             top_m_user_predictions_df.drop(columns=["confidence"], inplace = True)
             top_m_user_predictions_df.drop_duplicates(inplace = True)
-            top_m_user_predictions = list(top_m_user_predictions_df.T.to_dict().values()) # does this work ???
+            top_m_user_predictions = list(top_m_user_predictions_df.T.to_dict().values()) 
             
             top_m_item_predictions_df = pd.DataFrame(top_m_item_predictions)
             max_item_confidence = top_m_item_predictions_df["confidence"].max()
 
             top_m_item_predictions_df.drop(columns=["confidence"], inplace = True)
             top_m_item_predictions_df.drop_duplicates(inplace = True)
-            top_m_item_predictions = list(top_m_item_predictions_df.T.to_dict().values()) # does this work ???
+            top_m_item_predictions = list(top_m_item_predictions_df.T.to_dict().values()) 
 
             self.max_user_confidence = max_user_confidence
             self.max_item_confidence = max_item_confidence
@@ -231,11 +222,11 @@ class CoRecRecommender(GenericRecommender):
         
     def get_measure_of_trustworthiness(self, algorithm, user_id, item_id, prediction):
         #ic("cr_rec.get_measure_of_trustworthiness()")
+        
         epsilon = 0.01
         baseline_estimate =  self.get_baseline_estimate(user_id, item_id)
         
         if baseline_estimate - prediction == 0.0:
-            #print("DIVIDING BY 0")
             return abs(1/epsilon)
 
         else:
@@ -244,6 +235,7 @@ class CoRecRecommender(GenericRecommender):
 
     def get_baseline_estimate(self, user_id, item_id):
         #ic("cr_rec.get_baseline_estimate()")
+        
         mu = self.mean_train_rating
         bu = self.user_rec.get_user_mean_rating(user_id)
         bi = self.item_rec.get_item_mean_rating(item_id)
@@ -254,7 +246,7 @@ class CoRecRecommender(GenericRecommender):
         if bi is None:
             bi = 0.0
 
-        return mu # + bu + bi
+        return mu
     
     
     def get_Nu(self, algorithm, user_id):

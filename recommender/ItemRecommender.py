@@ -5,17 +5,13 @@
 
 from icecream import ic
 import types
-from recommender.Similarities import Similarities
 from recommender.GenericRecommender import GenericRecommender
 
 
 class ItemRecommender(GenericRecommender):
-    #def __init__(self, k: int, dataset = None) -> None:
-
     def __init__(self, dataset = None, **kwargs) -> None:
         ic("item_rec.__init__()")
         
-        #super().__init__(k, dataset)
         super().__init__(dataset, **kwargs)
     
     

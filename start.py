@@ -4,22 +4,12 @@
 
 import argparse
 from icecream import ic
-from run_experiment import run_experiment
-
+from run_experiment import run_experiment_yaml
 
 parser = argparse.ArgumentParser(description = "Run User and Item KNN")
-parser.add_argument("--w", type = str, default = "c")
-parser.add_argument("--k", type = int, default = 3)
-parser.add_argument("--s", type = bool, default = True)
-parser.add_argument("--s3", type = bool, default = True)
-parser.add_argument("--kfolds", type = int, default = 1)
+parser.add_argument("--config", type = str, default = "simple")
 args = parser.parse_args()
 
+ic(args.config)
 
-ic(args.w)
-ic(args.k)
-ic(args.s)
-ic(args.s3)
-ic(args.kfolds)
-
-run_experiment(k = args.k, which = args.w, save_results = args.s, save_in_s3 = args.s3, kfolds = args.kfolds)
+run_experiment_yaml(f"config_files/{args.config}.yml")

@@ -4,7 +4,6 @@
 
 
 import math
-from icecream import ic
 
 
 class Similarities:
@@ -48,11 +47,6 @@ class Similarities:
             return 0.0
         
         # Calculate Pearson correlation
-        
-        #ic(sum_prods)
-        
-        #ic(sum_prods / (math.sqrt(sum_squares1) * math.sqrt(sum_squares2)))
-        
         pear =  sum_prods / (math.sqrt(sum_squares1) * math.sqrt(sum_squares2))
         lambda_param = 100
         
@@ -61,7 +55,6 @@ class Similarities:
         
     @staticmethod
     def sim_pearson(ratings1: dict, ratings2: dict) -> float:
-        #ic("sm.sim_pearson()")
         # {item_id/user_id, rating}
         
         # Get co-rated
@@ -103,10 +96,8 @@ class Similarities:
 
     @staticmethod
     def sim_cosine(ratings1: dict, ratings2: dict) -> float:
-        #ic("sm.sim_cosine()")
         # {item_id/user_id, rating}
 
-        
         if len(ratings1) == 0 or len(ratings2) == 0:
             return 0.0
         
@@ -115,7 +106,6 @@ class Similarities:
 
     @staticmethod
     def dot_product(ratings1: dict, ratings2: dict) -> float:
-        #ic("sm.dot_product()")
         # {item_id/user_id, rating}
 
         dot_product = 0.0
@@ -130,9 +120,7 @@ class Similarities:
         
     @staticmethod  
     def magnitude(ratings: dict) -> float:
-        #ic("sm.magnitude()")
         # {item_id/user_id, rating}
-
 
         sum_squares = 0.0
         

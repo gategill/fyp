@@ -5,13 +5,13 @@
 
 import random
 from icecream import ic
-import os
 import numpy as np
 import pandas as pd
 
 class Dataset:
     def __init__(self, **kwargs):
         #ic("ds.__init__()")
+        
         self.kwargs = kwargs
         self.DATA_PATH = self.kwargs["dataset_path"]
         self.__reset()
@@ -22,7 +22,7 @@ class Dataset:
         self.load_ratings(self.kwargs["test_splitting_ratio"])    
         
         print("There are {} ratings in the trainset".format(self.num_ratings))  
-        print("Sparsity of the trainset is: {}%".format(round(self.sparsity, 5)))  
+        print("Sparsity of the trainset is: {}%".format(100*round(self.sparsity, 4)))  
     
         
     def load_items(self, filename: str = "movies.txt") -> None:
@@ -55,12 +55,10 @@ class Dataset:
             user_ids.append(int(user_id))
         
         self.user_ids = np.unique(user_ids)
-        # shuffle, k fod
         
         
     def read_in_ratings(self,  filename: str = "ratings.txt"):
         """ Reads in the data from a ratings file."""
-        
         #ic("ds.read_in_ratings()")
         
         if type(filename) != str:
@@ -84,7 +82,6 @@ class Dataset:
         random.shuffle(all_ratings) # inplace, returns None
         
         self.all_ratings = all_ratings
-        #self.all_ratings = random.shuffle(all_ratings)
         
         
     def get_ratings_as_df(self):
@@ -92,11 +89,10 @@ class Dataset:
     
     
     def prefilter_ratings(self, prefilterings):
+        # ic("ds.prefilter_rating()")
+        
         df = self.get_ratings_as_df()
         
-        #if kwargs.keys())) != str:
-        #    raise TypeError("load_ratings: you supplied filename = '%s' but filename must be a string" % filename)
-                
         for strategy, threshold in prefilterings.items():
             if type(strategy) != str:
                 raise TypeError("Invalid prefiltering strategy. Valid strategies must be a string")
@@ -130,7 +126,6 @@ class Dataset:
                 data["item_id"] = data["item_id"].astype(int)
                 
                 df = data
-                #print(df.head(10))
                 self.user_ids = list(map(int, np.unique(df["user_id"].to_list())))
                 self.item_ids = list(map(int, np.unique(df["item_id"].to_list())))
                 
@@ -173,7 +168,6 @@ class Dataset:
                 
                 print(f"The transactions after filtering are {len(data)}")
                 print(f"The users after filtering are {data['user_id'].nunique()}")
-                #data["user_id"] = df["user_id"].apply(lambda x)
                 data["user_id"] = data["user_id"].astype(int)
                 data["item_id"] = data["item_id"].astype(int)
                 
@@ -184,8 +178,7 @@ class Dataset:
                 print("df.shape AFTER cold_users: " + str(df.shape))
                 
         reduced_all_ratings = list(df.T.to_dict().values())
-        #print(reduced_all_ratings[:10])
-        #input("thtrh")
+
         self.all_ratings = reduced_all_ratings
           
           
@@ -224,7 +217,6 @@ class Dataset:
                 entry["user_id"] = int(entry["user_id"])
                 entry["item_id"] = int(entry["item_id"])
                 self.test_ratings.append(entry)                
-            #sleep(1)
                 
         self.mean_train_rating = self.mean_train_rating / num_ratings
         
@@ -265,13 +257,11 @@ class Dataset:
         self.update_train_ratings(new_recommendations)
         self.update_user_train_means()
         self.update_item_train_means()
-        #self.update_mean_train_rating()
+        #self.update_mean_train_rating() # just don't
         self.update_num_ratings(new_recommendations)
         
-        # will have to update these !!!
         print("There are {} ratings in the trainset".format(self.num_ratings))
-        #print("Sparsity of the trainset is: {}%".format(self.sparsity))
-
+        
                 
     def get_user_ids(self) -> list:
         # [user_ids]
@@ -297,9 +287,7 @@ class Dataset:
     def update_user_train_ratings(self, new_recommendations: list) -> None:
         # 
         ic("ds.update_user_train_ratings()")
-        
-        #self.num_ratings += len(new_recommendations)
-        
+                
         for recommendation in new_recommendations:
             user_id = int(recommendation["user_id"])
             item_id = int(recommendation["item_id"])
@@ -316,13 +304,13 @@ class Dataset:
             if len(ratings) > 0:
                 self.user_train_means[user_id] = sum(ratings.values()) * 1.0 / len(ratings)
             else:
-                #ic("empty in user")
                 self.user_train_means[user_id] = None
                 
                 
     def update_item_train_ratings(self, new_recommendations: list) -> None:
         # 
         ic("ds.update_item_train_ratings()")
+        
         for recommendation in new_recommendations:
             user_id = int(recommendation["user_id"])
             item_id = int(recommendation["item_id"])    
@@ -331,21 +319,16 @@ class Dataset:
             if rating is None:
                 raise TypeError
               
-            # should it not be append!!!! TODO FIXME 
-            #ic(item_id)
             self.item_train_ratings[item_id][user_id] = rating
             
             
     def update_train_ratings(self, new_recommendations: list) -> None:
         # 
         ic("ds.update_train_ratings()")
-        
    
         for recommendation in new_recommendations:  
-            #ic(recommendation)      
             if recommendation["rating"] is None:
                 raise TypeError
-            # maybe update? FIXME
             self.train_ratings.append(recommendation)
                                 
         
@@ -357,17 +340,14 @@ class Dataset:
             if len(ratings) > 0:
                 self.item_train_means[item_id] = sum(ratings.values()) * 1.0 / len(ratings)
             else:
-                #ic("empty in item")
-                #ic(item_id)
+
                 self.item_train_means[item_id] = None
                 
                     
     def update_mean_train_rating(self) -> None:
         # 
         ic("ds.update_mean_train_rating()")
-        #ic(list(self.item_train_means.values()))
-        #ic(len(self.item_train_means))            
-                
+
         new_mean_train_rating = np.nansum(list(self.item_train_means.values())) / len(self.item_train_means)
         
         ic(self.mean_train_rating)
@@ -482,6 +462,7 @@ class Dataset:
     @staticmethod
     def __d_to_dlist(dict: dict, keykey: int, valkey: int) -> list:
         #ic("ds.__d_to_dlist()")
+        
         ic(keykey)
         ic(valkey)
         

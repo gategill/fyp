@@ -4,9 +4,7 @@
 
 
 from icecream import ic
-import types
 from recommender.UserRecommender import UserRecommender
-from recommender.Similarities import Similarities
 
 
 class PearlPuRecommender(UserRecommender):
@@ -21,9 +19,8 @@ class PearlPuRecommender(UserRecommender):
     def recursive_prediction(self, active_user: int, candidate_moive: int, recursion_level: int = 1) -> float:
         """"""
         #ic("pp_rec.recursive_prediction()")
-        ic(recursion_level)
-        # starts at 1
         
+        # starts at 1
         if recursion_level > self.recursion_threshold:
             #ic("Reached Recursion Limit - Using Baseline")
             
@@ -42,24 +39,18 @@ class PearlPuRecommender(UserRecommender):
                 sim_x_y = self.get_user_similarity(self.similarity_function, active_user, neighbour_id)
                 mean_rating_for_neighbour = self.get_user_mean_rating(neighbour_id)
                 
-                #ic(sim_x_y)
                 alpha += (neighbour_item_rating - mean_rating_for_neighbour) * sim_x_y
                 beta += abs(sim_x_y)
                 
             else:
                 rec_pred = self.recursive_prediction(neighbour_id, candidate_moive, recursion_level + 1)
                 sim_x_y = self.get_user_similarity(self.similarity_function, active_user, neighbour_id)
-                #ic(sim_x_y)
                 mean_rating_for_neighbour = self.get_user_mean_rating(neighbour_id)
                 
                 alpha += self.weight_threshold * (rec_pred - mean_rating_for_neighbour) * sim_x_y
                 beta += self.weight_threshold * abs(sim_x_y)
         
         mean_rating_for_active_user = self.get_user_mean_rating(active_user)
-        
-        #ic(alpha)
-        #ic(beta)
-        
         
         if beta == 0.0:
             return mean_rating_for_active_user

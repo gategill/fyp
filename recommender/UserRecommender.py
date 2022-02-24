@@ -5,15 +5,12 @@
 
 from icecream import ic
 import types
-from recommender.Similarities import Similarities
 from recommender.GenericRecommender import GenericRecommender
 
 
 class UserRecommender(GenericRecommender):
-    #def __init__(self, k: int, dataset = None) -> None:
     def __init__(self, dataset = None, **kwargs) -> None:
         ic("user_rec.__init__()")
-        #super().__init__(k, dataset)
         super().__init__(dataset, **kwargs)
 
 
@@ -157,7 +154,7 @@ class UserRecommender(GenericRecommender):
         
         nearest_neighbours = []
         
-        for user_id in self.user_train_ratings: # 
+        for user_id in self.user_train_ratings:
             
             if active_user_id == user_id:
                 continue
@@ -350,9 +347,6 @@ class UserRecommender(GenericRecommender):
         """"""
         ##ic("user_rec.get_user_similarity()")
         
-        sim = similarity_function(self.user_train_ratings[active_user_id], self.user_train_ratings[user_id])
-        
-        #ic(sim)
-        
+        sim = similarity_function(self.user_train_ratings[active_user_id], self.user_train_ratings[user_id])        
         
         return sim

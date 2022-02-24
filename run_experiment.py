@@ -3,9 +3,7 @@
 """
 
 
-from sqlite3 import Timestamp
 from icecream import ic
-from time import sleep
 from recommender.UserRecommender import UserRecommender
 from recommender.ItemRecommender import ItemRecommender
 from recommender.PearlPuRecommender import PearlPuRecommender
@@ -19,10 +17,8 @@ import yaml
 import random
 import shutil
 
-#ic.disable()
-s3 = boto3.client('s3')
-#s3_resource = boto3.resource('s3')
 
+s3 = boto3.client('s3')
 
 def save_in_s3_function(data, which_model, current_timestamp):
     s3.put_object(Body = data, Bucket = "fyp-w9797878", Key = str(current_timestamp) + "/"+ which_model + '.txt')
@@ -30,27 +26,182 @@ def save_in_s3_function(data, which_model, current_timestamp):
 
 def read_in_yaml_file(config_path):
     with open(config_path) as f:
-        config_data = yaml.load(f, Loader = yaml.FullLoader)
-    return config_data
+        kwargs = yaml.load(f, Loader = yaml.FullLoader)
+
+    if "experiment_config" not in kwargs:
+        raise KeyError("missing experiment_config in kwargs")
+    if "seed" not in kwargs["experiment_config"]:
+        raise KeyError("missing seed in experiment_config")
+    if "save_in_s3" not in kwargs["experiment_config"]:
+        raise KeyError("missing save_in_s3 in experiment_config")
+    if "save_results" not in kwargs["experiment_config"]:
+        raise KeyError("missing save_results in experiment_config")
+    if "kfolds" not in kwargs["experiment_config"]:
+        raise KeyError("missing kfolds in experiment_config")
+    if "early_stop" not in kwargs["experiment_config"]:
+        raise KeyError("missing early_stop in experiment_config")
+    if "disable_ic" not in kwargs["experiment_config"]:
+        raise KeyError("missing disable_ic in experiment_config")
+    
+    if type(kwargs["experiment_config"]["seed"]) != int:
+        raise TypeError("seed should be an integer")
+    if type(kwargs["experiment_config"]["save_in_s3"]) != bool:
+        raise TypeError("save_in_s3 should be booleay")
+    if type(kwargs["experiment_config"]["save_results"]) != bool:
+        raise TypeError("save_results should be boolean")
+    if type(kwargs["experiment_config"]["kfolds"]) != int:
+        raise TypeError("kfolds should be an integer")
+    if type(kwargs["experiment_config"]["early_stop"]) != bool:
+        raise TypeError("early_stop should be boolean")
+    if type(kwargs["experiment_config"]["disable_ic"]) != bool:
+        raise TypeError("disable_ic should be boolean")
+    
+    
+    if "dataset_config" not in kwargs:
+        raise KeyError("missing dataset_config in kwargs")
+    if "dataset_path" not in kwargs["dataset_config"]:
+        raise KeyError("missing dataset_path in dataset_config")
+    if "prefiltering" not in kwargs["dataset_config"]:
+        raise KeyError("missing prefiltering in dataset_config")
+    if "test_splitting_ratio" not in kwargs["dataset_config"]:
+        raise KeyError("missing test_splitting_ratio in dataset_config")
+    
+    if type(kwargs["dataset_config"]["dataset_path"]) != str:
+        raise TypeError("dataset_path should be a string")
+    if type(kwargs["dataset_config"]["prefiltering"]) != dict:
+        raise TypeError("prefiltering should be a dictionary")
+    if type(kwargs["dataset_config"]["test_splitting_ratio"]) != float:
+        raise TypeError("test_splitting_ratio should be a float")
+    
+    
+    if "models" not in kwargs:
+        raise KeyError("missing models in kwargs")
+    if len(kwargs["models"]) == 0:
+        raise ValueError("no models provided in kwargs[models]")
+    
+    if "UserKNN" in kwargs["models"]:
+        if "neighbours" not in kwargs["models"]["UserKNN"]:
+            raise KeyError("missing neighbours in UserKNN")
+        if "similarity" not in kwargs["models"]["UserKNN"]:
+            raise KeyError("missing similarity in UserKNN")
+        
+        if type(kwargs["models"]["UserKNN"]["neighbours"]) != int:
+            raise TypeError("neighbours should be an integer")
+        if type(kwargs["models"]["UserKNN"]["similarity"]) != str:
+            raise TypeError("similarity should be an string")
+        
+        if kwargs["models"]["UserKNN"]["similarity"] not in ["sim_pearson", "sim_cosine", "sim_sim"]:
+            raise ValueError("invalid similarity measure. available similarites are: [sim_pearson, sim_cosine, sim_sim]")
+        
+        
+    if "ItemKNN" in kwargs["models"]:
+        if "neighbours" not in kwargs["models"]["ItemKNN"]:
+            raise KeyError("missing neighbours in ItemKNN")
+        if "similarity" not in kwargs["models"]["ItemKNN"]:
+            raise KeyError("missing similarity in ItemKNN")
+
+        if type(kwargs["models"]["ItemKNN"]["neighbours"]) != int:
+            raise TypeError("neighbours should be an integer")
+        if type(kwargs["models"]["ItemKNN"]["similarity"]) != str:
+            raise TypeError("similarity should be an string")
+        
+        if kwargs["models"]["ItemKNN"]["similarity"] not in ["sim_pearson", "sim_cosine", "sim_sim"]:
+            raise ValueError("invalid similarity measure. available similarites are: [sim_pearson, sim_cosine, sim_sim]")
+        
+        
+    if "Bootstrap" in kwargs["models"]:
+        if "neighbours" not in kwargs["models"]["Bootstrap"]:
+            raise KeyError("missing neighbours in Bootstrap")
+        if "similarity" not in kwargs["models"]["Bootstrap"]:
+            raise KeyError("missing similarity in Bootstrap")
+        if "iterations" not in kwargs["models"]["Bootstrap"]:
+            raise KeyError("missing iterations in Bootstrap")
+        if "additions" not in kwargs["models"]["Bootstrap"]:
+            raise KeyError("missing additions in Bootstrap")
+        
+        if type(kwargs["models"]["Bootstrap"]["neighbours"]) != int:
+            raise TypeError("neighbours should be an integer")
+        if type(kwargs["models"]["Bootstrap"]["similarity"]) != str:
+            raise TypeError("similarity should be an string")
+        if type(kwargs["models"]["Bootstrap"]["iterations"]) != int:
+            raise TypeError("iterations should be an integer")
+        if type(kwargs["models"]["Bootstrap"]["additions"]) != int:
+            raise TypeError("additions should be an integer")
+        
+        if kwargs["models"]["Bootstrap"]["similarity"] not in ["sim_pearson", "sim_cosine", "sim_sim"]:
+            raise ValueError("invalid similarity measure. available similarites are: [sim_pearson, sim_cosine, sim_sim]")
+        
+        
+    if "PearlPu" in kwargs["models"]:
+        if "neighbours" not in kwargs["models"]["PearlPu"]:
+            raise KeyError("missing neighbours in PearlPu")
+        if "similarity" not in kwargs["models"]["PearlPu"]:
+            raise KeyError("missing similarity in PearlPu")
+        if "weight_threshold" not in kwargs["models"]["PearlPu"]:
+            raise KeyError("missing weight_threshold in PearlPu")
+        if "recursion_threshold" not in kwargs["models"]["PearlPu"]:
+            raise KeyError("missing recursion_threshold in PearlPu")
+        
+        if type(kwargs["models"]["PearlPu"]["neighbours"]) != int:
+            raise TypeError("neighbours should be an integer")
+        if type(kwargs["models"]["PearlPu"]["similarity"]) != str:
+            raise TypeError("similarity should be an string")
+        if type(kwargs["models"]["PearlPu"]["weight_threshold"]) != float:
+            raise TypeError("weight_threshold should be a float")
+        if type(kwargs["models"]["PearlPu"]["recursion_threshold"]) != int:
+            raise TypeError("recursion_threshold should be an integer")
+        
+        if kwargs["models"]["PearlPu"]["similarity"] not in ["sim_pearson", "sim_cosine", "sim_sim"]:
+            raise ValueError("invalid similarity measure. available similarites are: [sim_pearson, sim_cosine, sim_sim]")
+        
+        
+    if "CoRec" in kwargs["models"]:
+        if "neighbours" not in kwargs["models"]["CoRec"]:
+            raise KeyError("missing neighbours in CoRec")
+        if "similarity" not in kwargs["models"]["CoRec"]:
+            raise KeyError("missing similarity in CoRec")
+        if "additions" not in kwargs["models"]["CoRec"]:
+            raise KeyError("missing additions in CoRec")
+        if "top_m" not in kwargs["models"]["CoRec"]:
+            raise KeyError("missing top_m in CoRec")
+
+        if type(kwargs["models"]["CoRec"]["neighbours"]) != int:
+            raise TypeError("neighbours should be an integer")
+        if type(kwargs["models"]["CoRec"]["similarity"]) != str:
+            raise TypeError("similarity should be an string")
+        if type(kwargs["models"]["CoRec"]["additions"]) != int:
+            raise TypeError("additions should be an integer")
+        if type(kwargs["models"]["CoRec"]["top_m"]) != int:
+            raise TypeError("top_m should be an integer")
+        if kwargs["models"]["CoRec"]["top_m"] < kwargs["models"]["CoRec"]["additions"]:
+            raise ValueError("top_m should be larger than additions (I think)")
+
+        if kwargs["models"]["CoRec"]["similarity"] not in ["sim_pearson", "sim_cosine", "sim_sim"]:
+            raise ValueError("invalid similarity measure. available similarites are: [sim_pearson, sim_cosine, sim_sim]")
+            
+            
+    return kwargs
 
 
 def run_experiment_yaml(config_path: str):
     kwargs = read_in_yaml_file(config_path)
     kwargs["config_path"] = config_path
-    
-    #print(config_data)
-    
+        
     run_experiment(**kwargs)
 
 
 def run_experiment(**kwargs) -> None:
-    random.seed(kwargs["exp_config"]["seed"])
-    save_in_s3 = kwargs["exp_config"]["save_in_s3"]
-    save_results = kwargs["exp_config"]["save_results"]
-    all_models =  "_".join(list(kwargs["models"].keys()))
+    save_in_s3 = kwargs["experiment_config"]["save_in_s3"]
+    save_results = kwargs["experiment_config"]["save_results"]
+    kfolds = kwargs["experiment_config"]["kfolds"]
     
-    for i in range(kwargs["exp_config"]["kfolds"]):
-        
+    all_models =  "_".join(list(kwargs["models"].keys()))
+    random.seed(kwargs["experiment_config"]["seed"])
+    
+    if kwargs["experiment_config"]["disable_ic"]: 
+        ic.disable()
+    
+    for i in range(kfolds):
         current_timestamp = int(time.time())
         save_path = "./results/{}".format(current_timestamp)
         os.mkdir(save_path)
@@ -58,7 +209,6 @@ def run_experiment(**kwargs) -> None:
         models = kwargs["models"]
         
         # For each rating in the test set, make a prediction using a 
-        # user-based KNN with k = 3
         lines_result = "algorithm, mae, time_elapsed\n"
         if "UserKNN" in models:
 
@@ -83,7 +233,6 @@ def run_experiment(**kwargs) -> None:
                     save_in_s3_function(line_error, "UserKNN", current_timestamp)
 
         # For each rating in the test set, make a prediction using an 
-        # item-based KNN with k = 3
         if "ItemKNN" in models:
             try:
                 tic = time.time()
@@ -151,25 +300,25 @@ def run_experiment(**kwargs) -> None:
 
 
         if "CoRec" in models:
-            #try:
-            tic = time.time()
-            u, mae = run_corec_rec_experiment(**kwargs)
-            toc = time.time()
-            time_elapsed = round(toc - tic, 3)
-            
-            print(u, mae, time_elapsed)
-            experiment_result = "CoRec, {}, {} \n".format(mae, time_elapsed)
-            lines_result += experiment_result
-            
-            if save_in_s3:
-                save_in_s3_function(experiment_result, "CoRec", current_timestamp)
-                    
-            #except Exception as e:
-            #    line_error = "error performing experiment, CoRec, error = {}".format(e)
-            #    print(line_error)
+            try:
+                tic = time.time()
+                u, mae = run_corec_rec_experiment(**kwargs)
+                toc = time.time()
+                time_elapsed = round(toc - tic, 3)
                 
-            #    if save_in_s3:
-            #        save_in_s3_function(line_error, "CoRec", current_timestamp)
+                print(u, mae, time_elapsed)
+                experiment_result = "CoRec, {}, {} \n".format(mae, time_elapsed)
+                lines_result += experiment_result
+                
+                if save_in_s3:
+                    save_in_s3_function(experiment_result, "CoRec", current_timestamp)
+                        
+            except Exception as e:
+                line_error = "error performing experiment, CoRec, error = {}".format(e)
+                print(line_error)
+                
+                if save_in_s3:
+                    save_in_s3_function(line_error, "CoRec", current_timestamp)
             
             
         if save_results:
@@ -178,7 +327,6 @@ def run_experiment(**kwargs) -> None:
             with open(saved_file_results, "w") as f:
                 f.write(lines_result)
                 
-            #saved_file_config = "{}/{}.yml".format(save_path, kwargs["config_path"])
             src = kwargs["config_path"]
             dst = save_path + "/config.yml"
             shutil.copyfile(src, dst)           
@@ -212,8 +360,8 @@ def run_user_rec_experiment(**kwargs):
             test["pred_rating"] = predicted_rating
             user_r.add_prediction(test)
             
-            if kwargs["exp_config"]["early_stop"]:
-                if i > 100:
+            if kwargs["experiment_config"]["early_stop"]:
+                if i > 50:
                     break
                     
         except KeyboardInterrupt:
@@ -222,7 +370,7 @@ def run_user_rec_experiment(**kwargs):
             break
         
     mae = Evaluation.mean_absolute_error(user_r.predictions)
-    mae = round(mae, 5)
+    mae = round(mae, 3)
     test["pred_rating"] = round(test["pred_rating"], 2)
     
     return test, mae     
@@ -250,18 +398,17 @@ def run_item_rec_experiment(**kwargs):
             test["pred_rating"] = predicted_rating
             item_r.add_prediction(test)
             
-            if kwargs["exp_config"]["early_stop"]:
-                if i > 100:
+            if kwargs["experiment_config"]["early_stop"]:
+                if i > 50:
                     break
                     
         except KeyboardInterrupt:
             ic("\nStopping\n")
             ic(i)
-            #sleep(1)
             break
         
     mae = Evaluation.mean_absolute_error(item_r.predictions)
-    mae = round(mae, 5)
+    mae = round(mae, 3)
     test["pred_rating"] = round(test["pred_rating"], 2)
     
     return test, mae        
@@ -269,7 +416,7 @@ def run_item_rec_experiment(**kwargs):
         
 def run_bootstrap_rec_experiment(**kwargs):
     kwargs["run_params"] = kwargs["models"]["Bootstrap"]
-    bs_r = BootstrapRecommender(**kwargs) # was 1,6
+    bs_r = BootstrapRecommender(**kwargs) # was 1, 6
     print("\nEnriching Bootstrap Recommender\n")
 
     bs_r.enrich()
@@ -292,8 +439,8 @@ def run_bootstrap_rec_experiment(**kwargs):
             test["pred_rating"] = predicted_rating
             bs_r.add_prediction(test)
             
-            if kwargs["exp_config"]["early_stop"]:
-                if i > 30:
+            if kwargs["experiment_config"]["early_stop"]:
+                if i > 10:
                     break
             
         except KeyboardInterrupt:
@@ -302,7 +449,7 @@ def run_bootstrap_rec_experiment(**kwargs):
             break
         
     mae = Evaluation.mean_absolute_error(bs_r.predictions)
-    mae = round(mae, 5)
+    mae = round(mae, 3)
     test["pred_rating"] = round(test["pred_rating"], 2)
 
     return test, mae     
@@ -333,8 +480,8 @@ def run_pearlpu_rec_experiment(**kwargs):
             test["pred_rating"] = predicted_rating
             pp_r.add_prediction(test)
             
-            if kwargs["exp_config"]["early_stop"]:
-                if i > 30:
+            if kwargs["experiment_config"]["early_stop"]:
+                if i > 10:
                     break
                     
         except KeyboardInterrupt:
@@ -343,7 +490,7 @@ def run_pearlpu_rec_experiment(**kwargs):
             break
         
     mae = Evaluation.mean_absolute_error(pp_r.predictions)
-    mae = round(mae, 5)
+    mae = round(mae, 3)
     test["pred_rating"] = round(test["pred_rating"], 2)
     
     return test, mae     
@@ -371,8 +518,8 @@ def run_corec_rec_experiment(**kwargs):
             test["item_pred_rating"] = item_predicted_rating
             co_rec_r.add_prediction(test)
 
-            if kwargs["exp_config"]["early_stop"]:
-                if i > 100:
+            if kwargs["experiment_config"]["early_stop"]:
+                if i > 30:
                     break
                     
         except KeyboardInterrupt:

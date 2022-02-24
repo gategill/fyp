@@ -1,21 +1,40 @@
-dataset_config:
-  dataset_path: "./data/given/"
-  prefiltering: {"user_k_core" : 25}
-  test_splitting_ratio: 0.2
-
-exp_config:
+experiment_config:
   seed: 42
   save_in_s3: False
   kfolds: 1
   early_stop: True
   save_results: True
+  disable_ic: True
+
+dataset_config:
+  dataset_path: "./data/given/"
+  prefiltering: {"user_k_core" : 25, "item_k_core": 10}
+  test_splitting_ratio: 0.2
 
 models:
-  CoRec:
-    neighbours: 5
+  UserKNN:
+    neighbours: 20
     similarity: sim_sim
-    additions: 10
-    top_m: 50
 
+  ItemKNN:
+    neighbours: 25
+    similarity: sim_cosine
+
+  Bootstrap:
+    neighbours: 17
+    similarity: sim_pearson
+    iterations: 3
+    additions: 10
+
+  PearlPu:
+    neighbours: 20
+    similarity: sim_cosine
+    weight_threshold: 1.0
+    recursion_threshold: 3
 
  
+  CoRec:
+    neighbours: 15
+    similarity: sim_pearson
+    additions: 100
+    top_m: 200

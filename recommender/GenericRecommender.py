@@ -3,17 +3,15 @@
 """
 
 
-#from time import sleep
 from icecream import ic
 from dataset.Dataset import Dataset
 from recommender.Similarities import Similarities
 
 
-
 class GenericRecommender:
-    #def __init__(self, k: int, dataset = None) -> None:
     def __init__(self, dataset = None, **kwargs) -> None:
         #ic("gen_rec.__init__()")
+        
         self.kwargs = kwargs        
         self.k = self.kwargs["run_params"]["neighbours"]
         self.similarity_function = self.get_similarity_function()
