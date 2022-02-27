@@ -95,31 +95,31 @@ def read_in_yaml_file(config_path):
             raise TypeError("Bootstrap.additions should be an integer")
         
         
-    if "PearlPu" in kwargs["models"]:
-        if "weight_threshold" not in kwargs["models"]["PearlPu"]:
-            raise KeyError("missing weight_threshold in PearlPu")
-        if "recursion_threshold" not in kwargs["models"]["PearlPu"]:
-            raise KeyError("missing recursion_threshold in PearlPu")
-        if "phi" not in kwargs["models"]["PearlPu"]:
-            raise KeyError("missing phi in PearlPu")
-        if "k_prime" not in kwargs["models"]["PearlPu"]:
-            raise KeyError("missing k_prime in PearlPu")
-        if "baseline" not in kwargs["models"]["PearlPu"]:
-            raise KeyError("missing baseline in PearlPu")
+    if "RecursiveKNN" in kwargs["models"]:
+        if "weight_threshold" not in kwargs["models"]["RecursiveKNN"]:
+            raise KeyError("missing weight_threshold in RecursiveKNN")
+        if "recursion_threshold" not in kwargs["models"]["RecursiveKNN"]:
+            raise KeyError("missing recursion_threshold in RecursiveKNN")
+        if "phi" not in kwargs["models"]["RecursiveKNN"]:
+            raise KeyError("missing phi in RecursiveKNN")
+        if "k_prime" not in kwargs["models"]["RecursiveKNN"]:
+            raise KeyError("missing k_prime in RecursiveKNN")
+        if "baseline" not in kwargs["models"]["RecursiveKNN"]:
+            raise KeyError("missing baseline in RecursiveKNN")
 
-        if type(kwargs["models"]["PearlPu"]["weight_threshold"]) != float:
-            raise TypeError("PearlPu.weight_threshold should be a float")
-        if type(kwargs["models"]["PearlPu"]["recursion_threshold"]) != int:
-            raise TypeError("PearlPu.recursion_threshold should be an integer")
-        if type(kwargs["models"]["PearlPu"]["phi"]) != int:
-            raise TypeError("PearlPu.phi should be an integer")
-        if type(kwargs["models"]["PearlPu"]["k_prime"]) != int:
-            raise TypeError("PearlPu.k_prime should be an integer")
-        if type(kwargs["models"]["PearlPu"]["baseline"]) != str:
-            raise TypeError("PearlPu.baseline should be a string")
+        if type(kwargs["models"]["RecursiveKNN"]["weight_threshold"]) != float:
+            raise TypeError("RecursiveKNN.weight_threshold should be a float")
+        if type(kwargs["models"]["RecursiveKNN"]["recursion_threshold"]) != int:
+            raise TypeError("RecursiveKNN.recursion_threshold should be an integer")
+        if type(kwargs["models"]["RecursiveKNN"]["phi"]) != int:
+            raise TypeError("RecursiveKNN.phi should be an integer")
+        if type(kwargs["models"]["RecursiveKNN"]["k_prime"]) != int:
+            raise TypeError("RecursiveKNN.k_prime should be an integer")
+        if type(kwargs["models"]["RecursiveKNN"]["baseline"]) != str:
+            raise TypeError("RecursiveKNN.baseline should be a string")
         
-        if kwargs["models"]["PearlPu"]["baseline"] not in ["bs", "bs+", "ss", "cs", "cs+"]:
-            raise ValueError("invalid PearlPu.baseline\navailable baselines are: [bs, bs+, ss, cs, cs+]")
+        if kwargs["models"]["RecursiveKNN"]["baseline"] not in ["bs", "bs+", "ss", "cs", "cs+"]:
+            raise ValueError("invalid RecursiveKNN.baseline\navailable baselines are: [bs, bs+, ss, cs, cs+]")
         
     if "CoRec" in kwargs["models"]:
         if "additions" not in kwargs["models"]["CoRec"]:

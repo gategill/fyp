@@ -3,10 +3,10 @@
 """
 
 
-from recommender.UserRecommender import UserRecommender
-from recommender.ItemRecommender import ItemRecommender
-from recommender.UserPearlPuRecommender import UserPearlPuRecommender
-from recommender.ItemPearlPuRecommender import ItemPearlPuRecommender
+from recommender.UserKNNRecommender import UserKNNRecommender
+from recommender.ItemKNNRecommender import ItemKNNRecommender
+from recommender.UserRecursiveKNNRecommender import UserRecursiveKNNRecommender
+from recommender.ItemRecursiveKNNRecommender import ItemRecursiveKNNRecommender
 from recommender.UserBootstrapRecommender import UserBootstrapRecommender
 from recommender.ItemBootstrapRecommender import ItemBootstrapRecommender
 from recommender.CoRecRecommender import CoRecRecommender
@@ -24,12 +24,12 @@ import numpy as np
 s3 = boto3.client('s3')
 
 def run_experiment(config_path) -> None:
-    recommenders = {"UserKNN" : UserRecommender, 
-                       "ItemKNN" : ItemRecommender,
+    recommenders = {"UserKNN" : UserKNNRecommender, 
+                       "ItemKNN" : ItemKNNRecommender,
                        "UserBootstrap" : UserBootstrapRecommender,
                        "ItemBootstrap" : ItemBootstrapRecommender,
-                       "UserPearlPu" : UserPearlPuRecommender, 
-                       "ItemPearlPu" : ItemPearlPuRecommender, 
+                       "UserRecursiveKNN" : UserRecursiveKNNRecommender, 
+                       "ItemRecursiveKNN" : ItemRecursiveKNNRecommender, 
                        "CoRec" : CoRecRecommender}
             
         

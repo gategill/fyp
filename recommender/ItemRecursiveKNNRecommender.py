@@ -4,11 +4,11 @@
 
 
 from icecream import ic
-from recommender.ItemRecommender import ItemRecommender
+from recommender.ItemKNNRecommender import ItemKNNRecommender
 
 # !!! UNDER CONSTRUCTION !!! 
 
-class ItemPearlPuRecommender(ItemRecommender):
+class ItemRecursiveKNNRecommender(ItemKNNRecommender):
     def __init__(self, dataset = None, **kwargs) -> None:
         #ic("pp_rec.__init__()")
 

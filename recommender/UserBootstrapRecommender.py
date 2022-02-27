@@ -5,10 +5,10 @@
 
 import random
 from icecream import ic
-from recommender.UserRecommender import UserRecommender
+from recommender.UserKNNRecommender import UserKNNRecommender
 
 
-class UserBootstrapRecommender(UserRecommender):
+class UserBootstrapRecommender(UserKNNRecommender):
     def __init__(self, dataset = None, **kwargs) -> None:
         #ic("bs_rec.__init__()")
         

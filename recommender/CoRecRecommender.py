@@ -5,8 +5,8 @@
 
 from icecream import ic
 from recommender.GenericRecommender import GenericRecommender
-from recommender.UserRecommender import UserRecommender
-from recommender.ItemRecommender import ItemRecommender
+from recommender.UserKNNRecommender import UserKNNRecommender
+from recommender.ItemKNNRecommender import ItemKNNRecommender
 from evaluation.Evaluation import Evaluation
 import random
 import copy
@@ -81,8 +81,8 @@ class CoRecRecommender(GenericRecommender):
                 unlabelled_entries.append({"user_id": user_id, "item_id": unseen_item})            
         
         # step 2: co-training
-        self.user_rec = UserRecommender(copy.deepcopy(self.dataset), **self.kwargs)  # are these an issue?  
-        self.item_rec = ItemRecommender(copy.deepcopy(self.dataset), **self.kwargs) 
+        self.user_rec = UserKNNRecommender(copy.deepcopy(self.dataset), **self.kwargs)  # are these an issue?  
+        self.item_rec = ItemKNNRecommender(copy.deepcopy(self.dataset), **self.kwargs) 
         
         self.user_rec.train()  
         self.item_rec.train()  

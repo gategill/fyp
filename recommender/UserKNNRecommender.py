@@ -8,7 +8,7 @@ import types
 from recommender.GenericRecommender import GenericRecommender
 
 
-class UserRecommender(GenericRecommender):
+class UserKNNRecommender(GenericRecommender):
     def __init__(self, dataset = None, **kwargs) -> None:
         ic("user_rec.__init__()")
         super().__init__(dataset, **kwargs)

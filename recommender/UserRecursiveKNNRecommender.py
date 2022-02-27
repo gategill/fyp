@@ -4,10 +4,10 @@
 
 
 from icecream import ic
-from recommender.UserRecommender import UserRecommender
+from recommender.UserKNNRecommender import UserKNNRecommender
 
 
-class UserPearlPuRecommender(UserRecommender):
+class UserRecursiveKNNRecommender(UserKNNRecommender):
     def __init__(self, dataset = None, **kwargs) -> None:
         #ic("pp_rec.__init__()")
 

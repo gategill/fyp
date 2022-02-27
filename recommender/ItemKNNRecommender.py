@@ -8,7 +8,7 @@ import types
 from recommender.GenericRecommender import GenericRecommender
 
 
-class ItemRecommender(GenericRecommender):
+class ItemKNNRecommender(GenericRecommender):
     def __init__(self, dataset = None, **kwargs) -> None:
         ic("item_rec.__init__()")
         
