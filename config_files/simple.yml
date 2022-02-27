@@ -15,9 +15,7 @@ dataset_config:
   prefiltering: {"user_k_core" : 20, "item_k_core": 5}
 
 models:
-  UserPearlPu:
-    weight_threshold: 1.0
-    recursion_threshold: 3
-    phi: 5
-    k_prime: 20
-    baseline: "bs"
+  CoRec:
+    additions: 100
+    top_m: 200
+

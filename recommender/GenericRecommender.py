@@ -52,8 +52,6 @@ class GenericRecommender:
                         break
                         
             except KeyboardInterrupt:
-                #ic("\nStopping\n")
-                #ic(i)
                 break
             
         return test
@@ -89,7 +87,6 @@ class GenericRecommender:
         
         self.user_ids = self.dataset.get_user_ids()
         self.item_ids = self.dataset.get_item_ids()
-        
         self.user_train_ratings = self.dataset.get_user_train_ratings()
         self.user_train_means = self.dataset.get_user_train_means()
         self.item_train_ratings = self.dataset.get_item_train_ratings()
@@ -171,3 +168,6 @@ class GenericRecommender:
         """a single dict entry"""
         self.predictions.append(prediction)
 
+
+    def __str__(self) -> str:
+        return "{},\n{},\n{}".format(self.k,self.similarity_function, self.dataset)

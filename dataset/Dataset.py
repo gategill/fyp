@@ -295,7 +295,7 @@ class Dataset:
         
         print("Added {} new recommendations to the trainset".format(len(new_recommendations)))
         print("There are {} ratings in the trainset".format(self.num_ratings))
-        print("Sparsity of the trainset is: {}%".format(100 * round(self.sparsity, 5)))  
+        #print("Sparsity of the trainset is: {}%".format(100 * round(self.sparsity, 4)))  
 
         
                 
