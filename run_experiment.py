@@ -16,7 +16,7 @@ import boto3
 import yaml
 import random
 import shutil
-
+# cold start < 20 ratings
 
 s3 = boto3.client('s3')
 
@@ -43,10 +43,10 @@ def read_in_yaml_file(config_path):
     if "disable_ic" not in kwargs["experiment_config"]:
         raise KeyError("missing disable_ic in experiment_config")
     
-    if type(kwargs["experiment_config"]["seed"]) != int:
+    if (type(kwargs["experiment_config"]["seed"]) != int):
         raise TypeError("seed should be an integer")
     if type(kwargs["experiment_config"]["save_in_s3"]) != bool:
-        raise TypeError("save_in_s3 should be booleay")
+        raise TypeError("save_in_s3 should be boolean")
     if type(kwargs["experiment_config"]["save_results"]) != bool:
         raise TypeError("save_results should be boolean")
     if type(kwargs["experiment_config"]["kfolds"]) != int:
@@ -86,12 +86,12 @@ def read_in_yaml_file(config_path):
             raise KeyError("missing similarity in UserKNN")
         
         if type(kwargs["models"]["UserKNN"]["neighbours"]) != int:
-            raise TypeError("neighbours should be an integer")
+            raise TypeError("UserKNN.neighbours should be an integer")
         if type(kwargs["models"]["UserKNN"]["similarity"]) != str:
-            raise TypeError("similarity should be an string")
+            raise TypeError("UserKNN.similarity should be an string")
         
         if kwargs["models"]["UserKNN"]["similarity"] not in ["sim_pearson", "sim_cosine", "sim_sim"]:
-            raise ValueError("invalid similarity measure. available similarites are: [sim_pearson, sim_cosine, sim_sim]")
+            raise ValueError("invalid UserKNN.similarity measure\navailable similarites are: [sim_pearson, sim_cosine, sim_sim]")
         
         
     if "ItemKNN" in kwargs["models"]:
@@ -101,12 +101,12 @@ def read_in_yaml_file(config_path):
             raise KeyError("missing similarity in ItemKNN")
 
         if type(kwargs["models"]["ItemKNN"]["neighbours"]) != int:
-            raise TypeError("neighbours should be an integer")
+            raise TypeError("ItemKNN.neighbours should be an integer")
         if type(kwargs["models"]["ItemKNN"]["similarity"]) != str:
-            raise TypeError("similarity should be an string")
+            raise TypeError("ItemKNN.similarity should be an string")
         
         if kwargs["models"]["ItemKNN"]["similarity"] not in ["sim_pearson", "sim_cosine", "sim_sim"]:
-            raise ValueError("invalid similarity measure. available similarites are: [sim_pearson, sim_cosine, sim_sim]")
+            raise ValueError("invalid ItemKNN.similarity\navailable similarites are: [sim_pearson, sim_cosine, sim_sim]")
         
         
     if "Bootstrap" in kwargs["models"]:
@@ -120,16 +120,16 @@ def read_in_yaml_file(config_path):
             raise KeyError("missing additions in Bootstrap")
         
         if type(kwargs["models"]["Bootstrap"]["neighbours"]) != int:
-            raise TypeError("neighbours should be an integer")
+            raise TypeError("Bootstrap.neighbours should be an integer")
         if type(kwargs["models"]["Bootstrap"]["similarity"]) != str:
-            raise TypeError("similarity should be an string")
+            raise TypeError("Bootstrap.similarity should be an string")
         if type(kwargs["models"]["Bootstrap"]["iterations"]) != int:
-            raise TypeError("iterations should be an integer")
+            raise TypeError("Bootstrap.iterations should be an integer")
         if type(kwargs["models"]["Bootstrap"]["additions"]) != int:
-            raise TypeError("additions should be an integer")
+            raise TypeError("Bootstrap.additions should be an integer")
         
         if kwargs["models"]["Bootstrap"]["similarity"] not in ["sim_pearson", "sim_cosine", "sim_sim"]:
-            raise ValueError("invalid similarity measure. available similarites are: [sim_pearson, sim_cosine, sim_sim]")
+            raise ValueError("invalid Bootstrap.similarity\navailable similarites are: [sim_pearson, sim_cosine, sim_sim]")
         
         
     if "PearlPu" in kwargs["models"]:
@@ -141,18 +141,32 @@ def read_in_yaml_file(config_path):
             raise KeyError("missing weight_threshold in PearlPu")
         if "recursion_threshold" not in kwargs["models"]["PearlPu"]:
             raise KeyError("missing recursion_threshold in PearlPu")
+        if "phi" not in kwargs["models"]["PearlPu"]:
+            raise KeyError("missing phi in PearlPu")
+        if "k_prime" not in kwargs["models"]["PearlPu"]:
+            raise KeyError("missing k_prime in PearlPu")
+        if "baseline" not in kwargs["models"]["PearlPu"]:
+            raise KeyError("missing baseline in PearlPu")
         
         if type(kwargs["models"]["PearlPu"]["neighbours"]) != int:
-            raise TypeError("neighbours should be an integer")
+            raise TypeError("PearlPu.neighbours should be an integer")
         if type(kwargs["models"]["PearlPu"]["similarity"]) != str:
-            raise TypeError("similarity should be an string")
+            raise TypeError("PearlPu.similarity should be an string")
         if type(kwargs["models"]["PearlPu"]["weight_threshold"]) != float:
-            raise TypeError("weight_threshold should be a float")
+            raise TypeError("PearlPu.weight_threshold should be a float")
         if type(kwargs["models"]["PearlPu"]["recursion_threshold"]) != int:
-            raise TypeError("recursion_threshold should be an integer")
+            raise TypeError("PearlPu.recursion_threshold should be an integer")
+        if type(kwargs["models"]["PearlPu"]["phi"]) != int:
+            raise TypeError("PearlPu.phi should be an integer")
+        if type(kwargs["models"]["PearlPu"]["k_prime"]) != int:
+            raise TypeError("PearlPu.k_prime should be an integer")
+        if type(kwargs["models"]["PearlPu"]["baseline"]) != str:
+            raise TypeError("PearlPu.baseline should be a string")
         
         if kwargs["models"]["PearlPu"]["similarity"] not in ["sim_pearson", "sim_cosine", "sim_sim"]:
-            raise ValueError("invalid similarity measure. available similarites are: [sim_pearson, sim_cosine, sim_sim]")
+            raise ValueError("invalid PearlPu.similarity\navailable similarites are: [sim_pearson, sim_cosine, sim_sim]")
+        if kwargs["models"]["PearlPu"]["baseline"] not in ["bs", "bs+", "ss", "cs", "cs+"]:
+            raise ValueError("invalid PearlPu.baseline\navailable baselines are: [bs, bs+, ss, cs, cs+]")
         
         
     if "CoRec" in kwargs["models"]:
@@ -166,37 +180,35 @@ def read_in_yaml_file(config_path):
             raise KeyError("missing top_m in CoRec")
 
         if type(kwargs["models"]["CoRec"]["neighbours"]) != int:
-            raise TypeError("neighbours should be an integer")
+            raise TypeError("CoRec.neighbours should be an integer")
         if type(kwargs["models"]["CoRec"]["similarity"]) != str:
-            raise TypeError("similarity should be an string")
+            raise TypeError("CoRec.similarity should be an string")
         if type(kwargs["models"]["CoRec"]["additions"]) != int:
-            raise TypeError("additions should be an integer")
+            raise TypeError("CoRec.additions should be an integer")
         if type(kwargs["models"]["CoRec"]["top_m"]) != int:
-            raise TypeError("top_m should be an integer")
+            raise TypeError("CoRec.top_m should be an integer")
         if kwargs["models"]["CoRec"]["top_m"] < kwargs["models"]["CoRec"]["additions"]:
-            raise ValueError("top_m should be larger than additions (I think)")
+            raise ValueError("CoRec.top_m should be larger than additions (I think)")
 
         if kwargs["models"]["CoRec"]["similarity"] not in ["sim_pearson", "sim_cosine", "sim_sim"]:
-            raise ValueError("invalid similarity measure. available similarites are: [sim_pearson, sim_cosine, sim_sim]")
-            
+            raise ValueError("invalid CoRec.similarity\navailable similarites are: [sim_pearson, sim_cosine, sim_sim]")
             
     return kwargs
 
 
-def run_experiment_yaml(config_path: str):
+def run_experiment(config_path) -> None:
     kwargs = read_in_yaml_file(config_path)
     kwargs["config_path"] = config_path
-        
-    run_experiment(**kwargs)
-
-
-def run_experiment(**kwargs) -> None:
+    
     save_in_s3 = kwargs["experiment_config"]["save_in_s3"]
     save_results = kwargs["experiment_config"]["save_results"]
     kfolds = kwargs["experiment_config"]["kfolds"]
+    a_seed = kwargs["experiment_config"]["seed"]
     
     all_models =  "_".join(list(kwargs["models"].keys()))
-    random.seed(kwargs["experiment_config"]["seed"])
+    
+    if a_seed != -1:
+        random.seed(a_seed)
     
     if kwargs["experiment_config"]["disable_ic"]: 
         ic.disable()
@@ -211,7 +223,6 @@ def run_experiment(**kwargs) -> None:
         # For each rating in the test set, make a prediction using a 
         lines_result = "algorithm, mae, time_elapsed\n"
         if "UserKNN" in models:
-
             try:
                 tic = time.time()
                 u, mae = run_user_rec_experiment(**kwargs)

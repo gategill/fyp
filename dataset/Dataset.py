@@ -182,7 +182,7 @@ class Dataset:
         self.all_ratings = reduced_all_ratings
           
           
-    def load_ratings(self, test_splitting_ratio: float = 0.2) -> None:
+    def load_ratings(self, test_splitting_ratio: float = 0.2, kfold = 0) -> None:
         #ic("ds.load_ratings()")
 
         """
