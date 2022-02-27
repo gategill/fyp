@@ -23,7 +23,7 @@ class UserPearlPuRecommender(UserRecommender):
         return self.recursive_prediction(active_user_id, candidate_item_id)
 
         
-    def recursive_prediction(self, active_user: int, candidate_moive: int, recursion_level: int = 1) -> float:
+    def recursive_prediction(self, active_user: int, candidate_item: int, recursion_level: int = 1) -> float:
         """"""
         #ic("pp_rec.recursive_prediction()")
         
@@ -32,7 +32,80 @@ class UserPearlPuRecommender(UserRecommender):
         if recursion_level > self.recursion_threshold:
             #ic("Reached Recursion Limit - Using Baseline")
             if self.baseline == "bs":
-                return self.predict_rating_user_based_nn_wtd(active_user, candidate_moive) # baseline
+                nns = self.get_k_nearest_users(self.similarity_function, self.k, active_user, candidate_item)
+                prediction = self.calculate_wtd_avg_rating(nns)
+                
+                if prediction:  
+                    return prediction
+                else:
+                    prediction = self.get_user_mean_rating(active_user)
+                    
+                    if prediction:
+                        return prediction
+                    else:
+                        return self.mean_train_rating      
+                          
+            if self.baseline == "bs+":
+                nns = self.get_k_nearest_users_with_overlap(self.similarity_function, self.k, active_user, candidate_item, self.phi)
+                prediction = self.calculate_wtd_avg_rating(nns)
+                
+                if prediction:  
+                    return prediction
+                else:
+                    prediction = self.get_user_mean_rating(active_user)
+                    
+                    if prediction:
+                        return prediction
+                    else:
+                        return self.mean_train_rating  
+                    
+            if self.baseline == "ss":
+                nns = self.get_k_nearest_users(self.similarity_function, self.k_prime, active_user)
+                prediction = self.calculate_wtd_avg_rating(nns)
+                
+                if prediction:  
+                    return prediction
+                else:
+                    prediction = self.get_user_mean_rating(active_user)
+                    
+                    if prediction:
+                        return prediction
+                    else:
+                        return self.mean_train_rating  
+                    
+            if self.baseline == "cs":
+                nns1 = self.get_k_nearest_users(self.similarity_function, self.k, active_user, candidate_item)
+                nns2 = self.get_k_nearest_users(self.similarity_function, self.k_prime, active_user)
+                nns = nns1 + nns2
+                nns = list(set(nns))
+                prediction = self.calculate_wtd_avg_rating(nns)
+                
+                if prediction:  
+                    return prediction
+                else:
+                    prediction = self.get_user_mean_rating(active_user)
+                    
+                    if prediction:
+                        return prediction
+                    else:
+                        return self.mean_train_rating  
+                    
+            if self.baseline == "cs+":
+                nns1 = self.get_k_nearest_users_with_overlap(self.similarity_function, self.k, active_user, candidate_item, self.phi)
+                nns2 = self.get_k_nearest_users_with_overlap(self.similarity_function, self.k_prime, active_user, self.phi)
+                nns = nns1 + nns2
+                nns = list(set(nns))
+                prediction = self.calculate_wtd_avg_rating(nns)
+                
+                if prediction:  
+                    return prediction
+                else:
+                    prediction = self.get_user_mean_rating(active_user)
+                    
+                    if prediction:
+                        return prediction
+                    else:
+                        return self.mean_train_rating  
 
         nns = self.get_k_nearest_users(self.similarity_function, self.k, active_user)  # no item id, doesn't limit to just rated
         
@@ -41,7 +114,7 @@ class UserPearlPuRecommender(UserRecommender):
         
         for neighbour in nns:
             neighbour_id = neighbour["user_id"]
-            neighbour_item_rating = self.get_user_item_rating(neighbour_id, candidate_moive)
+            neighbour_item_rating = self.get_user_item_rating(neighbour_id, candidate_item)
             
             if neighbour_item_rating is not None:
                 sim_x_y = self.get_user_similarity(self.similarity_function, active_user, neighbour_id)
@@ -51,7 +124,7 @@ class UserPearlPuRecommender(UserRecommender):
                 beta += abs(sim_x_y)
                 
             else:
-                rec_pred = self.recursive_prediction(neighbour_id, candidate_moive, recursion_level + 1)
+                rec_pred = self.recursive_prediction(neighbour_id, candidate_item, recursion_level + 1)
                 sim_x_y = self.get_user_similarity(self.similarity_function, active_user, neighbour_id)
                 mean_rating_for_neighbour = self.get_user_mean_rating(neighbour_id)
                 
