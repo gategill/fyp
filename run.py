@@ -5,7 +5,8 @@
 
 from recommender.UserRecommender import UserRecommender
 from recommender.ItemRecommender import ItemRecommender
-from recommender.PearlPuRecommender import PearlPuRecommender
+from recommender.UserPearlPuRecommender import UserPearlPuRecommender
+from recommender.ItemPearlPuRecommender import ItemPearlPuRecommender
 from recommender.UserBootstrapRecommender import UserBootstrapRecommender
 from recommender.ItemBootstrapRecommender import ItemBootstrapRecommender
 from recommender.CoRecRecommender import CoRecRecommender
@@ -27,7 +28,8 @@ def run_experiment(config_path) -> None:
                        "ItemKNN" : ItemRecommender,
                        "UserBootstrap" : UserBootstrapRecommender,
                        "ItemBootstrap" : ItemBootstrapRecommender,
-                       "PearlPu" : PearlPuRecommender, 
+                       "UserPearlPu" : UserPearlPuRecommender, 
+                       "ItemPearlPu" : ItemPearlPuRecommender, 
                        "CoRec" : CoRecRecommender}
             
         
@@ -40,7 +42,7 @@ def run_experiment(config_path) -> None:
     save_in_s3 = kwargs["experiment_config"]["save_in_s3"]
     kolds = kwargs["experiment_config"]["kolds"]
     a_seed = kwargs["experiment_config"]["seed"]
-    current_timestamp = int(str(time.time())[:-6])
+    current_timestamp = int(time.time())
     save_path = "./results/{}".format(current_timestamp)
     os.mkdir(save_path)
     os.mkdir(save_path + "/all")
@@ -89,6 +91,7 @@ def run_experiment(config_path) -> None:
         
                 try:                
                     print("Running {} Recommender".format(model))
+                    #print(kwargs["models"])
                     kwargs["models"][model]["neighbours"] = K
                     kwargs["models"][model]["similarity"] = kwargs["experiment_config"]["similarity"]
                     kwargs["run_params"] = kwargs["models"][model]

@@ -314,6 +314,28 @@ class ItemRecommender(GenericRecommender):
         return ratings  
 
 
+    def get_item_user_rating(self, user_id: int, item_id: int) -> float:
+        #ic("user_rec.get_user_item_rating()")
+        
+        """
+        Gets user_id's rating for item_id from the train set or None if this user has no rating for this item in the
+        train set.
+        """
+        
+        if type(item_id) != int or item_id < 1:
+            raise TypeError("get_user_item_rating: you supplied item_id = '%s' but item_id must be a positive integer" % item_id)
+        if item_id not in self.item_train_ratings:
+            raise ValueError("get_user_item_rating: you supplied item_id = %i but this item does not exist" % item_id)
+        if type(user_id) != int or user_id < 1:
+            raise TypeError("get_user_item_rating: you supplied user_id = '%s' but user_id must be a positive integer" % user_id)
+        if user_id not in self.user_train_ratings:
+            raise ValueError("get_user_item_rating: you supplied user_id = %i but this user does not exist" % user_id)
+        
+        if item_id in self.item_train_ratings and user_id in self.item_train_ratings[item_id]:
+            return self.item_train_ratings[item_id][user_id]
+        else:
+            return None
+
     def get_item_descriptors(self, item_id: int) -> dict:
         #ic("item_rec.get_item_descriptors()")
         

@@ -26,7 +26,14 @@ models:
     enrichments: 3
     additions: 10
 
-  PearlPu:
+  UserPearlPu:
+    weight_threshold: 1.0
+    recursion_threshold: 3
+    phi: 5
+    k_prime: 20
+    baseline: "bs"
+    
+  ItemPearlPu:
     weight_threshold: 1.0
     recursion_threshold: 3
     phi: 5
@@ -37,48 +44,6 @@ models:
     additions: 100
     top_m: 200
 
-
-  
-        
-def run_bootstrap_rec_experiment(**kwargs):
-    kwargs["run_params"] = kwargs["models"]["Bootstrap"]
-    bs_r = UserBootstrapRecommender(**kwargs) # was 1, 6
-    print("\nEnriching Bootstrap Recommender\n")
-
-    bs_r.enrich()
-
-    print("\nRunning Bootstrap Recommender\n")
-    
-    for i, test in enumerate(bs_r.test_ratings):
-        try:
-            user_id = int(test['user_id'])
-            item_id = int(test['item_id'])
-
-            predicted_rating = bs_r.predict_rating_user_based_nn_wtd(active_user_id = user_id, candidate_item_id = item_id)
-            
-            if predicted_rating < 1.0:
-                predicted_rating = 1.0
-                
-            if predicted_rating > 5:
-                predicted_rating = 5.0
-                
-            test["pred_rating"] = predicted_rating
-            bs_r.add_prediction(test)
-            
-            if kwargs["experiment_config"]["early_stop"]:
-                if i > 10:
-                    break
-            
-        except KeyboardInterrupt:
-            ic("\nStopping\n")
-            ic(i)
-            break
-        
-    mae = Evaluation.mean_absolute_error(bs_r.predictions)
-    mae = round(mae, 3)
-    test["pred_rating"] = round(test["pred_rating"], 2)
-
-    return test, mae     
 
 
 def run_pearlpu_rec_experiment(**kwargs):

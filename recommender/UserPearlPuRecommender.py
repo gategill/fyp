@@ -7,7 +7,7 @@ from icecream import ic
 from recommender.UserRecommender import UserRecommender
 
 
-class PearlPuRecommender(UserRecommender):
+class UserPearlPuRecommender(UserRecommender):
     def __init__(self, dataset = None, **kwargs) -> None:
         #ic("pp_rec.__init__()")
 
@@ -17,13 +17,18 @@ class PearlPuRecommender(UserRecommender):
         self.phi = kwargs["run_params"]["phi"]
         self.k_prime = kwargs["run_params"]["k_prime"]
         self.baseline = kwargs["run_params"]["baseline"]
+    
         
+    def get_single_prediction(self, active_user_id, candidate_item_id):
+        return self.recursive_prediction(active_user_id, candidate_item_id)
+
         
     def recursive_prediction(self, active_user: int, candidate_moive: int, recursion_level: int = 1) -> float:
         """"""
         #ic("pp_rec.recursive_prediction()")
         
         # starts at 1
+        #print("RECURSION PROGERSS = {}/{}".format(recursion_level, self.recursion_threshold))
         if recursion_level > self.recursion_threshold:
             #ic("Reached Recursion Limit - Using Baseline")
             if self.baseline == "bs":
@@ -66,4 +71,4 @@ class PearlPuRecommender(UserRecommender):
             if prediction > 5:
                 prediction = 5.0
     
-            return prediction
+            return round(prediction, self.ROUNDING)
