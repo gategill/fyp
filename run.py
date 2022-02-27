@@ -10,6 +10,9 @@ from recommender.ItemRecursiveKNNRecommender import ItemRecursiveKNNRecommender
 from recommender.UserBootstrapRecommender import UserBootstrapRecommender
 from recommender.ItemBootstrapRecommender import ItemBootstrapRecommender
 from recommender.CoRecRecommender import CoRecRecommender
+from recommender.MatrixFactorisationRecommender import MatrixFactorisationRecommender
+from recommender.MostPopRecommender import MostPopRecommender
+from recommender.RandomRecommender import RandomRecommender
 import YAMLHandler
 from dataset.Dataset import Dataset
 import traceback
