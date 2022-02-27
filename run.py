@@ -6,9 +6,10 @@
 from recommender.UserRecommender import UserRecommender
 from recommender.ItemRecommender import ItemRecommender
 from recommender.PearlPuRecommender import PearlPuRecommender
-from recommender.BootstrapRecommender import BootstrapRecommender
+from recommender.UserBootstrapRecommender import UserBootstrapRecommender
+from recommender.ItemBootstrapRecommender import ItemBootstrapRecommender
 from recommender.CoRecRecommender import CoRecRecommender
-from yaml_handler import read_in_yaml_file
+import YAMLHandler
 from dataset.Dataset import Dataset
 import traceback
 import time
@@ -24,12 +25,13 @@ s3 = boto3.client('s3')
 def run_experiment(config_path) -> None:
     recommenders = {"UserKNN" : UserRecommender, 
                        "ItemKNN" : ItemRecommender,
-                       "BootstrapKNN" : BootstrapRecommender,
+                       "UserBootstrap" : UserBootstrapRecommender,
+                       "ItemBootstrap" : ItemBootstrapRecommender,
                        "PearlPu" : PearlPuRecommender, 
                        "CoRec" : CoRecRecommender}
             
         
-    kwargs = read_in_yaml_file(config_path)
+    kwargs = YAMLHandler.read_in_yaml_file(config_path)
     # pass some agruments down
     kwargs["config_path"] = config_path
     kwargs["dataset_config"]["kolds"] = kwargs["experiment_config"]["kolds"]
@@ -38,7 +40,7 @@ def run_experiment(config_path) -> None:
     save_in_s3 = kwargs["experiment_config"]["save_in_s3"]
     kolds = kwargs["experiment_config"]["kolds"]
     a_seed = kwargs["experiment_config"]["seed"]
-    current_timestamp = int(time.time())
+    current_timestamp = int(str(time.time())[:-6])
     save_path = "./results/{}".format(current_timestamp)
     os.mkdir(save_path)
     os.mkdir(save_path + "/all")
@@ -66,6 +68,7 @@ def run_experiment(config_path) -> None:
     dataset = Dataset(**kwargs["dataset_config"])
     
     results_header = "algorithm, k, mae, time_elapsed_s, fold_num\n"
+    results_header += len(results_header) * "-"
     all_results = results_header
     
     for model in kwargs["models"]:
@@ -87,6 +90,7 @@ def run_experiment(config_path) -> None:
                 try:                
                     print("Running {} Recommender".format(model))
                     kwargs["models"][model]["neighbours"] = K
+                    kwargs["models"][model]["similarity"] = kwargs["experiment_config"]["similarity"]
                     kwargs["run_params"] = kwargs["models"][model]
                     
                     tic = time.time()

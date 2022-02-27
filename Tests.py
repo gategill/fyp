@@ -1,6 +1,6 @@
 import unittest
 
-import run_experiment as rexp
+import run as rexp
 class Tests(unittest.TestCase):
     
     def test_user_rec(self):

@@ -42,7 +42,7 @@ class GenericRecommender:
                 user_id = int(test['user_id'])
                 item_id = int(test['item_id'])
                 
-                predicted_rating = self.get_single_prediction(active_user_id = user_id, candidate_item_id = item_id, **self.kwargs)
+                predicted_rating = self.get_single_prediction(active_user_id = user_id, candidate_item_id = item_id)
                     
                 test["pred_rating"] = predicted_rating
                 self.add_prediction(test)
@@ -63,7 +63,7 @@ class GenericRecommender:
         # ic("gen_rec.evaluate_predictions()")
 
         mae = Evaluation.mean_absolute_error(self.predictions)
-        mae = round(mae, 3)
+        mae = round(mae, 5)
         
         return mae
     
@@ -164,7 +164,7 @@ class GenericRecommender:
         """recommendation*s* = list if dicts"""
         #ic("gen_rec.add_new_recommendations()")
         
-        self.dataset.add_new_recommendations_to_dataset(new_recommendations)
+        self.dataset.add_new_recommendations_to_trainset(new_recommendations)
 
     
     def add_prediction(self, prediction: dict) -> None:

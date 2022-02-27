@@ -6,6 +6,8 @@ experiment_config:
   disable_ic: True
   weighted_ratings: True
   evaluation_metrics: ["MAE"]
+  neighbours: 10
+  similarity: sim_sim
 
 dataset_config:
   dataset_path: "./data/given/"
@@ -13,22 +15,18 @@ dataset_config:
 
 models:
   UserKNN:
-    neighbours: 5
-    similarity: sim_sim
 
   ItemKNN:
-    neighbours: 5
-    similarity: sim_sim
 
-  Bootstrap:
-    neighbours: 5
-    similarity: sim_sim
-    fold_nums: 3
+  UserBootstrap:
+    enrichments: 3
+    additions: 10
+
+  ItemBootstrap:
+    enrichments: 3
     additions: 10
 
   PearlPu:
-    neighbours: 5
-    similarity: sim_sim
     weight_threshold: 1.0
     recursion_threshold: 3
     phi: 5
@@ -36,8 +34,6 @@ models:
     baseline: "bs"
 
   CoRec:
-    neighbours: 5
-    similarity: sim_sim
     additions: 100
     top_m: 200
 
@@ -46,7 +42,7 @@ models:
         
 def run_bootstrap_rec_experiment(**kwargs):
     kwargs["run_params"] = kwargs["models"]["Bootstrap"]
-    bs_r = BootstrapRecommender(**kwargs) # was 1, 6
+    bs_r = UserBootstrapRecommender(**kwargs) # was 1, 6
     print("\nEnriching Bootstrap Recommender\n")
 
     bs_r.enrich()

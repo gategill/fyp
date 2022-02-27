@@ -14,13 +14,9 @@ class UserRecommender(GenericRecommender):
         super().__init__(dataset, **kwargs)
 
 
-    def get_single_prediction(self, active_user_id, candidate_item_id, **kwargs):
-        if kwargs["experiment_config"]["weighted_ratings"]:
-            prediction =  self.predict_rating_user_based_nn_wtd(active_user_id, candidate_item_id)
+    def get_single_prediction(self, active_user_id, candidate_item_id):
+        prediction =  self.predict_rating_user_based_nn_wtd(active_user_id, candidate_item_id)
     
-        else:
-            prediction =  self.predict_rating_user_based_nn(active_user_id, candidate_item_id)
-            
         if prediction < 1.0:
             prediction = 1.0
     

@@ -2,3 +2,4 @@ venv/*
 .vscode/
 results/*
 report/
+Tests.py

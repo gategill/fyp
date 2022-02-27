@@ -1,12 +1,13 @@
 experiment_config:
-  seed: -1
+  seed: 1
   save_in_s3: False
   kolds: 5
   early_stop: True
   disable_ic: True
   weighted_ratings: True
   evaluation_metrics: ["MAE"]
-  neighbours: [5, 10]
+  neighbours: 10
+  similarity: sim_sim
 
 
 dataset_config:
@@ -14,8 +15,6 @@ dataset_config:
   prefiltering: {"user_k_core" : 20, "item_k_core": 5}
 
 models:
-  Bootstrap:
-    neighbours: 5
-    similarity: sim_sim
-    fold_nums: 3
-    additions: 10
+  ItemBootstrap:
+    enrichments: 3
+    additions: 5

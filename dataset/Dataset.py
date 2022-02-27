@@ -95,6 +95,7 @@ class Dataset:
         
         df = self.get_ratings_as_df()
         
+        print("\n")
         for strategy, threshold in prefilterings.items():
             if type(strategy) != str:
                 raise TypeError("Invalid prefiltering strategy. Valid strategies must be a string")
@@ -179,8 +180,8 @@ class Dataset:
                 
                 print("df.shape AFTER cold_users: " + str(df.shape))
                 
+        print("\n")
         reduced_all_ratings = list(df.T.to_dict().values())
-
         self.all_ratings = reduced_all_ratings
 
           
@@ -204,7 +205,7 @@ class Dataset:
         nrow = df.shape[0]
         a,b = ((fold_num * nrow) // n_split), ((1 + fold_num) * nrow // n_split)
         
-        print(a,b, sep = "-")
+        #print(a,b, sep = "-")
 
         df_test = df.loc[np.r_[a:b], :]
         df_train = df[~df.isin(df_test)].dropna()
@@ -250,7 +251,7 @@ class Dataset:
         self.mean_train_rating = self.mean_train_rating / num_ratings
         
         self.num_ratings = num_ratings
-        self.sparsity = 1 - self.num_ratings / (len(self.user_ids) * len(self.item_ids))
+        self.sparsity = 1 - (self.num_ratings / (len(self.user_ids) * len(self.item_ids))) # should this be user/items in trainset? TODO
         
         
         for user_id, ratings in self.user_train_ratings.items(): 
@@ -280,9 +281,9 @@ class Dataset:
         print("Sparsity of the trainset is: {}%".format(100 * round(self.sparsity, 5)))  
 
 
-    def add_new_recommendations_to_dataset(self, new_recommendations):
+    def add_new_recommendations_to_trainset(self, new_recommendations):
         # 
-        ic("ds.add_new_recommendations_to_dataset()")
+        ic("ds.add_new_recommendations_to_trainset()")
         
         self.append_new_user_train_ratings(new_recommendations)
         self.append_new_item_train_ratings(new_recommendations)
@@ -292,7 +293,10 @@ class Dataset:
         self.update_num_ratings(new_recommendations)
         #self.update_mean_train_rating() # just don't. it's fine
         
+        print("Added {} new recommendations to the trainset".format(len(new_recommendations)))
         print("There are {} ratings in the trainset".format(self.num_ratings))
+        print("Sparsity of the trainset is: {}%".format(100 * round(self.sparsity, 5)))  
+
         
                 
     def get_user_ids(self) -> list:
