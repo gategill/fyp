@@ -1,43 +1,21 @@
 experiment_config:
-  seed: 100
-  save_in_s3: True
-  kfolds: 5
-  early_stop: False
-  save_results: True
+  seed: -1
+  save_in_s3: False
+  kolds: 5
+  early_stop: True
   disable_ic: True
-  save_recs: True
+  weighted_ratings: True
+  evaluation_metrics: ["MAE"]
+  neighbours: [5, 10]
+
 
 dataset_config:
   dataset_path: "./data/given/"
   prefiltering: {"user_k_core" : 20, "item_k_core": 5}
-  test_splitting_ratio: 0.2
 
 models:
-  UserKNN:
-    neighbours: 5
-    similarity: sim_sim
-
-  ItemKNN:
-    neighbours: 5
-    similarity: sim_sim
-
   Bootstrap:
     neighbours: 5
     similarity: sim_sim
-    iterations: 3
+    fold_nums: 3
     additions: 10
-
-  PearlPu:
-    neighbours: 5
-    similarity: sim_sim
-    weight_threshold: 1.0
-    recursion_threshold: 3
-    phi: 5
-    k_prime: 20
-    baseline: "bs"
-
-  CoRec:
-    neighbours: 5
-    similarity: sim_sim
-    additions: 100
-    top_m: 200

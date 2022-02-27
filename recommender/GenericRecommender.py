@@ -3,8 +3,10 @@
 """
 
 
+import copy
 from icecream import ic
 from dataset.Dataset import Dataset
+from evaluation.Evaluation import Evaluation
 from recommender.Similarities import Similarities
 
 
@@ -13,12 +15,58 @@ class GenericRecommender:
         #ic("gen_rec.__init__()")
         
         self.kwargs = kwargs        
+        self.predictions = []
+        self.ROUNDING = 1
+        
         self.k = self.kwargs["run_params"]["neighbours"]
         self.similarity_function = self.get_similarity_function()
-        self.dataset = dataset
-        self.load_dataset(**self.kwargs["dataset_config"])
-        self.predictions = []
         
+        self.dataset = copy.deepcopy(dataset)
+
+        
+    def train(self):
+        # ic("gen_rec.train()")
+        self.load_dataset(**self.kwargs["dataset_config"])
+        # could be more training stage...
+        
+        
+    def get_single_prediction(self, **kwargs):
+        raise NotImplementedError("implement this method")
+
+    
+    def get_predictions(self):
+        #print(len(self.test_ratings))
+
+        for i, test in enumerate(self.test_ratings):
+            try:
+                user_id = int(test['user_id'])
+                item_id = int(test['item_id'])
+                
+                predicted_rating = self.get_single_prediction(active_user_id = user_id, candidate_item_id = item_id, **self.kwargs)
+                    
+                test["pred_rating"] = predicted_rating
+                self.add_prediction(test)
+                
+                if self.kwargs["experiment_config"]["early_stop"]:
+                    if i > 30:
+                        break
+                        
+            except KeyboardInterrupt:
+                #ic("\nStopping\n")
+                #ic(i)
+                break
+            
+        return test
+
+
+    def evaluate_predictions(self, method = "MAE"):
+        # ic("gen_rec.evaluate_predictions()")
+
+        mae = Evaluation.mean_absolute_error(self.predictions)
+        mae = round(mae, 3)
+        
+        return mae
+    
 
     def get_similarity_function(self):
         s = self.kwargs["run_params"]["similarity"]
@@ -79,7 +127,7 @@ class GenericRecommender:
         if rating > 5:
             rating = 5.0
                 
-        return rating
+        return round(rating, self.ROUNDING)
     
 
     def calculate_wtd_avg_rating(self, neighbours: list) -> float:
@@ -109,7 +157,7 @@ class GenericRecommender:
         if rating > 5:
             rating = 5.0
                 
-        return rating
+        return round(rating, self.ROUNDING)
     
     
     def add_new_recommendations(self, new_recommendations: list) -> None:

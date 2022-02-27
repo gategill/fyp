@@ -1,0 +1,162 @@
+experiment_config:
+  seed: 100
+  save_in_s3: False
+  kolds: 5
+  early_stop: True
+  disable_ic: True
+  weighted_ratings: True
+  evaluation_metrics: ["MAE"]
+
+dataset_config:
+  dataset_path: "./data/given/"
+  prefiltering: {"user_k_core" : 20, "item_k_core": 5}
+
+models:
+  UserKNN:
+    neighbours: 5
+    similarity: sim_sim
+
+  ItemKNN:
+    neighbours: 5
+    similarity: sim_sim
+
+  Bootstrap:
+    neighbours: 5
+    similarity: sim_sim
+    fold_nums: 3
+    additions: 10
+
+  PearlPu:
+    neighbours: 5
+    similarity: sim_sim
+    weight_threshold: 1.0
+    recursion_threshold: 3
+    phi: 5
+    k_prime: 20
+    baseline: "bs"
+
+  CoRec:
+    neighbours: 5
+    similarity: sim_sim
+    additions: 100
+    top_m: 200
+
+
+  
+        
+def run_bootstrap_rec_experiment(**kwargs):
+    kwargs["run_params"] = kwargs["models"]["Bootstrap"]
+    bs_r = BootstrapRecommender(**kwargs) # was 1, 6
+    print("\nEnriching Bootstrap Recommender\n")
+
+    bs_r.enrich()
+
+    print("\nRunning Bootstrap Recommender\n")
+    
+    for i, test in enumerate(bs_r.test_ratings):
+        try:
+            user_id = int(test['user_id'])
+            item_id = int(test['item_id'])
+
+            predicted_rating = bs_r.predict_rating_user_based_nn_wtd(active_user_id = user_id, candidate_item_id = item_id)
+            
+            if predicted_rating < 1.0:
+                predicted_rating = 1.0
+                
+            if predicted_rating > 5:
+                predicted_rating = 5.0
+                
+            test["pred_rating"] = predicted_rating
+            bs_r.add_prediction(test)
+            
+            if kwargs["experiment_config"]["early_stop"]:
+                if i > 10:
+                    break
+            
+        except KeyboardInterrupt:
+            ic("\nStopping\n")
+            ic(i)
+            break
+        
+    mae = Evaluation.mean_absolute_error(bs_r.predictions)
+    mae = round(mae, 3)
+    test["pred_rating"] = round(test["pred_rating"], 2)
+
+    return test, mae     
+
+
+def run_pearlpu_rec_experiment(**kwargs):
+    kwargs["run_params"] = kwargs["models"]["PearlPu"]
+
+    pp_r = PearlPuRecommender(**kwargs)
+
+    print("\nRunning Pearl Pu Recommender\n")
+
+    for i, test in enumerate(pp_r.test_ratings):
+        try:
+            user_id = int(test['user_id'])
+            item_id = int(test['item_id'])
+            
+            predicted_rating = pp_r.recursive_prediction(user_id, item_id)
+            
+            if predicted_rating < 1.0:
+                print("The rating is beyond the range: {}".format(predicted_rating))
+                predicted_rating = 1.0
+                
+            if predicted_rating > 5.0:
+                print("The rating is beyond the range: {}".format(predicted_rating))
+                predicted_rating = 5.0
+                
+            test["pred_rating"] = predicted_rating
+            pp_r.add_prediction(test)
+            
+            if kwargs["experiment_config"]["early_stop"]:
+                if i > 10:
+                    break
+                    
+        except KeyboardInterrupt:
+            ic("\nStopping\n")
+            ic(i)
+            break
+        
+    mae = Evaluation.mean_absolute_error(pp_r.predictions)
+    mae = round(mae, 3)
+    test["pred_rating"] = round(test["pred_rating"], 2)
+    
+    return test, mae     
+
+
+def run_corec_rec_experiment(**kwargs):
+    kwargs["run_params"] = kwargs["models"]["CoRec"]
+    co_rec_r = CoRecRecommender(**kwargs)
+
+    print("\nRunning CoRec Recommender\n")
+    
+    # train
+    co_rec_r.train_co_rec()
+
+    # predict and test
+    for i, test in enumerate(co_rec_r.test_ratings):
+        try:
+            user_id = int(test['user_id'])
+            item_id = int(test['item_id'])
+            
+            user_predicted_rating = co_rec_r.predict_co_rec_for_users(user_id, item_id)
+            item_predicted_rating = co_rec_r.predict_co_rec_for_items(user_id, item_id)
+            
+            test["user_pred_rating"] = user_predicted_rating
+            test["item_pred_rating"] = item_predicted_rating
+            co_rec_r.add_prediction(test)
+
+            if kwargs["experiment_config"]["early_stop"]:
+                if i > 30:
+                    break
+                    
+        except KeyboardInterrupt:
+            ic("\nStopping\n")
+            ic(i)
+            break
+        
+    mae_user, mae_item = Evaluation.mean_absolute_error(co_rec_r.predictions)
+    
+    return test, [mae_user, mae_item]

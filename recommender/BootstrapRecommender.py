@@ -13,16 +13,16 @@ class BootstrapRecommender(UserRecommender):
         #ic("bs_rec.__init__()")
         
         super().__init__(dataset, **kwargs)
-        self.iterations = kwargs["run_params"]["iterations"]
+        self.fold_nums = kwargs["run_params"]["fold_nums"]
         self.additions = kwargs["run_params"]["additions"]
         
         
     def enrich(self) -> None:
         #ic("bs_rec.enhance()")
         
-        for iteration in range(1, self.iterations + 1):
+        for fold_num in range(1, self.fold_nums + 1):
             print("\n")
-            ic(iteration)
+            ic(fold_num)
 
             new_recommendations = []
         
@@ -38,7 +38,7 @@ class BootstrapRecommender(UserRecommender):
                     if predicted_rating > 5:
                         predicted_rating = 5.0
      
-                    r = round(predicted_rating, 2)
+                    r = round(predicted_rating, 1)
                     new_recommendations.append({"user_id" : int(user_id) , "item_id" : int(mm) ,"rating" : float(r)})
                 
             self.add_new_recommendations(new_recommendations)

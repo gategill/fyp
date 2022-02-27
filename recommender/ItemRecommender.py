@@ -14,7 +14,24 @@ class ItemRecommender(GenericRecommender):
         
         super().__init__(dataset, **kwargs)
     
+
+    def get_single_prediction(self, active_user_id, candidate_item_id, **kwargs):
+        if kwargs["experiment_config"]["weighted_ratings"]:
+            prediction =  self.predict_rating_item_based_nn_wtd(active_user_id, candidate_item_id)
     
+        else:
+            prediction =  self.predict_rating_item_based_nn(active_user_id, candidate_item_id)
+            
+        if prediction < 1.0:
+            prediction = 1.0
+    
+        if prediction > 5:
+            prediction = 5.0
+            
+        prediction = round(prediction, self.ROUNDING)
+        return prediction
+        
+        
     def predict_rating_item_based_nn(self, active_user_id: int, candidate_item_id: int) -> float:
         #ic("item_rec.predict_rating_item_based_nn()")
         
@@ -28,8 +45,9 @@ class ItemRecommender(GenericRecommender):
                 
             if prediction > 5:
                 prediction = 5.0
+                
             return prediction
-        
+
         else:
             prediction = self.get_item_mean_rating(candidate_item_id)
             
