@@ -9,4 +9,5 @@ from .MatrixFactorisationRecommender import MatrixFactorisationRecommender
 from .MostPopRecommender import MostPopRecommender
 from .RandomRecommender import RandomRecommender
 from .CoRecRecommender import CoRecRecommender
+from .MeanRecommender import MeanRecommender
 from .Similarities import Similarities

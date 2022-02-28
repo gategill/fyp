@@ -77,6 +77,10 @@ def read_in_yaml_file(config_path):
         raise KeyError("missing models in kwargs")
     if len(kwargs["models"]) == 0:
         raise ValueError("no models provided in kwargs[models]")
+    for model in kwargs["models"]:
+        if model not in ["UserKNN", "ItemKNN", "Bootstrap", "UserRecursiveKNN", "ItemRecursiveKNN", "CoRec", "MatrixFactorisation", "MostPop", "Random", "Mean"]:
+            raise KeyError("invalid model\nvalid model are: [UserKNN, ItemKNN, Bootstrap, UserRecursiveKNN, ItemRecursiveKNN, CoRec, MatrixFactorisation, MostPop, Random, Mean]")
+        
         
     if "Bootstrap" in kwargs["models"]:
         if "enrichments" not in kwargs["models"]["Bootstrap"]:
@@ -90,31 +94,59 @@ def read_in_yaml_file(config_path):
             raise TypeError("Bootstrap.additions should be an integer")
         
         
-    if "RecursiveKNN" in kwargs["models"]:
-        if "weight_threshold" not in kwargs["models"]["RecursiveKNN"]:
-            raise KeyError("missing weight_threshold in RecursiveKNN")
-        if "recursion_threshold" not in kwargs["models"]["RecursiveKNN"]:
-            raise KeyError("missing recursion_threshold in RecursiveKNN")
-        if "phi" not in kwargs["models"]["RecursiveKNN"]:
-            raise KeyError("missing phi in RecursiveKNN")
-        if "k_prime" not in kwargs["models"]["RecursiveKNN"]:
-            raise KeyError("missing k_prime in RecursiveKNN")
-        if "baseline" not in kwargs["models"]["RecursiveKNN"]:
-            raise KeyError("missing baseline in RecursiveKNN")
+    if "UserRecursiveKNN" in kwargs["models"]:
+        if "weight_threshold" not in kwargs["models"]["UserRecursiveKNN"]:
+            raise KeyError("missing weight_threshold in UserRecursiveKNN")
+        if "recursion_threshold" not in kwargs["models"]["UserRecursiveKNN"]:
+            raise KeyError("missing recursion_threshold in UserRecursiveKNN")
+        if "phi" not in kwargs["models"]["UserRecursiveKNN"]:
+            raise KeyError("missing phi in UserRecursiveKNN")
+        if "k_prime" not in kwargs["models"]["UserRecursiveKNN"]:
+            raise KeyError("missing k_prime in UserRecursiveKNN")
+        if "baseline" not in kwargs["models"]["UserRecursiveKNN"]:
+            raise KeyError("missing baseline in UserRecursiveKNN")
 
-        if type(kwargs["models"]["RecursiveKNN"]["weight_threshold"]) != float:
-            raise TypeError("RecursiveKNN.weight_threshold should be a float")
-        if type(kwargs["models"]["RecursiveKNN"]["recursion_threshold"]) != int:
-            raise TypeError("RecursiveKNN.recursion_threshold should be an integer")
-        if type(kwargs["models"]["RecursiveKNN"]["phi"]) != int:
-            raise TypeError("RecursiveKNN.phi should be an integer")
-        if type(kwargs["models"]["RecursiveKNN"]["k_prime"]) != int:
-            raise TypeError("RecursiveKNN.k_prime should be an integer")
-        if type(kwargs["models"]["RecursiveKNN"]["baseline"]) != str:
-            raise TypeError("RecursiveKNN.baseline should be a string")
+        if type(kwargs["models"]["UserRecursiveKNN"]["weight_threshold"]) != float:
+            raise TypeError("UserRecursiveKNN.weight_threshold should be a float")
+        if type(kwargs["models"]["UserRecursiveKNN"]["recursion_threshold"]) != int:
+            raise TypeError("UserRecursiveKNN.recursion_threshold should be an integer")
+        if type(kwargs["models"]["UserRecursiveKNN"]["phi"]) != int:
+            raise TypeError("UserRecursiveKNN.phi should be an integer")
+        if type(kwargs["models"]["UserRecursiveKNN"]["k_prime"]) != int:
+            raise TypeError("UserRecursiveKNN.k_prime should be an integer")
+        if type(kwargs["models"]["UserRecursiveKNN"]["baseline"]) != str:
+            raise TypeError("UserRecursiveKNN.baseline should be a string")
         
-        if kwargs["models"]["RecursiveKNN"]["baseline"] not in ["bs", "bs+", "ss", "cs", "cs+"]:
-            raise ValueError("invalid RecursiveKNN.baseline\navailable baselines are: [bs, bs+, ss, cs, cs+]")
+        if kwargs["models"]["UserRecursiveKNN"]["baseline"] not in ["bs", "bs+", "ss", "cs", "cs+"]:
+            raise ValueError("invalid UserRecursiveKNN.baseline\navailable baselines are: [bs, bs+, ss, cs, cs+]")
+        
+
+    if "ItemRecursiveKNN" in kwargs["models"]:
+        if "weight_threshold" not in kwargs["models"]["ItemRecursiveKNN"]:
+            raise KeyError("missing weight_threshold in ItemRecursiveKNN")
+        if "recursion_threshold" not in kwargs["models"]["ItemRecursiveKNN"]:
+            raise KeyError("missing recursion_threshold in ItemRecursiveKNN")
+        if "phi" not in kwargs["models"]["ItemRecursiveKNN"]:
+            raise KeyError("missing phi in ItemRecursiveKNN")
+        if "k_prime" not in kwargs["models"]["ItemRecursiveKNN"]:
+            raise KeyError("missing k_prime in ItemRecursiveKNN")
+        if "baseline" not in kwargs["models"]["ItemRecursiveKNN"]:
+            raise KeyError("missing baseline in ItemRecursiveKNN")
+
+        if type(kwargs["models"]["ItemRecursiveKNN"]["weight_threshold"]) != float:
+            raise TypeError("ItemRecursiveKNN.weight_threshold should be a float")
+        if type(kwargs["models"]["ItemRecursiveKNN"]["recursion_threshold"]) != int:
+            raise TypeError("ItemRecursiveKNN.recursion_threshold should be an integer")
+        if type(kwargs["models"]["ItemRecursiveKNN"]["phi"]) != int:
+            raise TypeError("ItemRecursiveKNN.phi should be an integer")
+        if type(kwargs["models"]["ItemRecursiveKNN"]["k_prime"]) != int:
+            raise TypeError("ItemRecursiveKNN.k_prime should be an integer")
+        if type(kwargs["models"]["ItemRecursiveKNN"]["baseline"]) != str:
+            raise TypeError("ItemRecursiveKNN.baseline should be a string")
+        
+        if kwargs["models"]["ItemRecursiveKNN"]["baseline"] not in ["bs", "bs+", "ss", "cs", "cs+"]:
+            raise ValueError("invalid ItemRecursiveKNN.baseline\navailable baselines are: [bs, bs+, ss, cs, cs+]")
+        
         
     if "CoRec" in kwargs["models"]:
         if "additions" not in kwargs["models"]["CoRec"]:
@@ -128,6 +160,33 @@ def read_in_yaml_file(config_path):
             raise TypeError("CoRec.top_m should be an integer")
         if kwargs["models"]["CoRec"]["top_m"] < kwargs["models"]["CoRec"]["additions"]:
             raise ValueError("CoRec.top_m should be larger than additions (I think)")
+        
+        
+    if "MatrixFactorisation" in kwargs["models"]:
+        if "R" not in kwargs["models"]["MatrixFactorisation"]:
+            raise KeyError("missing R in MatrixFactorisation")
+        if "P" not in kwargs["models"]["MatrixFactorisation"]:
+            raise KeyError("missing P in MatrixFactorisation")
+        if "Q" not in kwargs["models"]["MatrixFactorisation"]:
+            raise KeyError("missing Q in MatrixFactorisation")
+        if "K" not in kwargs["models"]["MatrixFactorisation"]:
+            raise KeyError("missing K in MatrixFactorisation")
+        if "steps" not in kwargs["models"]["MatrixFactorisation"]:
+            raise KeyError("missing steps in MatrixFactorisation")
+        if "alpha" not in kwargs["models"]["MatrixFactorisation"]:
+            raise KeyError("missing alpha in MatrixFactorisation")
+        if "beta" not in kwargs["models"]["MatrixFactorisation"]:
+            raise KeyError("missing beta in MatrixFactorisation")
 
+        
+    if "MostPop" in kwargs["models"]:
+        if "top_m" not in kwargs["models"]["MostPop"]:
+            raise KeyError("missing top_m in MostPop")
+        
+        
+    if "Mean" in kwargs["models"]:
+        if "which" not in kwargs["models"]["Mean"]:
+            raise KeyError("missing which in Mean")
+        
             
     return kwargs

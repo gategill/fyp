@@ -13,6 +13,7 @@ from recommender.CoRecRecommender import CoRecRecommender
 from recommender.MatrixFactorisationRecommender import MatrixFactorisationRecommender
 from recommender.MostPopRecommender import MostPopRecommender
 from recommender.RandomRecommender import RandomRecommender
+from recommender.MeanRecommender import MeanRecommender
 import YAMLHandler
 from dataset.Dataset import Dataset
 import traceback
@@ -33,7 +34,12 @@ def run_experiment(config_path) -> None:
                        "ItemBootstrap" : ItemBootstrapRecommender,
                        "UserRecursiveKNN" : UserRecursiveKNNRecommender, 
                        "ItemRecursiveKNN" : ItemRecursiveKNNRecommender, 
-                       "CoRec" : CoRecRecommender}
+                       "CoRec" : CoRecRecommender,
+                       "MatrixFactorisation" : MatrixFactorisationRecommender,
+                       "MostPop" : MostPopRecommender,
+                       "Random" : RandomRecommender,
+                       "Mean" : MeanRecommender,
+                       }
             
         
     kwargs = YAMLHandler.read_in_yaml_file(config_path)

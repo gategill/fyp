@@ -14,4 +14,5 @@ dataset_config:
   prefiltering: {"user_k_core" : 20, "item_k_core": 5}
 
 models:
-  Random: {}
+  Mean:
+    which: "global"
