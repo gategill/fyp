@@ -1,147 +1,77 @@
+   
 """
 
 """
 
 
 from icecream import ic
-from recommender.UserKNNRecommender import UserKNNRecommender
+from recommender.GenericRecommender import GenericRecommender
+import numpy as np
 
 
-class MatrixFactorisationRecommender(UserKNNRecommender):
+class MatrixFactorisationRecommender(GenericRecommender):
     def __init__(self, dataset = None, **kwargs) -> None:
-        #ic("pp_rec.__init__()")
-
         super().__init__(dataset, **kwargs)
-        self.weight_threshold = kwargs["run_params"]["weight_threshold"]
-        self.recursion_threshold = kwargs["run_params"]["recursion_threshold"]
-        self.phi = kwargs["run_params"]["phi"]
-        self.k_prime = kwargs["run_params"]["k_prime"]
-        self.baseline = kwargs["run_params"]["baseline"]
-    
+        '''
+        R: rating matrix
+        P: |U| * K (User features matrix)
+        Q: |D| * K (Item features matrix)
+        K: latent features
+        steps: iterations
+        alpha: learning rate
+        beta: regularization parameter'''
         
-    def get_single_prediction(self, active_user_id, candidate_item_id):
-        return self.recursive_prediction(active_user_id, candidate_item_id)
+        
+        self.R = kwargs["run_params"]["R"]
+        self.P = kwargs["run_params"]["P"]
+        self.Q = kwargs["run_params"]["Q"]
+        self.K = kwargs["run_params"]["K"]
+        self.steps = kwargs["run_params"]["steps"]
+        self.alpha = kwargs["run_params"]["alpha"]
+        self.beta = kwargs["run_params"]["beta"]
 
-        
-    def recursive_prediction(self, active_user: int, candidate_item: int, recursion_level: int = 1) -> float:
-        """"""
-        #ic("pp_rec.recursive_prediction()")
-        
-        # starts at 1
-        if recursion_level > self.recursion_threshold:
-            #ic("Reached Recursion Limit - Using Baseline")
-            if self.baseline == "bs":
-                nns = self.get_k_nearest_users(self.similarity_function, self.k, active_user, candidate_item)
-                prediction = self.calculate_wtd_avg_rating(nns)
-                
-                if prediction:  
-                    return prediction
-                else:
-                    prediction = self.get_user_mean_rating(active_user)
-                    
-                    if prediction:
-                        return prediction
-                    else:
-                        return self.mean_train_rating      
-                          
-            if self.baseline == "bs+":
-                nns = self.get_k_nearest_users_with_overlap(self.similarity_function, self.k, active_user, candidate_item, self.phi)
-                prediction = self.calculate_wtd_avg_rating(nns)
-                
-                if prediction:  
-                    return prediction
-                else:
-                    prediction = self.get_user_mean_rating(active_user)
-                    
-                    if prediction:
-                        return prediction
-                    else:
-                        return self.mean_train_rating  
-                    
-            if self.baseline == "ss":
-                nns = self.get_k_nearest_users(self.similarity_function, self.k_prime, active_user)
-                prediction = self.calculate_wtd_avg_rating(nns)
-                
-                if prediction:  
-                    return prediction
-                else:
-                    prediction = self.get_user_mean_rating(active_user)
-                    
-                    if prediction:
-                        return prediction
-                    else:
-                        return self.mean_train_rating  
-                    
-            if self.baseline == "cs":
-                nns1 = self.get_k_nearest_users(self.similarity_function, self.k, active_user, candidate_item)
-                nns2 = self.get_k_nearest_users(self.similarity_function, self.k_prime, active_user)
-                nns = nns1 + nns2
-                nns = list(set(nns))
-                prediction = self.calculate_wtd_avg_rating(nns)
-                
-                if prediction:  
-                    return prediction
-                else:
-                    prediction = self.get_user_mean_rating(active_user)
-                    
-                    if prediction:
-                        return prediction
-                    else:
-                        return self.mean_train_rating  
-                    
-            if self.baseline == "cs+":
-                nns1 = self.get_k_nearest_users_with_overlap(self.similarity_function, self.k, active_user, candidate_item, self.phi)
-                nns2 = self.get_k_nearest_users_with_overlap(self.similarity_function, self.k_prime, active_user, self.phi)
-                nns = nns1 + nns2
-                nns = list(set(nns))
-                prediction = self.calculate_wtd_avg_rating(nns)
-                
-                if prediction:  
-                    return prediction
-                else:
-                    prediction = self.get_user_mean_rating(active_user)
-                    
-                    if prediction:
-                        return prediction
-                    else:
-                        return self.mean_train_rating  
-
-        # no item id, doesn't limit to just rated
-        nns = self.get_k_nearest_users(self.similarity_function, self.k, active_user)  
-        
-        alpha = 0.0
-        beta = 0.0
-        
-        for neighbour in nns:
-            neighbour_id = neighbour["user_id"]
-            neighbour_item_rating = self.get_user_item_rating(neighbour_id, candidate_item)
-            
-            if neighbour_item_rating is not None:
-                sim_x_y = self.get_user_similarity(self.similarity_function, active_user, neighbour_id)
-                mean_rating_for_neighbour = self.get_user_mean_rating(neighbour_id)
-                
-                alpha += (neighbour_item_rating - mean_rating_for_neighbour) * sim_x_y
-                beta += abs(sim_x_y)
-                
-            else:
-                rec_pred = self.recursive_prediction(neighbour_id, candidate_item, recursion_level + 1)
-                sim_x_y = self.get_user_similarity(self.similarity_function, active_user, neighbour_id)
-                mean_rating_for_neighbour = self.get_user_mean_rating(neighbour_id)
-                
-                alpha += self.weight_threshold * (rec_pred - mean_rating_for_neighbour) * sim_x_y
-                beta += self.weight_threshold * abs(sim_x_y)
-        
-        mean_rating_for_active_user = self.get_user_mean_rating(active_user)
-        
-        if beta == 0.0:
-            return mean_rating_for_active_user
-        else:
-            prediction = mean_rating_for_active_user + (alpha/beta)
-            
-            if prediction < 1.0:
-                prediction = 1.0
-                
-            if prediction > 5:
-                prediction = 5.0
     
-            return round(prediction, self.ROUNDING)
+    def train(self, **kwargs):
+        self.load_dataset(**self.kwargs["dataset_config"])
+        
+        self.Q = self.Q.T
+
+        for step in range(self.steps):
+            for i in range(len(self.R)):
+                for j in range(len(self.R[i])):
+                    if R[i][j] > 0:
+                        # calculate error
+                        eij = self.R[i][j] - np.dot(self.P[i,:],Q[:,j])
+
+                        for k in range(K):
+                            # calculate gradient with a and beta parameter
+                            self.P[i][k] = self.P[i][k] + self.alpha * (2 * eij * self.Q[k][j] - self.beta * self.P[i][k])
+                            self.Q[k][j] = self.Q[k][j] + self.alpha * (2 * eij * self.P[i][k] - self.beta * self.Q[k][j])
+
+            eR = np.dot(self.P,self.Q)
+
+            e = 0
+
+            for i in range(len(self.R)):
+
+                for j in range(len(self.R[i])):
+
+                    if self.R[i][j] > 0:
+
+                        e = e + pow(self.R[i][j] - np.dot(self.P[i,:],self.Q[:,j]), 2)
+
+                        for k in range(self.K):
+
+                            e = e + (self.beta/2) * (pow(self.P[i][k],2) + pow(self.Q[k][j],2))
+            # 0.001: local minimum
+            if e < 0.001:
+
+                break
+
+        return self.P, self.Q.T
+    
+    def get_single_prediction(self, nP, nQ):
+        nR = np.dot(nP, nQ.T)
+
+        return nR
+

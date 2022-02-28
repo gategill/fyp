@@ -413,6 +413,7 @@ class Dataset:
         except AssertionError as msg:
             print(msg)
 
+
     def get_user_popularity(self, user_id: int) -> int:
         """"""
         ##ic("ds.get_user_popularity()")
@@ -425,6 +426,13 @@ class Dataset:
         ##ic("ds.get_item_popularity()")
 
         return len(self.item_train_ratings[item_id])
+    
+    
+    def get_m_most_popular_items(self, m): # TODO
+        k_most_popular_items = sorted(self.item_train_ratings, key = lambda k: len(self.item_train_ratings[k]))[-m:]
+        
+        print(k_most_popular_items)
+        return k_most_popular_items
 
     
     def __reset(self) -> None:

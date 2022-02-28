@@ -1,0 +1,19 @@
+experiment_config:
+  seed: 100
+  save_in_s3: False
+  kolds: 5
+  early_stop: True
+  disable_ic: True
+  weighted_ratings: True
+  evaluation_metrics: ["MAE"]
+  neighbours: 10
+  similarity: sim_sim
+
+dataset_config:
+  dataset_path: "./data/given/"
+  prefiltering: {"user_k_core" : 20, "item_k_core": 5}
+
+models:
+  UserBootstrap:
+    enrichments: 3
+    additions: 10

@@ -75,6 +75,10 @@ class ItemKNNRecommender(GenericRecommender):
             else:
                 return self.mean_train_rating
             
+            
+    def get_m_most_popular_items(self, m):
+        return self.dataset.get_m_most_popular_items(m)
+
 
     def get_k_nearest_items(self, similarity_function: types.FunctionType, k: int, candidate_item_id: int, active_user_id: int = None) -> list:
         #ic("item_rec.get_k_nearest_items()")
@@ -136,7 +140,7 @@ class ItemKNNRecommender(GenericRecommender):
                 nearest_neighbours.pop(lowest_sim_index)
                 
         return nearest_neighbours
-
+        
 
     def get_thresholded_nearest_items(self, similarity_function: types.FunctionType, threshold: float, candidate_item_id: int, active_user_id: int = None) -> list:
         #ic("item_rec.get_thresholded_nearest_items()")
@@ -335,6 +339,7 @@ class ItemKNNRecommender(GenericRecommender):
             return self.item_train_ratings[item_id][user_id]
         else:
             return None
+
 
     def get_item_descriptors(self, item_id: int) -> dict:
         #ic("item_rec.get_item_descriptors()")

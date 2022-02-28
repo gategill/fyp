@@ -13,33 +13,10 @@ dataset_config:
   dataset_path: "./data/given/"
   prefiltering: {"user_k_core" : 20, "item_k_core": 5}
 
-models:
-  UserKNN:
-
-  ItemKNN:
-
-  UserBootstrap:
-    enrichments: 3
-    additions: 10
-
-  ItemBootstrap:
-    enrichments: 3
-    additions: 10
-
-  UserRecursiveKNN:
-    weight_threshold: 1.0
-    recursion_threshold: 3
-    phi: 5
-    k_prime: 20
-    baseline: "bs"
-    
+models:    
   ItemRecursiveKNN:
     weight_threshold: 1.0
     recursion_threshold: 3
     phi: 5
     k_prime: 20
     baseline: "bs"
-
-  CoRec:
-    additions: 30
-    top_m: 50
