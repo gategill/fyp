@@ -84,7 +84,7 @@ def run_experiment(config_path) -> None:
         
     dataset = Dataset(**kwargs["dataset_config"])
     
-    results_header = "algorithm, k, mae, time_elapsed_s, fold_num\n"
+    results_header = "algorithm, k, mae, rmse, time_elapsed_s, fold_num\n"
     results_header += (len(results_header) * "-") + "\n"
     all_results = results_header
     
@@ -95,6 +95,7 @@ def run_experiment(config_path) -> None:
         for K in kwargs["experiment_config"]["neighbours"]:    
             print("NEIGHBOURS = {}".format(K))
             model_k_mae = []
+            model_k_rmse = []
             model_k_results = results_header
 
             for fold_num in range(kolds):
@@ -117,20 +118,23 @@ def run_experiment(config_path) -> None:
                     toc = time.time()
                     time_elapsed = round(toc - tic, 3)
                     
-                    mae = a_recommender.evaluate_predictions()
+                    mae = a_recommender.evaluate_predictions("MAE")
+                    rmse = a_recommender.evaluate_predictions("RMSE")
                         
                     del a_recommender
 
-                    print(test, mae)
+                    print(test, mae, rmse)
                     
                     model_k_mae.append(mae)
+                    model_k_rmse.append(rmse)
                     
-                    experiment_result = "{}, {}, {}, {}, {}\n".format(model, K, mae, time_elapsed, fold_num + 1)
+                    experiment_result = "{}, {}, {}, {}, {}, {}\n".format(model, K, mae, rmse, time_elapsed, fold_num + 1)
                     all_results += experiment_result
                     model_results += experiment_result
                     model_k_results += experiment_result
                     single_results += experiment_result
                     
+                    # saving singles
                     with open("{}/single/single-{}-{}-{}.txt".format(save_path, model, K, fold_num + 1), "w") as f:
                         f.write(single_results)
                     
@@ -142,6 +146,7 @@ def run_experiment(config_path) -> None:
                     line_error = "error performing experiment, {}, error = {}".format(model, e)
                     print(traceback.print_exc())
                     
+                    # saving errors
                     with open("{}/single/single-{}-{}-{}.txt".format(save_path, model, K, fold_num), "w") as f:
                         f.write(line_error)
                     
@@ -150,7 +155,6 @@ def run_experiment(config_path) -> None:
                         s3.put_object(Body = line_error, Bucket = "fyp-w9797878", Key = s3_name)
                 
                 
-            model_k_num_singles = len(model_k_mae)
             
             if model == "CoRec":
                 user_mae = [i [0] for i in model_k_mae]
@@ -158,29 +162,32 @@ def run_experiment(config_path) -> None:
                 
                 model_k_user_mean_mae = round(np.mean(user_mae), 5) 
                 model_k_item_mean_mae = round(np.mean(item_mae), 5) 
-                model_k_user_std = round(np.std(user_mae), 5)
-                model_k_item_std = round(np.std(item_mae), 5)
                 
                 model_k_mean_mae = [model_k_user_mean_mae, model_k_item_mean_mae]
-                model_k_std = [model_k_user_std, model_k_item_std]
+                
+                user_rmse = [i [0] for i in model_k_rmse]
+                item_rmse = [i [1] for i in model_k_rmse]
+                
+                model_k_user_mean_rmse = round(np.mean(user_rmse), 5) 
+                model_k_item_mean_rmse = round(np.mean(item_rmse), 5) 
+                
+                model_k_mean_mae = [model_k_user_mean_mae, model_k_item_mean_mae]
+                model_k_mean_rmse = [model_k_user_mean_rmse, model_k_item_mean_rmse]
                 
             else:
                 model_k_mean_mae = round(np.mean(model_k_mae), 5) 
-                model_k_std = round(np.std(model_k_mae), 5)
+                model_k_mean_rmse = round(np.mean(model_k_rmse), 5) 
             
-            model_k_results += "{}_{}: Number of Folds = {}\n".format(model, K, model_k_num_singles)
-            model_k_results += "{}_{}: Mean MAE = {}\n".format(model, K, model_k_mean_mae)
-            model_k_results += "{}_{}: Standard Deviation = {}\n\n".format(model, K, model_k_std)
+            model_k_results += "{}_{}: Averaged_MAE = {}\n".format(model, K, model_k_mean_mae)
+            model_k_results += "{}_{}: Averaged_RMSE = {}\n".format(model, K, model_k_mean_rmse)
             
-            model_results += "{}_{}: Number of Folds = {}\n".format(model, K, model_k_num_singles)
-            model_results += "{}_{}: Mean MAE = {}\n".format(model, K, model_k_mean_mae)
-            model_results += "{}_{}: Standard Deviation = {}\n\n".format(model, K, model_k_std)
+            model_results += "{}_{}: Averaged_MAE = {}\n".format(model, K, model_k_mean_mae)
+            model_results += "{}_{}: Averaged_RMSE = {}\n".format(model, K, model_k_mean_rmse)
             
-            all_results += "{}_{}: Number of Folds = {}\n".format(model, K, model_k_num_singles)
-            all_results += "{}_{}: Mean MAE = {}\n".format(model, K, model_k_mean_mae)
-            all_results += "{}_{}: Standard Deviation = {}\n\n".format(model, K, model_k_std)
+            all_results += "{}_{}: Averaged_MAE = {}\n".format(model, K, model_k_mean_mae)            
+            all_results += "{}_{}: Averaged_RMSE = {}\n".format(model, K, model_k_mean_rmse)            
             
-            
+            # saving model_k
             with open("{}/model_k/model_k-{}-{}.txt".format(save_path, model, K), "w") as f:
                 f.write(model_k_results)
         
@@ -188,14 +195,16 @@ def run_experiment(config_path) -> None:
                 s3_name = "{}/model_k/model_k-{}-{}.txt".format(current_timestamp, model, K)
                 s3.put_object(Body = model_k_results, Bucket = "fyp-w9797878", Key = s3_name)
              
-             
+        
+        # saving model   
         with open("{}/model/model-{}.txt".format(save_path, model), "w") as f:
             f.write(model_results)
         
         if save_in_s3:
             s3_name = "{}/model/model-{}.txt".format(current_timestamp, model)
             s3.put_object(Body = model_results, Bucket = "fyp-w9797878", Key = s3_name)
-                
+       
+    # saving all         
     with open("{}/all/all-{}.txt".format(save_path, all_models), "w") as f:
         f.write(all_results)
            

@@ -6,7 +6,7 @@ experiment_config:
   disable_ic: True
   paired_t_test: True
 
-  evaluation_metrics: ["MAE"]
+  evaluation_metrics: ["MAE", "RMSE"]
   neighbours: 10
   similarity: sim_sim
 

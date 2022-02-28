@@ -61,13 +61,14 @@ class CoRecRecommender(GenericRecommender):
     def evaluate_predictions(self, method = "MAE"):
         # ic("gen_rec.evaluate_predictions()")
         
-        mae_user, mae_item = Evaluation.mean_absolute_error(self.predictions)
-
-        mae_user = round(mae_user, 5)
-        mae_item = round(mae_item, 5)
+        if method == "MAE":
+            mae_user, mae_item = Evaluation.mean_absolute_error(self.predictions)
+            return round(mae_user, 5), round(mae_item, 5)
         
-        return mae_user, mae_item
-    
+        if method == "RMSE":
+            rmse_user, rmse_item = Evaluation.root_mean_square_error(self.predictions)
+            return round(rmse_user, 5), round(rmse_item, 5)
+                
     
     def co_training(self):
         ic("cr_rec.train_co_rec()")

@@ -2,8 +2,8 @@ from .GenericRecommender import GenericRecommender
 from .ItemKNNRecommender import ItemKNNRecommender
 from .UserKNNRecommender import UserKNNRecommender
 from .UserBootstrapRecommender import UserBootstrapRecommender
-from .ConfidentBootstrapRecommender import ConfidentUserBootstrapRecommender
-from .ConfidentItemBootstrapRecommender import CoonfidentItemBootstrapRecommender
+from .ConfidentUserBootstrapRecommender import ConfidentUserBootstrapRecommender
+from .ConfidentItemBootstrapRecommender import ConfidentItemBootstrapRecommender
 from .ItemBootstrapRecommender import ItemBootstrapRecommender
 from .UserRecursiveKNNRecommender import UserRecursiveKNNRecommender
 from .ItemRecursiveKNNRecommender import ItemRecursiveKNNRecommender

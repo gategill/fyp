@@ -57,11 +57,14 @@ class GenericRecommender:
 
     def evaluate_predictions(self, method = "MAE"):
         # ic("gen_rec.evaluate_predictions()")
-
-        mae = Evaluation.mean_absolute_error(self.predictions)
-        mae = round(mae, 5)
         
-        return mae
+        if method == "MAE":
+            mae = Evaluation.mean_absolute_error(self.predictions)
+            return round(mae, 5)
+        
+        if method == "RMSE":
+            rmse = Evaluation.root_mean_square_error(self.predictions)
+            return round(rmse, 5)
     
 
     def get_similarity_function(self):
