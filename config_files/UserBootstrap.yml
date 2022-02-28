@@ -4,6 +4,7 @@ experiment_config:
   kolds: 5
   early_stop: True
   disable_ic: True
+  paired_t_test: True
   
   evaluation_metrics: ["MAE"]
   neighbours: 10
@@ -15,5 +16,5 @@ dataset_config:
 
 models:
   UserBootstrap:
-    enrichments: 3
-    additions: 10
+    enrichments: 2
+    additions: 30

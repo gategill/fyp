@@ -16,6 +16,6 @@ class RandomRecommender(GenericRecommender):
     
         
     def get_single_prediction(self, active_user_id, candidate_item_id):
-        return  np.random.uniform(1.0, 5.0)
+        return  round(np.random.uniform(1.0, 5.0), self.ROUNDING)
 
 

@@ -77,7 +77,7 @@ class CoRecRecommender(GenericRecommender):
         
         for user_id in self.user_train_ratings.keys():
             for unseen_item in self.get_user_unrated_items(user_id, self.additions):
-                unlabelled_entries.append({"user_id": user_id, "item_id": unseen_item})            
+                unlabelled_entries.append({"user_id": user_id, "item_id": unseen_item})    
         
         # step 2: co-training
         self.user_rec = UserKNNRecommender(copy.deepcopy(self.dataset), **self.kwargs)
@@ -152,15 +152,16 @@ class CoRecRecommender(GenericRecommender):
                 for ite in top_m_user_predictions:
                     if ite in train_unlabelled_users:
                         train_unlabelled_users.remove(ite)
-                        old_num_users -= 1
 
                 for ite in top_m_item_predictions:
                     if ite in train_unlabelled_items:
                         train_unlabelled_items.remove(ite)
-                        old_num_item -= 1
         
-                assert(old_num_users > len(train_unlabelled_users)), "make sure the number of unlabelled users is decreasing"
-                assert(old_num_items > len(train_unlabelled_items)), "make sure the number of unlabelled items is decreasing"
+                assert(old_num_users > len(train_unlabelled_users)), "ERROR: the number of unlabelled users is NOT decreasing"
+                assert(old_num_items > len(train_unlabelled_items)), "ERROR: the number of unlabelled items is NOT decreasing"
+                
+                old_num_users -= len(train_unlabelled_users)
+                old_num_items -= len(train_unlabelled_items)
             
             except AssertionError as msg:
                 print(msg)

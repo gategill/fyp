@@ -24,6 +24,8 @@ def read_in_yaml_file(config_path):
         raise KeyError("missing neighbours in experiment_config")
     if "similarity" not in kwargs["experiment_config"]:
             raise KeyError("missing similarity in experiment_config")
+    if "paired_t_test" not in kwargs["experiment_config"]:
+            raise KeyError("missing paired_t_test in experiment_config")
     
     
     if type(kwargs["experiment_config"]["neighbours"]) not in [int, list]:
@@ -51,6 +53,8 @@ def read_in_yaml_file(config_path):
         raise TypeError("early_stop should be boolean")
     if type(kwargs["experiment_config"]["disable_ic"]) != bool:
         raise TypeError("disable_ic should be boolean")
+    if type(kwargs["experiment_config"]["paired_t_test"]) != bool:
+        raise TypeError("paired_t_test should be boolean")
     if type(kwargs["experiment_config"]["evaluation_metrics"]) != (list or str) :
         raise TypeError("evaluation_metrics should be string or list")
     if type(kwargs["experiment_config"]["similarity"]) != str:
@@ -76,8 +80,8 @@ def read_in_yaml_file(config_path):
     if len(kwargs["models"]) == 0:
         raise ValueError("no models provided in kwargs[models]")
     for model in kwargs["models"]:
-        if model not in ["UserKNN", "ItemKNN", "Bootstrap", "UserRecursiveKNN", "ItemRecursiveKNN", "CoRec", "MatrixFactorisation", "MostPop", "Random", "Mean"]:
-            raise KeyError("invalid model\nvalid model are: [UserKNN, ItemKNN, Bootstrap, UserRecursiveKNN, ItemRecursiveKNN, CoRec, MatrixFactorisation, MostPop, Random, Mean]")
+        if model not in ["UserKNN", "ItemKNN", "UserBootstrap","ItemBootstrap", "UserRecursiveKNN", "ItemRecursiveKNN", "CoRec", "MatrixFactorisation", "MostPop", "Random", "Mean"]:
+            raise KeyError("invalid model\nvalid model are: [UserKNN, ItemKNN, UserBootstrap, ItemBootstrap, UserRecursiveKNN, ItemRecursiveKNN, CoRec, MatrixFactorisation, MostPop, Random, Mean]")
         
         
     if "Bootstrap" in kwargs["models"]:

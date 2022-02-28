@@ -1,12 +1,13 @@
 experiment_config:
   seed: 100
   save_in_s3: False
-  kolds: 5
-  early_stop: False
+  kolds: 10
+  early_stop: True
   disable_ic: True
+  paired_t_test: True
   
   evaluation_metrics: ["MAE"]
-  neighbours: 10
+  neighbours: [5, 10, 15, 20]
   similarity: sim_sim
 
 dataset_config:
@@ -14,9 +15,25 @@ dataset_config:
   prefiltering: {"user_k_core" : 20, "item_k_core": 5}
 
 models:
+  UserKNN: {}
+
+  ItemKNN: {}
+
+  UserBootstrap:
+    enrichments: 2
+    additions: 30
+
+  ItemBootstrap:
+    enrichments: 2
+    additions: 30
+
   UserRecursiveKNN:
     weight_threshold: 1.0
-    recursion_threshold: 3
+    recursion_threshold: 2
     phi: 5
     k_prime: 20
     baseline: "bs"
+    
+  #CoRec:
+  #  additions: 30
+  #  top_m: 3000
