@@ -21,11 +21,11 @@ models:
 
   UserBootstrap:
     enrichments: 2
-    additions: 30
+    additions: 5
 
   ItemBootstrap:
     enrichments: 2
-    additions: 30
+    additions: 5
 
   UserRecursiveKNN:
     weight_threshold: 1.0

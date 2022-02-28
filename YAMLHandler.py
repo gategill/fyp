@@ -80,8 +80,8 @@ def read_in_yaml_file(config_path):
     if len(kwargs["models"]) == 0:
         raise ValueError("no models provided in kwargs[models]")
     for model in kwargs["models"]:
-        if model not in ["UserKNN", "ItemKNN", "UserBootstrap","ItemBootstrap", "UserRecursiveKNN", "ItemRecursiveKNN", "CoRec", "MatrixFactorisation", "MostPop", "Random", "Mean"]:
-            raise KeyError("invalid model\nvalid model are: [UserKNN, ItemKNN, UserBootstrap, ItemBootstrap, UserRecursiveKNN, ItemRecursiveKNN, CoRec, MatrixFactorisation, MostPop, Random, Mean]")
+        if model not in ["UserKNN", "ItemKNN", "UserBootstrap","ItemBootstrap", "UserRecursiveKNN", "ItemRecursiveKNN", "CoRec", "MatrixFactorisation", "MostPop", "Random", "Mean", "ConfidentUserBootstrap","ConfidentItemBootstrap"]:
+            raise KeyError("invalid model\nvalid model are: [UserKNN, ItemKNN, UserBootstrap, ItemBootstrap, UserRecursiveKNN, ItemRecursiveKNN, CoRec, MatrixFactorisation, MostPop, Random, Mean, ConfidentUserBootstrap,ConfidentItemBootstrap]")
         
         
     if "Bootstrap" in kwargs["models"]:
@@ -189,6 +189,42 @@ def read_in_yaml_file(config_path):
     if "Mean" in kwargs["models"]:
         if "which" not in kwargs["models"]["Mean"]:
             raise KeyError("missing which in Mean")
+        
+        
+    if "ConfidentUserBootstrap" in kwargs["models"]:
+        if "enrichments" not in kwargs["models"]["ConfidentUserBootstrap"]:
+            raise KeyError("missing enrichments in ConfidentUserBootstrap")
+        if "additions" not in kwargs["models"]["ConfidentUserBootstrap"]:
+            raise KeyError("missing additions in ConfidentUserBootstrap")
+        if "top_m" not in kwargs["models"]["ConfidentUserBootstrap"]:
+            raise KeyError("missing top_m in ConfidentUserBootstrap")
+
+        if type(kwargs["models"]["ConfidentUserBootstrap"]["enrichments"]) != int:
+            raise TypeError("ConfidentUserBootstrap.enrichments should be an integer")
+        if type(kwargs["models"]["ConfidentUserBootstrap"]["additions"]) != int:
+            raise TypeError("ConfidentUserBootstrap.additions should be an integer")
+        if type(kwargs["models"]["ConfidentUserBootstrap"]["top_m"]) != int:
+            raise TypeError("ConfidentUserBootstrap.top_m should be an integer")
+        if kwargs["models"]["ConfidentUserBootstrap"]["top_m"] < kwargs["models"]["ConfidentUserBootstrap"]["additions"]:
+            raise ValueError("ConfidentUserBootstrap.top_m should be larger than additions (I think)")
+        
+        
+    if "ConfidentItemBootstrap" in kwargs["models"]:
+        if "enrichments" not in kwargs["models"]["ConfidentItemBootstrap"]:
+            raise KeyError("missing enrichments in ConfidentItemBootstrap")
+        if "additions" not in kwargs["models"]["ConfidentItemBootstrap"]:
+            raise KeyError("missing additions in ConfidentItemBootstrap")
+        if "top_m" not in kwargs["models"]["ConfidentItemBootstrap"]:
+            raise KeyError("missing top_m in ConfidentItemBootstrap")
+
+        if type(kwargs["models"]["ConfidentItemBootstrap"]["enrichments"]) != int:
+            raise TypeError("ConfidentItemBootstrap.enrichments should be an integer")
+        if type(kwargs["models"]["ConfidentItemBootstrap"]["additions"]) != int:
+            raise TypeError("ConfidentItemBootstrap.additions should be an integer")
+        if type(kwargs["models"]["ConfidentItemBootstrap"]["top_m"]) != int:
+            raise TypeError("ConfidentItemBootstrap.top_m should be an integer")
+        if kwargs["models"]["ConfidentItemBootstrap"]["top_m"] < kwargs["models"]["ConfidentItemBootstrap"]["additions"]:
+            raise ValueError("ConfidentItemBootstrap.top_m should be larger than additions (I think)")
         
             
     return kwargs

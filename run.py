@@ -7,7 +7,9 @@ from recommender.MatrixFactorisationRecommender import MatrixFactorisationRecomm
 from recommender.UserRecursiveKNNRecommender import UserRecursiveKNNRecommender
 from recommender.ItemRecursiveKNNRecommender import ItemRecursiveKNNRecommender
 from recommender.UserBootstrapRecommender import UserBootstrapRecommender
+from recommender.ConfidentUserBootstrapRecommender import ConfidentUserBootstrapRecommender
 from recommender.ItemBootstrapRecommender import ItemBootstrapRecommender
+from recommender.ConfidentItemBootstrapRecommender import ConfidentItemBootstrapRecommender
 from recommender.ItemKNNRecommender import ItemKNNRecommender
 from recommender.UserKNNRecommender import UserKNNRecommender
 from recommender.MostPopRecommender import MostPopRecommender
@@ -33,7 +35,9 @@ def run_experiment(config_path) -> None:
     recommenders = {"UserKNN" : UserKNNRecommender, 
                        "ItemKNN" : ItemKNNRecommender,
                        "UserBootstrap" : UserBootstrapRecommender,
+                       "ConfidentUserBootstrap" : ConfidentUserBootstrapRecommender,
                        "ItemBootstrap" : ItemBootstrapRecommender,
+                       "ConfidentItemBootstrap" : ConfidentItemBootstrapRecommender,
                        "UserRecursiveKNN" : UserRecursiveKNNRecommender, 
                        "ItemRecursiveKNN" : ItemRecursiveKNNRecommender, 
                        "CoRec" : CoRecRecommender,

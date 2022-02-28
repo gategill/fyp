@@ -16,5 +16,5 @@ dataset_config:
 
 models:
   ItemBootstrap:
-    enrichments: 3
-    additions: 10
+    enrichments: 2
+    additions: 5

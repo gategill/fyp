@@ -256,7 +256,7 @@ class Dataset:
             self.item_test_ratings[item_id][user_id] = rating
             
         print("There are {} ratings in the trainset".format(self.num_ratings))  
-        print("Sparsity of the trainset is: {}%".format(100 * round(self.sparsity, 5)))  
+        print("Sparsity of the trainset is: {}%".format(100 * round(self.sparsity, 4)))  
 
 
     def add_new_recommendations_to_trainset(self, new_recommendations):

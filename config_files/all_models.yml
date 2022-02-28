@@ -20,12 +20,12 @@ models:
   ItemKNN: {}
 
   UserBootstrap:
-    enrichments: 3
-    additions: 10
+    enrichments: 2
+    additions: 5
 
   ItemBootstrap:
-    enrichments: 3
-    additions: 10
+    enrichments: 2
+    additions: 5
 
   UserRecursiveKNN:
     weight_threshold: 1.0
@@ -61,3 +61,13 @@ models:
 
   Mean:
     which: "global"
+
+  ConfidentUserBootstrap:
+    enrichments: 2
+    additions: 5
+    top_m: 50
+
+  ConfidentItemBootstrap:
+    enrichments: 2
+    additions: 5
+    top_m: 50
