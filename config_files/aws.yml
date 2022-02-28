@@ -2,7 +2,7 @@ experiment_config:
   seed: 100
   save_in_s3: False
   kolds: 5
-  early_stop: True
+  early_stop: False
   disable_ic: True
   
   evaluation_metrics: ["MAE"]
@@ -14,5 +14,9 @@ dataset_config:
   prefiltering: {"user_k_core" : 20, "item_k_core": 5}
 
 models:
-  MostPop:
-    top_m: 100
+  UserRecursiveKNN:
+    weight_threshold: 1.0
+    recursion_threshold: 3
+    phi: 5
+    k_prime: 20
+    baseline: "bs"

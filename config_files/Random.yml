@@ -4,7 +4,7 @@ experiment_config:
   kolds: 5
   early_stop: True
   disable_ic: True
-  weighted_ratings: True
+  
   evaluation_metrics: ["MAE"]
   neighbours: 10
   similarity: sim_sim

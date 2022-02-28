@@ -18,8 +18,6 @@ def read_in_yaml_file(config_path):
         raise KeyError("missing early_stop in experiment_config")
     if "disable_ic" not in kwargs["experiment_config"]:
         raise KeyError("missing disable_ic in experiment_config")
-    if "weighted_ratings" not in kwargs["experiment_config"]:
-        raise KeyError("missing weighted_ratings in experiment_config")
     if "evaluation_metrics" not in kwargs["experiment_config"]:
         raise KeyError("missing evaluation_metrics in experiment_config")
     if "neighbours" not in kwargs["experiment_config"]:
