@@ -73,7 +73,7 @@ def run_experiment(config_path) -> None:
     dataset = Dataset(**kwargs["dataset_config"])
     
     results_header = "algorithm, k, mae, time_elapsed_s, fold_num\n"
-    results_header += len(results_header) * "-"
+    results_header += (len(results_header) * "-") + "\n"
     all_results = results_header
     
     for model in kwargs["models"]:
@@ -94,7 +94,6 @@ def run_experiment(config_path) -> None:
         
                 try:                
                     print("Running {} Recommender".format(model))
-                    #print(kwargs["models"])
                     kwargs["models"][model]["neighbours"] = K
                     kwargs["models"][model]["similarity"] = kwargs["experiment_config"]["similarity"]
                     kwargs["run_params"] = kwargs["models"][model]

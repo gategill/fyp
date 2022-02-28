@@ -26,11 +26,11 @@ class Similarities:
         if n == 0: 
             return 0.0
         
-        # Means over co-rated
+        # means over co-rated
         mean1 = sum([ratings1[id] for id in co_rated]) * 1.0 / n
         mean2 = sum([ratings2[id] for id in co_rated]) * 1.0 / n
         
-        # Sums of products of differences and sums of squared differences
+        # sums of products of differences and sums of squared differences
         sum_prods = 0.0
         sum_squares1 = 0.0
         sum_squares2 = 0.0
@@ -42,11 +42,11 @@ class Similarities:
             sum_squares1 = sum_squares1 + difference1 * difference1
             sum_squares2 = sum_squares2 + difference2 * difference2
             
-        # Handle zero variances
+        # handle zero variances
         if sum_squares1 == 0 or sum_squares2 == 0:
             return 0.0
         
-        # Calculate Pearson correlation
+        # calculate Pearson correlation
         pear =  sum_prods / (math.sqrt(sum_squares1) * math.sqrt(sum_squares2))
         lambda_param = 100
         
@@ -57,7 +57,7 @@ class Similarities:
     def sim_pearson(ratings1: dict, ratings2: dict) -> float:
         # {item_id/user_id, rating}
         
-        # Get co-rated
+        # get co-rated
         co_rated = []
         
         for id in ratings1: 
@@ -67,15 +67,15 @@ class Similarities:
                 
         n = len(co_rated)
         
-        # If no co-rated, return 0
+        # if no co-rated, return 0
         if n == 0: 
             return 0.0
         
-        # Means over co-rated
+        # means over co-rated
         mean1 = sum([ratings1[id] for id in co_rated]) * 1.0 / n
         mean2 = sum([ratings2[id] for id in co_rated]) * 1.0 / n
         
-        # Sums of products of differences and sums of squared differences
+        # sums of products of differences and sums of squared differences
         sum_prods = 0.0
         sum_squares1 = 0.0
         sum_squares2 = 0.0
@@ -87,7 +87,7 @@ class Similarities:
             sum_squares1 = sum_squares1 + difference1 * difference1
             sum_squares2 = sum_squares2 + difference2 * difference2
             
-        # Handle zero variances
+        # handle zero variances
         if sum_squares1 == 0 or sum_squares2 == 0:
             return 0.0
         

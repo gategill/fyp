@@ -35,8 +35,6 @@ class GenericRecommender:
 
     
     def get_predictions(self):
-        #print(len(self.test_ratings))
-
         for i, test in enumerate(self.test_ratings):
             try:
                 user_id = int(test['user_id'])
@@ -130,7 +128,7 @@ class GenericRecommender:
     def calculate_wtd_avg_rating(self, neighbours: list) -> float:
         # weighted, introduces similarity
         # [{sim, user_id, rating}]
-        ##ic("gen_rec.calculate_wtd_avg_rating()")
+        #ic("gen_rec.calculate_wtd_avg_rating()")
         
         if len(neighbours) == 0:
             return None

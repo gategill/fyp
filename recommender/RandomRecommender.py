@@ -28,7 +28,6 @@ class RandomRecommender(UserKNNRecommender):
         #ic("pp_rec.recursive_prediction()")
         
         # starts at 1
-        #print("RECURSION PROGERSS = {}/{}".format(recursion_level, self.recursion_threshold))
         if recursion_level > self.recursion_threshold:
             #ic("Reached Recursion Limit - Using Baseline")
             if self.baseline == "bs":
@@ -107,7 +106,8 @@ class RandomRecommender(UserKNNRecommender):
                     else:
                         return self.mean_train_rating  
 
-        nns = self.get_k_nearest_users(self.similarity_function, self.k, active_user)  # no item id, doesn't limit to just rated
+        # no item id, doesn't limit to just rated
+        nns = self.get_k_nearest_users(self.similarity_function, self.k, active_user)
         
         alpha = 0.0
         beta = 0.0

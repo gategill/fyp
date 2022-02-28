@@ -67,17 +67,12 @@ def read_in_yaml_file(config_path):
         raise KeyError("missing dataset_path in dataset_config")
     if "prefiltering" not in kwargs["dataset_config"]:
         raise KeyError("missing prefiltering in dataset_config")
-    #if "test_splitting_ratio" not in kwargs["dataset_config"]:
-    #    raise KeyError("missing test_splitting_ratio in dataset_config")
     
     if type(kwargs["dataset_config"]["dataset_path"]) != str:
         raise TypeError("dataset_path should be a string")
     if type(kwargs["dataset_config"]["prefiltering"]) != dict:
         raise TypeError("prefiltering should be a dictionary")
-    #if type(kwargs["dataset_config"]["test_splitting_ratio"]) != float:
-    #    raise TypeError("test_splitting_ratio should be a float")
-    
-    
+ 
     if "models" not in kwargs:
         raise KeyError("missing models in kwargs")
     if len(kwargs["models"]) == 0:

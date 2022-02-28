@@ -46,7 +46,7 @@ class UserKNNRecommender(GenericRecommender):
 
 
     def predict_rating_user_based_nn_wtd(self, active_user_id: int, candidate_item_id: int) -> float:
-        ##ic("user_rec.predict_rating_user_based_nn_wtd()")
+        #ic("user_rec.predict_rating_user_based_nn_wtd()")
 
         nns = self.get_k_nearest_users(self.similarity_function, self.k, active_user_id, candidate_item_id)
         prediction = self.calculate_wtd_avg_rating(nns)
@@ -63,7 +63,7 @@ class UserKNNRecommender(GenericRecommender):
 
 
     def get_k_nearest_users(self, similarity_function: types.FunctionType, k: int, active_user_id: int, candidate_item_id: int = None) -> list:
-        ##ic("user_rec.get_k_nearest_users()")
+        #ic("user_rec.get_k_nearest_users()")
         
         """
         [{user_id: int, rating: float, sim: float}]
@@ -105,8 +105,10 @@ class UserKNNRecommender(GenericRecommender):
             
             candidate_neighbour = {'user_id': user_id, 'sim': sim}
             
-            if not candidate_item_id is None: # if not None = if confined to users with that item ID
-                candidate_neighbour['rating'] = self.user_train_ratings[user_id][candidate_item_id] # what's your ID? 
+            # if not None = if confined to users with that item ID
+            if not candidate_item_id is None:
+                # what's your ID? 
+                candidate_neighbour['rating'] = self.user_train_ratings[user_id][candidate_item_id]
             
             nearest_neighbours.append(candidate_neighbour)
             
@@ -131,7 +133,7 @@ class UserKNNRecommender(GenericRecommender):
     
     
     def get_k_nearest_users_with_overlap(self, similarity_function: types.FunctionType, k: int, active_user_id: int, candidate_item_id: int = None, overlap: int = 0) -> list:
-        ##ic("user_rec.get_k_nearest_users_with_overlap()")
+        #ic("user_rec.get_k_nearest_users_with_overlap()")
         
         """
         [{user_id: int, rating: float, sim: float}]
@@ -179,8 +181,10 @@ class UserKNNRecommender(GenericRecommender):
             
             candidate_neighbour = {'user_id': user_id, 'sim': sim}
             
-            if not candidate_item_id is None: # if not None = if confined to users with that item ID
-                candidate_neighbour['rating'] = self.user_train_ratings[user_id][candidate_item_id] # what's your ID? 
+            # if not None = if confined to users with that item ID
+            if not candidate_item_id is None:
+                # what's your ID? 
+                candidate_neighbour['rating'] = self.user_train_ratings[user_id][candidate_item_id]
             
             nearest_neighbours.append(candidate_neighbour)
             
@@ -374,7 +378,7 @@ class UserKNNRecommender(GenericRecommender):
             
             
     def get_user_mean_rating(self, user_id: int) -> float:
-        ##ic("user_rec.get_user_mean_rating()")
+        #ic("user_rec.get_user_mean_rating()")
          
         """
         Gets the mean of user_id's ratings from the train set. If this user has no ratings in the
@@ -429,7 +433,7 @@ class UserKNNRecommender(GenericRecommender):
         
     def get_user_similarity(self, similarity_function: types.FunctionType, active_user_id: int, user_id: int) -> float:
         """"""
-        ##ic("user_rec.get_user_similarity()")
+        #ic("user_rec.get_user_similarity()")
         
         sim = similarity_function(self.user_train_ratings[active_user_id], self.user_train_ratings[user_id])        
         

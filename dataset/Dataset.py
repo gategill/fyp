@@ -19,7 +19,6 @@ class Dataset:
         self.load_users()
         self.read_in_ratings()
         self.prefilter_ratings()
-        #self.load_ratings()    
     
         
     def load_items(self, filename: str = "movies.txt") -> None:
@@ -76,9 +75,8 @@ class Dataset:
                                 
             all_ratings.append({'user_id': user_id, 'item_id': item_id, 'rating': rating})
         
-        #print(all_ratings[:10])
-        random.shuffle(all_ratings) # inplace, returns None
-        #print(all_ratings[:10])
+        # inplace, returns None
+        random.shuffle(all_ratings)
         
         self.all_ratings = all_ratings
         
@@ -175,7 +173,8 @@ class Dataset:
                 data["item_id"] = data["item_id"].astype(int)
                 
                 df = data
-                self.user_ids = list(map(int, np.unique(df["user_id"].to_list()))) # should these be all or training? TODO
+                # should these be all or training? TODO
+                self.user_ids = list(map(int, np.unique(df["user_id"].to_list())))
                 self.item_ids = list(map(int, np.unique(df["item_id"].to_list())))
                 
                 print("df.shape AFTER cold_users: " + str(df.shape))
@@ -193,31 +192,19 @@ class Dataset:
         the remaining ratings are treated as the train set.
         """
      
-        #if type(test_splitting_ratio) != float:
-        #    raise TypeError("load_ratings: you supplied test_splitting_ratio = '%s' but test_splitting_ratio must be a float" % test_splitting_ratio)
-        #if test_splitting_ratio < 0.0 or test_splitting_ratio > 1.0:
-        #    raise ValueError("load_ratings: you supplied test_splitting_ratio = '%f' but test_splitting_ratio must be between 0.0 and 1.0 inclusive" % test_splitting_ratio)
         num_ratings = 0
         n_split = self.kwargs["kolds"]
-        #fold_num = self.kwargs["fold_num"]
         
         df = self.get_ratings_as_df()
         nrow = df.shape[0]
         a,b = ((fold_num * nrow) // n_split), ((1 + fold_num) * nrow // n_split)
         
-        #print(a,b, sep = "-")
 
         df_test = df.loc[np.r_[a:b], :]
         df_train = df[~df.isin(df_test)].dropna()
         
         self.train_ratings = list(df_train.T.to_dict().values())
         self.test_ratings = list(df_test.T.to_dict().values())
-        
-        #print(self.train_ratings[:5])
-        #print("\n")
-        #print(self.test_ratings[:5])
-                    
-        #for entry in self.all_ratings:
         
         # train_ratings
         for entry in self.train_ratings:
@@ -232,26 +219,17 @@ class Dataset:
             self.user_train_ratings.setdefault(user_id, {})
             self.item_train_ratings.setdefault(item_id, {})
         
-        #if random.random() >= test_splitting_ratio: # goes to trainset
             self.user_train_ratings[user_id][item_id] = rating
             self.item_train_ratings[item_id][user_id] = rating
             self.mean_train_rating = self.mean_train_rating + rating
-            #self.train_ratings.append(entry)
-            num_ratings += 1
-
-
-        #else: # goes to testset
-        #for entry in self.test_ratings:
-        #    entry["user_id"] = int(entry["user_id"])
-        #    entry["item_id"] = int(entry["item_id"])
-        #    entry["rating"] = float(entry["rating"])
-
-            #self.test_ratings.append(entry)                
+            num_ratings += 1            
                 
         self.mean_train_rating = self.mean_train_rating / num_ratings
         
         self.num_ratings = num_ratings
-        self.sparsity = 1 - (self.num_ratings / (len(self.user_ids) * len(self.item_ids))) # should this be user/items in trainset? TODO
+        
+        # should this be user/items in trainset? TODO
+        self.sparsity = 1 - (self.num_ratings / (len(self.user_ids) * len(self.item_ids)))
         
         
         for user_id, ratings in self.user_train_ratings.items(): 
@@ -282,7 +260,6 @@ class Dataset:
 
 
     def add_new_recommendations_to_trainset(self, new_recommendations):
-        # 
         ic("ds.add_new_recommendations_to_trainset()")
         
         self.append_new_user_train_ratings(new_recommendations)
@@ -291,12 +268,9 @@ class Dataset:
         self.update_user_train_means()
         self.update_item_train_means()
         self.update_num_ratings(new_recommendations)
-        #self.update_mean_train_rating() # just don't. it's fine
         
         print("Added {} new recommendations to the trainset".format(len(new_recommendations)))
         print("There are {} ratings in the trainset".format(self.num_ratings))
-        #print("Sparsity of the trainset is: {}%".format(100 * round(self.sparsity, 4)))  
-
         
                 
     def get_user_ids(self) -> list:
@@ -321,7 +295,6 @@ class Dataset:
 
 
     def append_new_user_train_ratings(self, new_recommendations: list) -> None:
-        # 
         ic("ds.append_new_user_train_ratings()")
                 
         for recommendation in new_recommendations:
@@ -333,7 +306,6 @@ class Dataset:
                 
         
     def update_user_train_means(self) -> None:
-        # 
         ic("ds.update_user_train_means()")
         
         for user_id, ratings in self.user_train_ratings.items():
@@ -344,7 +316,6 @@ class Dataset:
                 
                 
     def append_new_item_train_ratings(self, new_recommendations: list) -> None:
-        # 
         ic("ds.append_new_item_train_ratings()")
         
         for recommendation in new_recommendations:
@@ -359,7 +330,6 @@ class Dataset:
             
             
     def append_new_train_ratings(self, new_recommendations: list) -> None:
-        # 
         ic("ds.append_new_train_ratings()")
    
         for recommendation in new_recommendations:  
@@ -369,7 +339,6 @@ class Dataset:
                                 
         
     def update_item_train_means(self) -> None:
-        # 
         ic("ds.update_item_train_means()")
         
         for item_id, ratings in self.item_train_ratings.items():
@@ -378,22 +347,9 @@ class Dataset:
             else:
 
                 self.item_train_means[item_id] = None
-                
-                    
-    def update_mean_train_rating(self) -> None:
-        # 
-        ic("ds.update_mean_train_rating()")
-
-        new_mean_train_rating = np.nansum(list(self.item_train_means.values())) / len(self.item_train_means)
-        
-        ic(self.mean_train_rating)
-        ic(new_mean_train_rating)
-        
-        #self.mean_train_rating = new_mean_train_rating
 
                 
     def get_mean_train_rating(self) -> float:
-        # 
         #ic("ds.get_mean_train_rating()")
 
         return self.mean_train_rating
@@ -449,8 +405,6 @@ class Dataset:
         
         
     def update_num_ratings(self, new_recommendations: list) -> None:
-        """"""
-        # TODO should I replace this???
         #ic("ds.update_num_ratings()")
         try:
             self.num_ratings += len(new_recommendations)
@@ -458,11 +412,7 @@ class Dataset:
             
         except AssertionError as msg:
             print(msg)
-            
-        #print("is self.num_ratings == len(self.train_ratings) ?")
-        #print(self.num_ratings == len(self.train_ratings))
-        
-        
+
     def get_user_popularity(self, user_id: int) -> int:
         """"""
         ##ic("ds.get_user_popularity()")

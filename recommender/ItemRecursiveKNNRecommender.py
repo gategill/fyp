@@ -29,13 +29,15 @@ class ItemRecursiveKNNRecommender(ItemKNNRecommender):
         #ic("pp_rec.recursive_prediction()")
         
         # starts at 1
-        #print("RECURSION PROGERSS = {}/{}".format(recursion_level, self.recursion_threshold))
         if recursion_level > self.recursion_threshold:
             #ic("Reached Recursion Limit - Using Baseline")
             if self.baseline == "bs":
-                return self.predict_rating_item_based_nn_wtd(active_user, candidate_item) # baseline # is this even right? does it make sense? TODO
+                # baseline
+                # is this even right? does it make sense? TODO
+                return self.predict_rating_item_based_nn_wtd(active_user, candidate_item)
 
-        nns = self.get_k_nearest_items(self.similarity_function, self.k, candidate_item)  # no user id, doesn't limit to just rated
+        # no user id, doesn't limit to just rated
+        nns = self.get_k_nearest_items(self.similarity_function, self.k, candidate_item)
         
         alpha = 0.0
         beta = 0.0

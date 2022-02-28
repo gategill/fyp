@@ -356,7 +356,7 @@ class ItemKNNRecommender(GenericRecommender):
         
     def get_item_similarity(self, similarity_function: types.FunctionType, candidate_item_id: int, item_id: int) -> float:
         """"""
-        ##ic("item_rec.get_item_similarity()")
+        #ic("item_rec.get_item_similarity()")
         
         return similarity_function(self.item_train_ratings[candidate_item_id], self.item_train_ratings[item_id])
         
