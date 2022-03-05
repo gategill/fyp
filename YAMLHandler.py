@@ -20,27 +20,8 @@ def read_in_yaml_file(config_path):
         raise KeyError("missing disable_ic in experiment_config")
     if "evaluation_metrics" not in kwargs["experiment_config"]:
         raise KeyError("missing evaluation_metrics in experiment_config")
-    if "neighbours" not in kwargs["experiment_config"]:
-        raise KeyError("missing neighbours in experiment_config")
-    if "similarity" not in kwargs["experiment_config"]:
-            raise KeyError("missing similarity in experiment_config")
     if "paired_t_test" not in kwargs["experiment_config"]:
             raise KeyError("missing paired_t_test in experiment_config")
-    
-    
-    if type(kwargs["experiment_config"]["neighbours"]) not in [int, list]:
-        raise TypeError("neighbours should be a list of integers list")
-    
-        
-    if type(kwargs["experiment_config"]["neighbours"]) == list:
-        for nn in kwargs["experiment_config"]["neighbours"]:
-            if type(nn) != int:
-                raise TypeError("neighbours should be integers in a list")
-            
-    if type(kwargs["experiment_config"]["neighbours"]) == int:
-        li = []
-        li.append(kwargs["experiment_config"]["neighbours"])
-        kwargs["experiment_config"]["neighbours"] = li
 
 
     if (type(kwargs["experiment_config"]["seed"]) != int):
@@ -55,12 +36,8 @@ def read_in_yaml_file(config_path):
         raise TypeError("disable_ic should be boolean")
     if type(kwargs["experiment_config"]["paired_t_test"]) != bool:
         raise TypeError("paired_t_test should be boolean")
-    if type(kwargs["experiment_config"]["evaluation_metrics"]) != (list or str) :
-        raise TypeError("evaluation_metrics should be string or list")
-    if type(kwargs["experiment_config"]["similarity"]) != str:
-            raise TypeError("similarity should be an string") 
-    if kwargs["experiment_config"]["similarity"] not in ["sim_pearson", "sim_cosine", "sim_sim"]:
-        raise ValueError("invalid similarity measure\navailable similarites are: [sim_pearson, sim_cosine, sim_sim]")
+    if type(kwargs["experiment_config"]["evaluation_metrics"]) != str:
+        raise TypeError("evaluation_metrics should be string")
 
     
     if "dataset_config" not in kwargs:
@@ -83,7 +60,32 @@ def read_in_yaml_file(config_path):
         if model not in ["UserKNN", "ItemKNN", "UserBootstrap","ItemBootstrap", "UserRecursiveKNN", "ItemRecursiveKNN", "CoRec", "MatrixFactorisation", "MostPop", "Random", "Mean", "ConfidentUserBootstrap","ConfidentItemBootstrap"]:
             raise KeyError("invalid model\nvalid model are: [UserKNN, ItemKNN, UserBootstrap, ItemBootstrap, UserRecursiveKNN, ItemRecursiveKNN, CoRec, MatrixFactorisation, MostPop, Random, Mean, ConfidentUserBootstrap,ConfidentItemBootstrap]")
         
-        
+    for model in kwargs["models"]:
+        if "neighbours" not in kwargs["models"][model]:
+            raise KeyError("missing neighbours in {}".format(model))
+        if "similarity" not in kwargs["models"][model]:
+             raise KeyError("missing similarity in {}".format(model))
+         
+        if type(kwargs["models"][model]["neighbours"]) not in [int, list]:
+            raise TypeError("neighbours should be a list of integers list")
+            
+        if type(kwargs["models"][model]["neighbours"]) == list:
+            for nn in kwargs["models"][model]:
+                if type(nn) != int:
+                    raise TypeError("neighbours should be integers in a list")
+                
+        if type(kwargs["models"][model]["neighbours"]) == int:
+            li = []
+            li.append(kwargs["models"][model]["neighbours"])
+            kwargs["models"][model]["neighbours"] = li
+            
+        if type(kwargs["models"][model]["similarity"]) != str:
+                raise TypeError("similarity should be an string") 
+            
+        if kwargs["models"][model]["similarity"] not in ["sim_pearson", "sim_cosine", "sim_sim"]:
+            raise ValueError("invalid similarity measure\navailable similarites are: [sim_pearson, sim_cosine, sim_sim]")
+            
+            
     if "Bootstrap" in kwargs["models"]:
         if "enrichments" not in kwargs["models"]["Bootstrap"]:
             raise KeyError("missing enrichments in Bootstrap")

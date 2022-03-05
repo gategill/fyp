@@ -5,29 +5,37 @@ experiment_config:
   early_stop: True
   disable_ic: True
   paired_t_test: True
-  
-  evaluation_metrics: ["MAE", "RMSE"]
-  neighbours: [5, 10, 15, 20]
-  similarity: sim_sim
+  evaluation_metrics: "MAE"
+
 
 dataset_config:
   dataset_path: "./data/given/"
   prefiltering: {"user_k_core" : 20, "item_k_core": 5}
 
 models:
-  UserKNN: {}
+  UserKNN:
+    neighbours: [5, 10, 15, 20]
+    similarity: sim_sim
 
-  ItemKNN: {}
+  ItemKNN:
+    neighbours: [5, 10, 15, 20]
+    similarity: sim_sim
 
   UserBootstrap:
+    neighbours: [5, 10, 15, 20]
+    similarity: sim_sim
     enrichments: 2
     additions: 5
 
   ItemBootstrap:
+    neighbours: [5, 10, 15, 20]
+    similarity: sim_sim
     enrichments: 2
     additions: 5
 
   UserRecursiveKNN:
+    neighbours: [5, 10, 15, 20]
+    similarity: sim_sim
     weight_threshold: 1.0
     recursion_threshold: 2
     phi: 5
@@ -35,5 +43,7 @@ models:
     baseline: "bs"
     
   #CoRec:
+    #neighbours: [5, 10, 15, 20]
+    #similarity: sim_sim
   #  additions: 30
   #  top_m: 3000

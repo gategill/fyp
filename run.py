@@ -84,18 +84,21 @@ def run_experiment(config_path) -> None:
         
     dataset = Dataset(**kwargs["dataset_config"])
     
-    results_header = "algorithm, k, mae, rmse, time_elapsed_s, fold_num\n"
+    results_header = "algorithm, k, mae, time_elapsed_s, fold_num\n"
     results_header += (len(results_header) * "-") + "\n"
     all_results = results_header
     
     for model in kwargs["models"]:
+        #print(kwargs)
         model_results = results_header            
         print("MODEL = {}".format(model))
         
-        for K in kwargs["experiment_config"]["neighbours"]:    
+        #for K in kwargs["experiment_config"]["neighbours"]:    
+        for K in kwargs["models"][model]["neighbours"]:
+  
             print("NEIGHBOURS = {}".format(K))
             model_k_mae = []
-            model_k_rmse = []
+            #model_k_rmse = []
             model_k_results = results_header
 
             for fold_num in range(kolds):
@@ -107,8 +110,8 @@ def run_experiment(config_path) -> None:
         
                 try:                
                     print("Running {} Recommender".format(model))
-                    kwargs["models"][model]["neighbours"] = K
-                    kwargs["models"][model]["similarity"] = kwargs["experiment_config"]["similarity"]
+                    #kwargs["models"][model]["neighbours"] = K
+                    #kwargs["models"][model]["similarity"] = kwargs["experiment_config"]["similarity"]
                     kwargs["run_params"] = kwargs["models"][model]
                     
                     tic = time.time()
@@ -119,16 +122,16 @@ def run_experiment(config_path) -> None:
                     time_elapsed = round(toc - tic, 3)
                     
                     mae = a_recommender.evaluate_predictions("MAE")
-                    rmse = a_recommender.evaluate_predictions("RMSE")
+                    #rmse = a_recommender.evaluate_predictions("RMSE")
                         
                     del a_recommender
 
-                    print(test, mae, rmse)
+                    print(test, mae)
                     
                     model_k_mae.append(mae)
-                    model_k_rmse.append(rmse)
+                    #model_k_rmse.append(rmse)
                     
-                    experiment_result = "{}, {}, {}, {}, {}, {}\n".format(model, K, mae, rmse, time_elapsed, fold_num + 1)
+                    experiment_result = "{}, {}, {}, {}, {}\n".format(model, K, mae, time_elapsed, fold_num + 1)
                     all_results += experiment_result
                     model_results += experiment_result
                     model_k_results += experiment_result
@@ -165,27 +168,27 @@ def run_experiment(config_path) -> None:
                 
                 model_k_mean_mae = [model_k_user_mean_mae, model_k_item_mean_mae]
                 
-                user_rmse = [i [0] for i in model_k_rmse]
-                item_rmse = [i [1] for i in model_k_rmse]
+                #user_rmse = [i [0] for i in model_k_rmse]
+                #item_rmse = [i [1] for i in model_k_rmse]
                 
-                model_k_user_mean_rmse = round(np.mean(user_rmse), 5) 
-                model_k_item_mean_rmse = round(np.mean(item_rmse), 5) 
+                #model_k_user_mean_rmse = round(np.mean(user_rmse), 5) 
+                #model_k_item_mean_rmse = round(np.mean(item_rmse), 5) 
                 
                 model_k_mean_mae = [model_k_user_mean_mae, model_k_item_mean_mae]
-                model_k_mean_rmse = [model_k_user_mean_rmse, model_k_item_mean_rmse]
+                #model_k_mean_rmse = [model_k_user_mean_rmse, model_k_item_mean_rmse]
                 
             else:
                 model_k_mean_mae = round(np.mean(model_k_mae), 5) 
-                model_k_mean_rmse = round(np.mean(model_k_rmse), 5) 
+                #model_k_mean_rmse = round(np.mean(model_k_rmse), 5) 
             
             model_k_results += "{}_{}: Averaged_MAE = {}\n".format(model, K, model_k_mean_mae)
-            model_k_results += "{}_{}: Averaged_RMSE = {}\n".format(model, K, model_k_mean_rmse)
+            #model_k_results += "{}_{}: Averaged_RMSE = {}\n".format(model, K, model_k_mean_rmse)
             
             model_results += "{}_{}: Averaged_MAE = {}\n".format(model, K, model_k_mean_mae)
-            model_results += "{}_{}: Averaged_RMSE = {}\n".format(model, K, model_k_mean_rmse)
+            #model_results += "{}_{}: Averaged_RMSE = {}\n".format(model, K, model_k_mean_rmse)
             
             all_results += "{}_{}: Averaged_MAE = {}\n".format(model, K, model_k_mean_mae)            
-            all_results += "{}_{}: Averaged_RMSE = {}\n".format(model, K, model_k_mean_rmse)            
+            #all_results += "{}_{}: Averaged_RMSE = {}\n".format(model, K, model_k_mean_rmse)            
             
             # saving model_k
             with open("{}/model_k/model_k-{}-{}.txt".format(save_path, model, K), "w") as f:

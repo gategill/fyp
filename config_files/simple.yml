@@ -2,13 +2,11 @@ experiment_config:
   seed: 1
   save_in_s3: False
   kolds: 5
+  validation: True
   early_stop: True
   disable_ic: True
   paired_t_test: True
-
-  evaluation_metrics: ["MAE", "RMSE"]
-  neighbours: 10
-  similarity: sim_sim
+  evaluation_metrics: "MAE"
 
 
 dataset_config:
@@ -17,6 +15,8 @@ dataset_config:
 
 models:
   CoRec:
+    neighbours: 10
+    similarity: sim_sim
     additions: 100
     top_m: 200
 
