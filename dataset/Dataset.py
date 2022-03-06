@@ -184,7 +184,7 @@ class Dataset:
         self.all_ratings = reduced_all_ratings
 
           
-    def load_ratings(self, fold_num) -> None:
+    def load_ratings(self, fold_num = None) -> None:
         #ic("ds.load_ratings()")
 
         """
@@ -193,19 +193,25 @@ class Dataset:
         """
      
         num_ratings = 0
-        n_split = self.kwargs["kolds"]
         
         df = self.get_ratings_as_df()
         nrow = df.shape[0]
-        a,b = ((fold_num * nrow) // n_split), ((1 + fold_num) * nrow // n_split)
         
+        if fold_num:
+            n_split = self.kwargs["k_folds"]
+            a, b = ((fold_num * nrow) // n_split), ((1 + fold_num) * nrow // n_split) 
+        elif "train_ratio" in self.kwargs:
+            a, b = np.floor(nrow * self.kwargs["train_ratio"]), nrow
+        else:
+            raise ValueError("error loading ratings")
 
         df_test = df.loc[np.r_[a:b], :]
         df_train = df[~df.isin(df_test)].dropna()
         
         self.train_ratings = list(df_train.T.to_dict().values())
         self.test_ratings = list(df_test.T.to_dict().values())
-        
+            
+            
         # train_ratings
         for entry in self.train_ratings:
             entry["user_id"] = int(entry["user_id"])
@@ -255,7 +261,7 @@ class Dataset:
             self.user_test_ratings[user_id][item_id] = rating
             self.item_test_ratings[item_id][user_id] = rating
             
-        print("There are {} ratings in the trainset".format(self.num_ratings))  
+        print("there are {} ratings in the trainset".format(self.num_ratings))  
         print("sparsity of the trainset is: {}%".format(100 * round(self.sparsity, 4)))  
 
 

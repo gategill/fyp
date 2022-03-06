@@ -51,11 +51,15 @@ def run_experiment(config_path) -> None:
     kwargs = YAMLHandler.read_in_yaml_file(config_path)
     # pass some agruments down
     kwargs["config_path"] = config_path
-    kwargs["dataset_config"]["kolds"] = kwargs["experiment_config"]["kolds"]
-    
+    if "k_folds" in  kwargs["testing_strategy"]["method"]:
+        kwargs["dataset_config"]["k_folds"] = k_folds = kwargs["testing_strategy"]["method"]["k_fold"]
+        
+    if "train_ratio" in  kwargs["testing_strategy"]["method"]:
+        kwargs["dataset_config"]["train_ratio"] = train_ratio = kwargs["testing_strategy"]["method"]["train_ratio"]
+        k_folds = 1
+
 
     save_in_s3 = kwargs["experiment_config"]["save_in_s3"]
-    kolds = kwargs["experiment_config"]["kolds"]
     a_seed = kwargs["experiment_config"]["seed"]
     current_timestamp = int(time.time())
     save_path = "./results/{}".format(current_timestamp)
@@ -101,18 +105,19 @@ def run_experiment(config_path) -> None:
             #model_k_rmse = []
             model_k_results = results_header
 
-            for fold_num in range(kolds):
+            for fold_num in range(k_folds):
                 single_results = results_header
                 
-                print("FOLD NUMBER = {}/{}\n".format(fold_num + 1, kolds))
+                print("FOLD NUMBER = {}/{}\n".format(fold_num + 1, k_folds))
             
-                dataset.load_ratings(fold_num)
+                dataset.load_ratings(fold_num) if k_folds > 1 else dataset.load_ratings()
         
                 try:                
-                    print("Running {} Recommender".format(model))
+                    print("running {} recommender".format(model))
                     #kwargs["models"][model]["neighbours"] = K
                     #kwargs["models"][model]["similarity"] = kwargs["experiment_config"]["similarity"]
                     kwargs["run_params"] = kwargs["models"][model]
+                    kwargs["run_params"]["neighbours"] = K
                     
                     tic = time.time()
                     a_recommender = recommenders[model](dataset, **kwargs)

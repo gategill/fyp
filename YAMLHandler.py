@@ -5,15 +5,15 @@ import yaml
 def read_in_yaml_file(config_path):
     with open(config_path) as f:
         kwargs = yaml.load(f, Loader = yaml.FullLoader)
-
+    '''
     if "experiment_config" not in kwargs:
         raise KeyError("missing experiment_config in kwargs")
     if "seed" not in kwargs["experiment_config"]:
         raise KeyError("missing seed in experiment_config")
     if "save_in_s3" not in kwargs["experiment_config"]:
         raise KeyError("missing save_in_s3 in experiment_config")
-    if "kolds" not in kwargs["experiment_config"]:
-        raise KeyError("missing kolds in experiment_config")
+    if "k_folds" not in kwargs["experiment_config"]:
+        raise KeyError("missing k_folds in experiment_config")
     if "early_stop" not in kwargs["experiment_config"]:
         raise KeyError("missing early_stop in experiment_config")
     if "disable_ic" not in kwargs["experiment_config"]:
@@ -28,8 +28,8 @@ def read_in_yaml_file(config_path):
         raise TypeError("seed should be an integer")
     if type(kwargs["experiment_config"]["save_in_s3"]) != bool:
         raise TypeError("save_in_s3 should be boolean")
-    if type(kwargs["experiment_config"]["kolds"]) != int:
-        raise TypeError("kolds should be an integer")
+    if type(kwargs["experiment_config"]["k_folds"]) != int:
+        raise TypeError("k_folds should be an integer")
     if type(kwargs["experiment_config"]["early_stop"]) != bool:
         raise TypeError("early_stop should be boolean")
     if type(kwargs["experiment_config"]["disable_ic"]) != bool:
@@ -227,6 +227,6 @@ def read_in_yaml_file(config_path):
             raise TypeError("ConfidentItemBootstrap.top_m should be an integer")
         if kwargs["models"]["ConfidentItemBootstrap"]["top_m"] < kwargs["models"]["ConfidentItemBootstrap"]["additions"]:
             raise ValueError("ConfidentItemBootstrap.top_m should be larger than additions (I think)")
-        
+        '''
             
     return kwargs

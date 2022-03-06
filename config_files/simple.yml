@@ -1,22 +1,28 @@
 experiment_config:
   seed: 1
   save_in_s3: False
-  kolds: 5
-  validation: True
-  early_stop: True
   disable_ic: True
+  early_stop: True
+
+testing_strategy:
+  method:
+    #k_folds: 5
+    #validation: [0.6, 0.2, 0.2]
+    train_ratio: 0.8 # add it
   paired_t_test: True
   evaluation_metrics: "MAE"
 
 
 dataset_config:
-  dataset_path: "./data/given/"
+  #dataset_path: "./data/given/"
+  prepared: 
+    train_path: "./data/given/train_ratings.csv"
+    test_path: "./data/given/validation_ratings.csv"
   prefiltering: {"user_k_core" : 20, "item_k_core": 5}
 
 models:
-  CoRec:
-    neighbours: 10
+  UserKNN:
+    neighbours: [10, 15, 20]
     similarity: sim_sim
-    additions: 100
-    top_m: 200
+
 
