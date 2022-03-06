@@ -12,55 +12,31 @@ def read_in_yaml_file(config_path):
         raise KeyError("missing seed in experiment_config")
     if "save_in_s3" not in kwargs["experiment_config"]:
         raise KeyError("missing save_in_s3 in experiment_config")
+    if "kolds" not in kwargs["experiment_config"]:
+        raise KeyError("missing kolds in experiment_config")
+    if "early_stop" not in kwargs["experiment_config"]:
+        raise KeyError("missing early_stop in experiment_config")
     if "disable_ic" not in kwargs["experiment_config"]:
         raise KeyError("missing disable_ic in experiment_config")
+    if "evaluation_metrics" not in kwargs["experiment_config"]:
+        raise KeyError("missing evaluation_metrics in experiment_config")
+    if "paired_t_test" not in kwargs["experiment_config"]:
+            raise KeyError("missing paired_t_test in experiment_config")
 
 
     if (type(kwargs["experiment_config"]["seed"]) != int):
         raise TypeError("seed should be an integer")
     if type(kwargs["experiment_config"]["save_in_s3"]) != bool:
         raise TypeError("save_in_s3 should be boolean")
+    if type(kwargs["experiment_config"]["kolds"]) != int:
+        raise TypeError("kolds should be an integer")
+    if type(kwargs["experiment_config"]["early_stop"]) != bool:
+        raise TypeError("early_stop should be boolean")
     if type(kwargs["experiment_config"]["disable_ic"]) != bool:
         raise TypeError("disable_ic should be boolean")
-
-
-
-    if "testing_strategy" not in kwargs:
-        raise KeyError("missing testing_strategy in kwargs")
-    if "method" not in kwargs["testing_strategy"]:
-        raise KeyError("missing method in testing_strategy")
-    if "early_stop" not in kwargs["testing_strategy"]:
-        raise KeyError("missing early_stop in testing_strategy")
-    if "evaluation_metrics" not in kwargs["testing_strategy"]:
-        raise KeyError("missing evaluation_metrics in testing_strategy")
-    if "paired_t_test" not in kwargs["testing_strategy"]:
-        raise KeyError("missing paired_t_test in testing_strategy")
-    
-    #if kwargs["testing_strategy"]["method"] not in ["validation", "k_folds"]:
-    #    print(kwargs["testing_strategy"]["method"])
-    
-    if "k_folds" in kwargs["testing_strategy"]["method"]:
-        if type(kwargs["testing_strategy"]["method"]["k_folds"]) != int:
-            raise TypeError("k_folds should be an integer")
-        
-    elif "validation" in kwargs["testing_strategy"]["method"]:
-        if type(kwargs["testing_strategy"]["method"]["validation"]) != list:
-            raise TypeError("validation should be a list of fractions")
-        for v in kwargs["testing_strategy"]["method"]["validation"]:
-            if type(v) != float:
-                raise ValueError("validation should be a list of fractions")
-        if sum(kwargs["testing_strategy"]["method"]["validation"]) != 1.0:
-            raise ValueError("validation fractions should add up to 1.0")
-    else:
-        raise ValueError("invalid method intesting_strategy method")
-        
-            
-    
-    if type(kwargs["testing_strategy"]["early_stop"]) != bool:
-        raise TypeError("early_stop should be boolean")
-    if type(kwargs["testing_strategy"]["paired_t_test"]) != bool:
+    if type(kwargs["experiment_config"]["paired_t_test"]) != bool:
         raise TypeError("paired_t_test should be boolean")
-    if type(kwargs["testing_strategy"]["evaluation_metrics"]) != str:
+    if type(kwargs["experiment_config"]["evaluation_metrics"]) != str:
         raise TypeError("evaluation_metrics should be string")
 
     
@@ -252,6 +228,5 @@ def read_in_yaml_file(config_path):
         if kwargs["models"]["ConfidentItemBootstrap"]["top_m"] < kwargs["models"]["ConfidentItemBootstrap"]["additions"]:
             raise ValueError("ConfidentItemBootstrap.top_m should be larger than additions (I think)")
         
-    print("YAML tests passed")
             
     return kwargs

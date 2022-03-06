@@ -13,7 +13,7 @@ class Dataset:
         #ic("ds.__init__()")
         
         self.kwargs = kwargs
-        self.DATA_PATH = self.kwargs["dataset_config"]["dataset_path"]
+        self.DATA_PATH = self.kwargs["dataset_path"]
         self.__reset()
         self.load_items()
         self.load_users()
@@ -89,7 +89,7 @@ class Dataset:
         # cold start < 20 ratings
 
         # ic("ds.prefilter_rating()"       
-        prefilterings = self.kwargs["dataset_config"]["prefiltering"]
+        prefilterings = self.kwargs["prefiltering"]
         
         df = self.get_ratings_as_df()
         
@@ -184,7 +184,7 @@ class Dataset:
         self.all_ratings = reduced_all_ratings
 
           
-    def load_ratings(self, fold_num = -1) -> None:
+    def load_ratings(self, fold_num) -> None:
         #ic("ds.load_ratings()")
 
         """
@@ -193,29 +193,18 @@ class Dataset:
         """
      
         num_ratings = 0
+        n_split = self.kwargs["kolds"]
         
-        if fold_num >= 0:
-            n_split = self.kwargs["dataset_config"]["k_folds"]
-            
-            df = self.get_ratings_as_df()
-            nrow = df.shape[0]
-            a, b = ((fold_num * nrow) // n_split), ((1 + fold_num) * nrow // n_split)
-            
-            df_test = df.loc[np.r_[a : b], :]
-            df_train = df[~df.isin(df_test)].dropna()
-            
-            self.train_ratings = list(df_train.T.to_dict().values())
-            self.test_ratings = list(df_test.T.to_dict().values())
-            
-        else:
-            for entry in self.all_ratings:
-                ran = random.random()
-                if ran < 0.6:
-                    self.train_ratings.append(entry)
-                elif ran < 0.8:
-                    self.validation_ratings.append(entry)
-                else:
-                    self.test_ratings.append(entry)
+        df = self.get_ratings_as_df()
+        nrow = df.shape[0]
+        a,b = ((fold_num * nrow) // n_split), ((1 + fold_num) * nrow // n_split)
+        
+
+        df_test = df.loc[np.r_[a:b], :]
+        df_train = df[~df.isin(df_test)].dropna()
+        
+        self.train_ratings = list(df_train.T.to_dict().values())
+        self.test_ratings = list(df_test.T.to_dict().values())
         
         # train_ratings
         for entry in self.train_ratings:
@@ -266,13 +255,9 @@ class Dataset:
             self.user_test_ratings[user_id][item_id] = rating
             self.item_test_ratings[item_id][user_id] = rating
             
-        print("there are {} ratings in the trainset".format(self.num_ratings))  
+        print("There are {} ratings in the trainset".format(self.num_ratings))  
         print("sparsity of the trainset is: {}%".format(100 * round(self.sparsity, 4)))  
 
-
-    def prepare_for_cross_validation(self):
-        self.add_new_recommendations_to_trainset(self.validate_ratings)
-        
 
     def add_new_recommendations_to_trainset(self, new_recommendations):
         ic("ds.add_new_recommendations_to_trainset()")
@@ -285,7 +270,7 @@ class Dataset:
         self.update_num_ratings(new_recommendations)
         
         print("added {} new recommendations to the trainset".format(len(new_recommendations)))
-        print("there are {} ratings in the trainset".format(self.num_ratings))
+        print("There are {} ratings in the trainset".format(self.num_ratings))
         
                 
     def get_user_ids(self) -> list:
@@ -450,10 +435,6 @@ class Dataset:
         return k_most_popular_items
 
     
-    def get_validation_ratings(self):
-        return self.validation_ratings
-    
-    
     def __reset(self) -> None:
         #ic("ds.__reset()")
         
@@ -465,8 +446,6 @@ class Dataset:
         self.item_train_ratings = {}
         self.item_train_means = {}
         self.train_ratings = []
-        
-        self.validation_ratings = []
         
         self.user_test_ratings = {}
         self.item_test_ratings = {}

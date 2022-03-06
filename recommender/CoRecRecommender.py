@@ -48,7 +48,7 @@ class CoRecRecommender(GenericRecommender):
                 test["item_pred_rating"] = item_predicted_rating
                 self.add_prediction(test)
 
-                if self.kwargs["testing_strategy"]["early_stop"]:
+                if self.kwargs["experiment_config"]["early_stop"]:
                     if i > 30:
                         break
                         
@@ -113,7 +113,7 @@ class CoRecRecommender(GenericRecommender):
                     entry["confidence"] = round(confidence, 3)
                     predicted_user_ratings.append(entry)
                                         
-                    if self.kwargs["testing_strategy"]["early_stop"]:
+                    if self.kwargs["experiment_config"]["early_stop"]:
                         if i > 100:
                             break
                 
@@ -136,7 +136,7 @@ class CoRecRecommender(GenericRecommender):
                     entry["confidence"] = round(confidence, 3)
                     predicted_item_ratings.append(entry)
                     
-                    if self.kwargs["testing_strategy"]["early_stop"]:
+                    if self.kwargs["experiment_config"]["early_stop"]:
                         if i > 100:
                             break
                     
@@ -206,7 +206,7 @@ class CoRecRecommender(GenericRecommender):
             self.user_rec.add_new_recommendations(top_m_item_predictions) # add item to user
             self.item_rec.add_new_recommendations(top_m_user_predictions) # add user to item
             
-            if (self.kwargs["testing_strategy"]["early_stop"]) and (old_num_items < int(math.floor(0.9 * train_unlabelled_users))):
+            if (self.kwargs["experiment_config"]["early_stop"]) and (old_num_items < int(math.floor(0.9 * train_unlabelled_users))):
                 break
 
 
