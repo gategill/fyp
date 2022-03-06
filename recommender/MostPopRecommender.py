@@ -47,7 +47,7 @@ class MostPopRecommender(GenericRecommender):
                 test["pred_rating"] = prediction
                 self.add_prediction(test)
                 
-                if self.kwargs["experiment_config"]["early_stop"]:
+                if self.kwargs["testing_strategy"]["early_stop"]:
                     if i > 30:
                         break
                         

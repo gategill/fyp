@@ -51,14 +51,12 @@ def run_experiment(config_path) -> None:
     kwargs = YAMLHandler.read_in_yaml_file(config_path)
     # pass some agruments down
     kwargs["config_path"] = config_path
-    kwargs["dataset_config"]["kolds"] = kwargs["experiment_config"]["kolds"]
-    
-
     save_in_s3 = kwargs["experiment_config"]["save_in_s3"]
-    kolds = kwargs["experiment_config"]["kolds"]
     a_seed = kwargs["experiment_config"]["seed"]
     current_timestamp = int(time.time())
     save_path = "./results/{}".format(current_timestamp)
+    
+        
     os.mkdir(save_path)
     os.mkdir(save_path + "/all")
     os.mkdir(save_path + "/model")
@@ -82,82 +80,135 @@ def run_experiment(config_path) -> None:
     if kwargs["experiment_config"]["disable_ic"]: 
         ic.disable()
         
-    dataset = Dataset(**kwargs["dataset_config"])
     
     results_header = "algorithm, k, mae, time_elapsed_s, fold_num\n"
     results_header += (len(results_header) * "-") + "\n"
     all_results = results_header
     
+    if "k_folds" in kwargs["testing_strategy"]["method"]:
+        kwargs["dataset_config"]["k_folds"] = kwargs["testing_strategy"]["method"]["k_folds"]
+        k_folds =  kwargs["dataset_config"]["k_folds"]
+        cross_validate = True
+        
+    elif "validation" in kwargs["testing_strategy"]["method"]:
+        kwargs["dataset_config"]["validation"] = kwargs["testing_strategy"]["method"]["validation"]
+        validate = True
+        #kwargs["dataset_config"]["validation"] = kwargs["testing_strategy"]["method"]["validation"]
+        #train_ratio =  kwargs["dataset_config"]["validation"][0]
+        #validation_ratio =  kwargs["dataset_config"]["validation"][1]
+        #test_ratio =  kwargs["dataset_config"]["validation"][2]
+        
+    else:
+        raise ValueError("no (valid) method in testing_strategy")
+        
+    dataset = Dataset(**kwargs)
+        
+        
     for model in kwargs["models"]:
         #print(kwargs)
         model_results = results_header            
         print("MODEL = {}".format(model))
         
         #for K in kwargs["experiment_config"]["neighbours"]:    
-        for K in kwargs["models"][model]["neighbours"]:
+        for K in kwargs["models"][model]["neighbours"]: # for param_set in param_space
   
             print("NEIGHBOURS = {}".format(K))
             model_k_mae = []
             #model_k_rmse = []
             model_k_results = results_header
 
-            for fold_num in range(kolds):
-                single_results = results_header
-                
-                print("FOLD NUMBER = {}/{}\n".format(fold_num + 1, kolds))
+            print("running {} recommender".format(model))
+            #kwargs["models"][model]["neighbours"] = K
+            #kwargs["models"][model]["similarity"] = kwargs["experiment_config"]["similarity"]
+            kwargs["run_params"] = kwargs["models"][model]
+            kwargs["run_params"]["neighbours"] = K
             
-                dataset.load_ratings(fold_num)
-        
-                try:                
-                    print("Running {} Recommender".format(model))
-                    #kwargs["models"][model]["neighbours"] = K
-                    #kwargs["models"][model]["similarity"] = kwargs["experiment_config"]["similarity"]
-                    kwargs["run_params"] = kwargs["models"][model]
+            if cross_validate:
+                for fold_num in range(k_folds):
+                    print("FOLD NUMBER = {}/{}\n".format(fold_num + 1, k_folds))
+                    single_results = results_header
+                    dataset.load_ratings(fold_num)
+            
+                    try:                
+                        tic = time.time()
+                        a_recommender = recommenders[model](dataset, **kwargs)
+                        a_recommender.train()
+                        test = a_recommender.get_predictions(on = "test_ratings")
+                        toc = time.time()
+                        time_elapsed = round(toc - tic, 3)
+                        
+                        mae = a_recommender.evaluate_predictions("MAE")
+                        #rmse = a_recommender.evaluate_predictions("RMSE")
+                            
+                        del a_recommender
+
+                        print(test, mae)
+                        
+                        model_k_mae.append(mae)
+                        
+                        #model_k_rmse.append(rmse)
+                        
+                        experiment_result = "{}, {}, {}, {}, {}\n".format(model, K, mae, time_elapsed, fold_num + 1)
+                        all_results += experiment_result
+                        model_results += experiment_result
+                        model_k_results += experiment_result
+                        single_results += experiment_result
+                        
+                        # saving singles
+                        with open("{}/single/single-{}-{}-{}.txt".format(save_path, model, K, fold_num + 1), "w") as f:
+                            f.write(single_results)
+                        
+                        if save_in_s3:
+                            s3_name = "{}/single/single-{}-{}-{}.txt".format(current_timestamp,model, K, fold_num)
+                            s3.put_object(Body = single_results, Bucket = "fyp-w9797878", Key = s3_name)
                     
+                    except Exception as e:
+                        line_error = "error performing experiment, {}, error = {}".format(model, e)
+                        print(traceback.print_exc())
+                        
+                        # saving errors
+                        with open("{}/single/single-{}-{}-{}.txt".format(save_path, model, K, fold_num), "w") as f:
+                            f.write(line_error)
+                        
+                        if save_in_s3:
+                            s3_name = "{}/single/single-{}-{}-{}.txt".format(current_timestamp,model, K, fold_num)
+                            s3.put_object(Body = line_error, Bucket = "fyp-w9797878", Key = s3_name)
+                
+            elif validate:
+                try:
+                    dataset.load_ratings()
+                
                     tic = time.time()
                     a_recommender = recommenders[model](dataset, **kwargs)
                     a_recommender.train()
-                    test = a_recommender.get_predictions()
+                    test = a_recommender.get_predictions(on = "validation_ratings")
                     toc = time.time()
                     time_elapsed = round(toc - tic, 3)
                     
                     mae = a_recommender.evaluate_predictions("MAE")
                     #rmse = a_recommender.evaluate_predictions("RMSE")
                         
-                    del a_recommender
 
                     print(test, mae)
                     
                     model_k_mae.append(mae)
-                    #model_k_rmse.append(rmse)
+                    if (model_k_mae == 0):
+                        if mae >= max(model_k_mae):
+                            best_recommender = a_recommender
+                    del a_recommender
                     
-                    experiment_result = "{}, {}, {}, {}, {}\n".format(model, K, mae, time_elapsed, fold_num + 1)
-                    all_results += experiment_result
-                    model_results += experiment_result
-                    model_k_results += experiment_result
-                    single_results += experiment_result
-                    
-                    # saving singles
-                    with open("{}/single/single-{}-{}-{}.txt".format(save_path, model, K, fold_num + 1), "w") as f:
-                        f.write(single_results)
-                    
-                    if save_in_s3:
-                        s3_name = "{}/single/single-{}-{}-{}.txt".format(current_timestamp,model, K, fold_num)
-                        s3.put_object(Body = single_results, Bucket = "fyp-w9797878", Key = s3_name)
-                
                 except Exception as e:
-                    line_error = "error performing experiment, {}, error = {}".format(model, e)
-                    print(traceback.print_exc())
-                    
-                    # saving errors
-                    with open("{}/single/single-{}-{}-{}.txt".format(save_path, model, K, fold_num), "w") as f:
-                        f.write(line_error)
-                    
-                    if save_in_s3:
-                        s3_name = "{}/single/single-{}-{}-{}.txt".format(current_timestamp,model, K, fold_num)
-                        s3.put_object(Body = line_error, Bucket = "fyp-w9797878", Key = s3_name)
-                
-                
+                        line_error = "error performing experiment, {}, error = {}".format(model, e)
+                        print(traceback.print_exc())
+                        
+                        # saving errors
+                        with open("{}/single/single-{}-{}.txt".format(save_path, model, K), "w") as f:
+                            f.write(line_error)
+                        
+                        if save_in_s3:
+                            s3_name = "{}/single/single-{}-{}.txt".format(current_timestamp,model, K)
+                            s3.put_object(Body = line_error, Bucket = "fyp-w9797878", Key = s3_name)
+
             
             if model == "CoRec":
                 user_mae = [i [0] for i in model_k_mae]
@@ -182,6 +233,7 @@ def run_experiment(config_path) -> None:
                 #model_k_mean_rmse = round(np.mean(model_k_rmse), 5) 
             
             model_k_results += "{}_{}: Averaged_MAE = {}\n".format(model, K, model_k_mean_mae)
+            #model_k_results += "{}_{}: Winning_Model = {}\n".format(model, K, model_k_mean_mae)
             #model_k_results += "{}_{}: Averaged_RMSE = {}\n".format(model, K, model_k_mean_rmse)
             
             model_results += "{}_{}: Averaged_MAE = {}\n".format(model, K, model_k_mean_mae)
@@ -199,6 +251,11 @@ def run_experiment(config_path) -> None:
                 s3.put_object(Body = model_k_results, Bucket = "fyp-w9797878", Key = s3_name)
              
         
+        if validate:
+            #best_recommender.prepare_for_cross_validation()
+            best_recommender.train(include_validation = True)
+            best_recommender.get_predictions(on = "test_ratings")
+                       
         # saving model   
         with open("{}/model/model-{}.txt".format(save_path, model), "w") as f:
             f.write(model_results)

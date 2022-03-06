@@ -24,9 +24,11 @@ class GenericRecommender:
         self.dataset = copy.deepcopy(dataset)
 
         
-    def train(self):
+    def train(self, include_validation = False):
         # ic("gen_rec.train()")
-        self.load_dataset(**self.kwargs["dataset_config"])
+        self.load_dataset(**self.kwargs)
+        if include_validation:
+            self.dataset.prepare_for_cross_validation()
         # could be more training stage...
         
         
@@ -34,8 +36,10 @@ class GenericRecommender:
         raise NotImplementedError("implement this method")
 
     
-    def get_predictions(self):
-        for i, test in enumerate(self.test_ratings):
+    def get_predictions(self, on = "test_ratings"):
+        tests = self.validation_ratings if on == "validation_ratings" else self.test_ratings
+        
+        for i, test in enumerate(tests):
             try:
                 user_id = int(test['user_id'])
                 item_id = int(test['item_id'])
@@ -45,7 +49,9 @@ class GenericRecommender:
                 test["pred_rating"] = predicted_rating
                 self.add_prediction(test)
                 
-                if self.kwargs["experiment_config"]["early_stop"]:
+                #print(self.kwargs["testing_strategy"])
+                
+                if self.kwargs["testing_strategy"]["early_stop"]:
                     if i > 30:
                         break
                         
@@ -53,6 +59,8 @@ class GenericRecommender:
                 break
             
         return test
+    
+    
 
 
     def evaluate_predictions(self, method = "MAE"):
@@ -93,6 +101,8 @@ class GenericRecommender:
         self.item_train_ratings = self.dataset.get_item_train_ratings()
         self.item_train_means = self.dataset.get_item_train_means()
         self.train_ratings = self.dataset.get_train_ratings()
+        
+        self.validation_ratings = self.dataset.get_validation_ratings()
         
         self.user_test_ratings = self.dataset.get_user_test_ratings()
         self.item_test_ratings = self.dataset.get_item_test_ratings()
@@ -171,4 +181,4 @@ class GenericRecommender:
 
 
     def __str__(self) -> str:
-        return "{},\n{},\n{}".format(self.k,self.similarity_function, self.dataset)
+        return "{},\n{}".format(self.k,self.similarity_function, self.dataset)
