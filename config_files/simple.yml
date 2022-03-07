@@ -7,22 +7,22 @@ experiment_config:
 testing_strategy:
   method:
     #k_folds: 5
-    #validation: [0.6, 0.2, 0.2]
-    train_ratio: 0.8 # add it
+    validation: [0.6, 0.2, 0.2]
+    #train_ratio: 0.8 # add it
   paired_t_test: True
   evaluation_metrics: "MAE"
 
 
 dataset_config:
-  #dataset_path: "./data/given/"
-  prepared: 
-    train_path: "./data/given/train_ratings.csv"
-    test_path: "./data/given/validation_ratings.csv"
+  dataset_path: "./data/given/"
+  #prepared: 
+  #  train_path: "./data/given/train_ratings.csv"
+  #  test_path: "./data/given/validation_ratings.csv"
   prefiltering: {"user_k_core" : 20, "item_k_core": 5}
 
 models:
   UserKNN:
-    neighbours: [10, 15, 20]
+    neighbours: [5, 10, 15, 20]
     similarity: sim_sim
 
 

@@ -34,16 +34,19 @@ class GenericRecommender:
         raise NotImplementedError("implement this method")
 
     
-    def get_predictions(self):
-        for i, test in enumerate(self.test_ratings):
+    def predict(self, which = None):
+        entries = self.validation_ratings if which == "validation" else self.test_ratings
+        #print(entries)
+        for i, entry in enumerate(entries):
+            #print(entry)
             try:
-                user_id = int(test['user_id'])
-                item_id = int(test['item_id'])
+                user_id = int(entry['user_id'])
+                item_id = int(entry['item_id'])
                 
                 predicted_rating = self.get_single_prediction(active_user_id = user_id, candidate_item_id = item_id)
                     
-                test["pred_rating"] = predicted_rating
-                self.add_prediction(test)
+                entry["pred_rating"] = predicted_rating
+                self.add_prediction(entry)
                 
                 if self.kwargs["experiment_config"]["early_stop"]:
                     if i > 30:
@@ -51,20 +54,14 @@ class GenericRecommender:
                         
             except KeyboardInterrupt:
                 break
-            
-        return test
+        #print(self.predictions)
+        return self.predictions[-1]
 
 
-    def evaluate_predictions(self, method = "MAE"):
+    def evaluate_predictions(self,):
         # ic("gen_rec.evaluate_predictions()")
-        
-        if method == "MAE":
-            mae = Evaluation.mean_absolute_error(self.predictions)
-            return round(mae, 5)
-        
-        if method == "RMSE":
-            rmse = Evaluation.root_mean_square_error(self.predictions)
-            return round(rmse, 5)
+        mae = Evaluation.mean_absolute_error(self.predictions)
+        return round(mae, 5)
     
 
     def get_similarity_function(self):
@@ -97,6 +94,10 @@ class GenericRecommender:
         self.user_test_ratings = self.dataset.get_user_test_ratings()
         self.item_test_ratings = self.dataset.get_item_test_ratings()
         self.test_ratings = self.dataset.get_test_ratings()
+        
+        self.user_validation_ratings = self.dataset.get_user_validation_ratings()
+        self.item_validation_ratings = self.dataset.get_item_validation_ratings()
+        self.validation_ratings = self.dataset.get_validation_ratings()
         
         self.mean_train_rating = self.dataset.get_mean_train_rating()
                 
@@ -164,11 +165,18 @@ class GenericRecommender:
         
         self.dataset.add_new_recommendations_to_trainset(new_recommendations)
 
+    def prepare_for_validation(self):
+        self.reset_predictions()
+        self.add_new_recommendations(self.validation_ratings) # might cause abnormalities in augmentation
+    
     
     def add_prediction(self, prediction: dict) -> None:
-        """a single dict entry"""
+        """a single dict entry is addod to a list"""
         self.predictions.append(prediction)
+        
+    def reset_predictions(self):
+        self.predictions = []
 
 
     def __str__(self) -> str:
-        return "{},\n{},\n{}".format(self.k,self.similarity_function, self.dataset)
+        return "{},\n{},\n{}".format(self.k, self.similarity_function, self.dataset)

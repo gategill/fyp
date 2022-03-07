@@ -36,7 +36,7 @@ class CoRecRecommender(GenericRecommender):
         return user_predicted_rating, item_predicted_rating
     
     
-    def get_predictions(self):
+    def predict(self):
         for i, test in enumerate(self.test_ratings):
             try:
                 user_id = int(test['user_id'])

@@ -33,7 +33,7 @@ class MeanRecommender(GenericRecommender): # TODO
         return round(prediction, self.ROUNDING)
 
 
-    def get_predictions(self):
+    def predict(self):
         for i, test in enumerate(self.test_ratings):
             try:
                 user_id = int(test['user_id'])

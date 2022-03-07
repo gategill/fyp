@@ -200,17 +200,41 @@ class Dataset:
         if fold_num:
             n_split = self.kwargs["k_folds"]
             a, b = ((fold_num * nrow) // n_split), ((1 + fold_num) * nrow // n_split) 
+
+            df_test = df.loc[np.r_[a:b], :]
+            df_train = df[~df.isin(df_test)].dropna()
+            
+            self.train_ratings = list(df_train.T.to_dict().values())
+            self.test_ratings = list(df_test.T.to_dict().values())
+            
+        elif "validation" in self.kwargs:
+            a = np.floor(nrow * self.kwargs["train_ratio"])
+            b = np.floor(nrow * (self.kwargs["train_ratio"] + self.kwargs["validation_ratio"]))
+            
+            df_train = df.loc[np.r_[0:a], :]
+            df_validation = df.loc[np.r_[a:b], :]
+            df_test = df.loc[np.r_[b:nrow], :]
+            
+            self.train_ratings = list(df_train.T.to_dict().values())
+            self.validation_ratings = list(df_validation.T.to_dict().values())
+            self.test_ratings = list(df_test.T.to_dict().values())
+            
+            print(df_train.shape)
+            print(df_validation.shape)
+            print(df_test.shape)
+            
         elif "train_ratio" in self.kwargs:
             a, b = np.floor(nrow * self.kwargs["train_ratio"]), nrow
+            
+            df_test = df.loc[np.r_[a:b], :]
+            df_train = df[~df.isin(df_test)].dropna()
+            
+            self.train_ratings = list(df_train.T.to_dict().values())
+            self.test_ratings = list(df_test.T.to_dict().values())
+            
+            
         else:
             raise ValueError("error loading ratings")
-
-        df_test = df.loc[np.r_[a:b], :]
-        df_train = df[~df.isin(df_test)].dropna()
-        
-        self.train_ratings = list(df_train.T.to_dict().values())
-        self.test_ratings = list(df_test.T.to_dict().values())
-            
             
         # train_ratings
         for entry in self.train_ratings:
@@ -261,6 +285,17 @@ class Dataset:
             self.user_test_ratings[user_id][item_id] = rating
             self.item_test_ratings[item_id][user_id] = rating
             
+        for entry in self.validation_ratings:
+            user_id = int(entry["user_id"])
+            item_id = int(entry["item_id"])
+            rating = entry["rating"]
+            
+            self.user_validation_ratings.setdefault(user_id, {})
+            self.item_validation_ratings.setdefault(item_id, {})
+            
+            self.user_validation_ratings[user_id][item_id] = rating
+            self.item_validation_ratings[item_id][user_id] = rating
+            
         print("there are {} ratings in the trainset".format(self.num_ratings))  
         print("sparsity of the trainset is: {}%".format(100 * round(self.sparsity, 4)))  
 
@@ -276,9 +311,20 @@ class Dataset:
         self.update_num_ratings(new_recommendations)
         
         print("added {} new recommendations to the trainset".format(len(new_recommendations)))
-        print("There are {} ratings in the trainset".format(self.num_ratings))
+        print("there are now {} ratings in the trainset".format(self.num_ratings))
         
-                
+        
+    def get_user_validation_ratings(self):
+        return self.user_validation_ratings 
+    
+    
+    def get_item_validation_ratings(self):
+        return self.item_validation_ratings 
+    
+    
+    def get_validation_ratings(self):
+        return self.validation_ratings 
+       
     def get_user_ids(self) -> list:
         # [user_ids]
         #ic("ds.get_user_ids()")
@@ -307,7 +353,10 @@ class Dataset:
             user_id = int(recommendation["user_id"])
             item_id = int(recommendation["item_id"])
             rating = recommendation["rating"]
-            
+
+            if user_id not in self.user_train_ratings:
+                self.user_train_ratings[user_id] = {}    
+                        
             self.user_train_ratings[user_id][item_id] = rating
                 
         
@@ -332,6 +381,9 @@ class Dataset:
             if rating is None:
                 raise TypeError
               
+            if item_id not in self.item_train_ratings:
+                self.item_train_ratings[item_id] = {}
+
             self.item_train_ratings[item_id][user_id] = rating
             
             
@@ -456,6 +508,10 @@ class Dataset:
         self.user_test_ratings = {}
         self.item_test_ratings = {}
         self.test_ratings = []
+        
+        self.user_validation_ratings = {}
+        self.item_validation_ratings = {}
+        self.validation_ratings = []
         
         self.mean_train_rating = 0.0
         

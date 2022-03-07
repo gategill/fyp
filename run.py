@@ -54,10 +54,19 @@ def run_experiment(config_path) -> None:
     if "k_folds" in  kwargs["testing_strategy"]["method"]:
         kwargs["dataset_config"]["k_folds"] = k_folds = kwargs["testing_strategy"]["method"]["k_fold"]
         
-    if "train_ratio" in  kwargs["testing_strategy"]["method"]:
+    elif "train_ratio" in  kwargs["testing_strategy"]["method"]:
         kwargs["dataset_config"]["train_ratio"] = train_ratio = kwargs["testing_strategy"]["method"]["train_ratio"]
         k_folds = 1
-
+        
+    elif "validation" in  kwargs["testing_strategy"]["method"]:
+        kwargs["dataset_config"]["validation"] = validation = True
+        kwargs["dataset_config"]["train_ratio"]  = kwargs["testing_strategy"]["method"]["validation"][0]
+        kwargs["dataset_config"]["validation_ratio"]  = kwargs["testing_strategy"]["method"]["validation"][1]
+        kwargs["dataset_config"]["test_ratio"] = kwargs["testing_strategy"]["method"]["validation"][2]
+        k_folds = 1
+        
+    else:
+        raise ValueError("invalid method in testing_strategy")
 
     save_in_s3 = kwargs["experiment_config"]["save_in_s3"]
     a_seed = kwargs["experiment_config"]["seed"]
@@ -93,12 +102,14 @@ def run_experiment(config_path) -> None:
     all_results = results_header
     
     for model in kwargs["models"]:
+        model_mae = []
+        best_recommender = []
         #print(kwargs)
         model_results = results_header            
         print("MODEL = {}".format(model))
         
         #for K in kwargs["experiment_config"]["neighbours"]:    
-        for K in kwargs["models"][model]["neighbours"]:
+        for K in kwargs["models"][model]["neighbours"]: # for param_set in param_space
   
             print("NEIGHBOURS = {}".format(K))
             model_k_mae = []
@@ -122,19 +133,19 @@ def run_experiment(config_path) -> None:
                     tic = time.time()
                     a_recommender = recommenders[model](dataset, **kwargs)
                     a_recommender.train()
-                    test = a_recommender.get_predictions()
+                    which = "validation" if validation else None
+                    a_prediction = a_recommender.predict(which = which) 
                     toc = time.time()
                     time_elapsed = round(toc - tic, 3)
                     
-                    mae = a_recommender.evaluate_predictions("MAE")
-                    #rmse = a_recommender.evaluate_predictions("RMSE")
+                    mae = a_recommender.evaluate_predictions()
                         
-                    del a_recommender
-
-                    print(test, mae)
+                    print(a_prediction, mae)
                     
                     model_k_mae.append(mae)
-                    #model_k_rmse.append(rmse)
+                    model_mae.append(mae)
+                    
+                    best_recommender = [K, a_recommender] if mae <= min(model_mae) else best_recommender
                     
                     experiment_result = "{}, {}, {}, {}, {}\n".format(model, K, mae, time_elapsed, fold_num + 1)
                     all_results += experiment_result
@@ -163,7 +174,6 @@ def run_experiment(config_path) -> None:
                         s3.put_object(Body = line_error, Bucket = "fyp-w9797878", Key = s3_name)
                 
                 
-            
             if model == "CoRec":
                 user_mae = [i [0] for i in model_k_mae]
                 item_mae = [i [1] for i in model_k_mae]
@@ -173,27 +183,12 @@ def run_experiment(config_path) -> None:
                 
                 model_k_mean_mae = [model_k_user_mean_mae, model_k_item_mean_mae]
                 
-                #user_rmse = [i [0] for i in model_k_rmse]
-                #item_rmse = [i [1] for i in model_k_rmse]
-                
-                #model_k_user_mean_rmse = round(np.mean(user_rmse), 5) 
-                #model_k_item_mean_rmse = round(np.mean(item_rmse), 5) 
-                
-                model_k_mean_mae = [model_k_user_mean_mae, model_k_item_mean_mae]
-                #model_k_mean_rmse = [model_k_user_mean_rmse, model_k_item_mean_rmse]
-                
             else:
                 model_k_mean_mae = round(np.mean(model_k_mae), 5) 
-                #model_k_mean_rmse = round(np.mean(model_k_rmse), 5) 
             
             model_k_results += "{}_{}: Averaged_MAE = {}\n".format(model, K, model_k_mean_mae)
-            #model_k_results += "{}_{}: Averaged_RMSE = {}\n".format(model, K, model_k_mean_rmse)
-            
             model_results += "{}_{}: Averaged_MAE = {}\n".format(model, K, model_k_mean_mae)
-            #model_results += "{}_{}: Averaged_RMSE = {}\n".format(model, K, model_k_mean_rmse)
-            
             all_results += "{}_{}: Averaged_MAE = {}\n".format(model, K, model_k_mean_mae)            
-            #all_results += "{}_{}: Averaged_RMSE = {}\n".format(model, K, model_k_mean_rmse)            
             
             # saving model_k
             with open("{}/model_k/model_k-{}-{}.txt".format(save_path, model, K), "w") as f:
@@ -203,7 +198,19 @@ def run_experiment(config_path) -> None:
                 s3_name = "{}/model_k/model_k-{}-{}.txt".format(current_timestamp, model, K)
                 s3.put_object(Body = model_k_results, Bucket = "fyp-w9797878", Key = s3_name)
              
+        print("RUnning VALIDATION")
+        validated_model = best_recommender[1]
+        best_k = best_recommender[0]
+        validated_model.prepare_for_validation()
+        validated_prediction = validated_model.predict()
+        validated_mae = validated_model.evaluate_predictions()
+    
+        print(validated_prediction, validated_mae)
         
+        model_results += "{}_{}: Validated_MAE = {}\n".format(model, best_k, validated_mae)
+        all_results += "{}_{}: Validated_MAE = {}\n".format(model, best_k, validated_mae)           
+
+                    
         # saving model   
         with open("{}/model/model-{}.txt".format(save_path, model), "w") as f:
             f.write(model_results)
@@ -218,5 +225,5 @@ def run_experiment(config_path) -> None:
            
     if save_in_s3:
         s3_name = "{}/all/all-{}-{}-{}.txt".format(current_timestamp,model, all_models)
-        s3.put_object(Body = single_results, Bucket = "fyp-w9797878", Key = s3_name)
+        s3.put_object(Body = all_results, Bucket = "fyp-w9797878", Key = s3_name)
         

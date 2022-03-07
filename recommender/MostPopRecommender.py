@@ -37,7 +37,7 @@ class MostPopRecommender(GenericRecommender):
                 return self.mean_train_rating
     
     
-    def get_predictions(self):
+    def predict(self):
         prediction = self.get_single_prediction(candidate_item_id = item_id)
         for i, test in enumerate(self.test_ratings):
             try:
