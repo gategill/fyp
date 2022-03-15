@@ -296,6 +296,18 @@ class Dataset:
             self.user_validation_ratings[user_id][item_id] = rating
             self.item_validation_ratings[item_id][user_id] = rating
             
+        #all_ratings_df = pd.DataFrame(self.all_ratings)
+        #train_ratings_df = pd.DataFrame(self.train_ratings)
+        #user_train_ratings_df = pd.DataFrame(self.user_train_ratings)
+        #item_train_ratings_df = pd.DataFrame(self.item_train_ratings)
+        
+        #all_ratings_df.to_csv(self.DATA_PATH + "all_ratings.csv")
+        #train_ratings_df.to_csv(self.DATA_PATH + "train_ratings.csv")
+        #user_train_ratings_df.to_csv(self.DATA_PATH + "user_train_ratings.csv")
+        #item_train_ratings_df.to_csv(self.DATA_PATH + "item_train_ratings.csv")
+        
+        
+            
         print("there are {} ratings in the trainset".format(self.num_ratings))  
         print("sparsity of the trainset is: {}%".format(100 * round(self.sparsity, 4)))  
 
