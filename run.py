@@ -51,12 +51,15 @@ def run_experiment(config_path) -> None:
     kwargs = YAMLHandler.read_in_yaml_file(config_path)
     # pass some agruments down
     kwargs["config_path"] = config_path
-    kwargs["dataset_config"]["kolds"] = kwargs["experiment_config"]["kolds"]
+    kwargs["dataset_config"]["kfolds"] = kwargs["experiment_config"]["kfolds"]
     
 
     save_in_s3 = kwargs["experiment_config"]["save_in_s3"]
-    kolds = kwargs["experiment_config"]["kolds"]
-    a_seed = kwargs["experiment_config"]["seed"]
+    kfolds = kwargs["experiment_config"]["kfolds"]
+    if "seed" in kwargs["experiment_config"]:
+        a_seed = kwargs["experiment_config"]["seed"]
+        random.seed(a_seed)
+        
     current_timestamp = int(time.time())
     save_path = "./results/{}".format(current_timestamp)
     os.mkdir(save_path)
@@ -75,10 +78,7 @@ def run_experiment(config_path) -> None:
             s3.upload_fileobj(f, Bucket = "fyp-w9797878",  Key = str(current_timestamp) + "/config_file.yml")
 
     all_models =  "_".join(list(kwargs["models"].keys()))
-    
-    if a_seed != -1:
-        random.seed(a_seed)
-    
+
     if kwargs["experiment_config"]["disable_ic"]: 
         ic.disable()
         
@@ -101,17 +101,17 @@ def run_experiment(config_path) -> None:
             #model_k_rmse = []
             model_k_results = results_header
 
-            for fold_num in range(kolds):
+            for fold_num in range(kfolds):
                 single_results = results_header
                 
-                print("FOLD NUMBER = {}/{}\n".format(fold_num + 1, kolds))
+                print("FOLD NUMBER = {}/{}\n".format(fold_num + 1, kfolds))
             
                 dataset.load_ratings(fold_num)
         
                 try:                
                     print("Running {} Recommender".format(model))
-                    #kwargs["models"][model]["neighbours"] = K
-                    #kwargs["models"][model]["similarity"] = kwargs["experiment_config"]["similarity"]
+                    kwargs["models"][model]["neighbours"] = K
+                    kwargs["models"][model]["similarity"] = kwargs["models"][model]["similarity"]
                     kwargs["run_params"] = kwargs["models"][model]
                     
                     tic = time.time()

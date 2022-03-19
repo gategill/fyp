@@ -5,7 +5,7 @@
 
 from icecream import ic
 from recommender.UserKNNRecommender import UserKNNRecommender
-
+import copy
 
 class UserRecursiveKNNRecommender(UserKNNRecommender):
     def __init__(self, dataset = None, **kwargs) -> None:
@@ -16,21 +16,21 @@ class UserRecursiveKNNRecommender(UserKNNRecommender):
         self.recursion_threshold = kwargs["run_params"]["recursion_threshold"]
         self.phi = kwargs["run_params"]["phi"]
         self.k_prime = kwargs["run_params"]["k_prime"]
-        self.baseline = kwargs["run_params"]["baseline"]
+        self.neighbour_selection = kwargs["run_params"]["neighbour_selection"]
     
         
     def get_single_prediction(self, active_user_id, candidate_item_id):
         return self.recursive_prediction(active_user_id, candidate_item_id)
 
         
-    def recursive_prediction(self, active_user: int, candidate_item: int, recursion_level: int = 1) -> float:
+    def recursive_prediction(self, active_user: int, candidate_item: int, recursion_level: int = 2) -> float:
         """"""
         #ic("pp_rec.recursive_prediction()")
         
         # starts at 1
         if recursion_level > self.recursion_threshold:
-            #ic("Reached Recursion Limit - Using Baseline")
-            if self.baseline == "bs":
+            #ic("Reached Recursion Limit - Using neighbour_selection")
+            if self.neighbour_selection == "bs":
                 nns = self.get_k_nearest_users(self.similarity_function, self.k, active_user, candidate_item)
                 prediction = self.calculate_wtd_avg_rating(nns)
                 
@@ -44,7 +44,7 @@ class UserRecursiveKNNRecommender(UserKNNRecommender):
                     else:
                         return self.mean_train_rating      
                           
-            if self.baseline == "bs+":
+            if self.neighbour_selection == "bs+":
                 nns = self.get_k_nearest_users_with_overlap(self.similarity_function, self.k, active_user, candidate_item, self.phi)
                 prediction = self.calculate_wtd_avg_rating(nns)
                 
@@ -58,8 +58,12 @@ class UserRecursiveKNNRecommender(UserKNNRecommender):
                     else:
                         return self.mean_train_rating  
                     
-            if self.baseline == "ss":
+            if self.neighbour_selection == "ss":
                 nns = self.get_k_nearest_users(self.similarity_function, self.k_prime, active_user)
+                print(nns)
+                
+                #for n in nns:
+                #recursive_prediction()
                 prediction = self.calculate_wtd_avg_rating(nns)
                 
                 if prediction:  
@@ -72,11 +76,13 @@ class UserRecursiveKNNRecommender(UserKNNRecommender):
                     else:
                         return self.mean_train_rating  
                     
-            if self.baseline == "cs":
-                nns1 = self.get_k_nearest_users(self.similarity_function, self.k, active_user, candidate_item)
-                nns2 = self.get_k_nearest_users(self.similarity_function, self.k_prime, active_user)
+            if self.neighbour_selection == "cs":
+                nns1 = self.get_k_nearest_users(self.similarity_function, self.k,active_user, candidate_item)
+                nns2 = self.get_k_nearest_users(self.similarity_function, self.k_prime,  active_user, None)
+                print(nns2)
                 nns = nns1 + nns2
-                nns = list(set(nns))
+                #nns = list(set(nns))
+                print(nns)
                 prediction = self.calculate_wtd_avg_rating(nns)
                 
                 if prediction:  
@@ -89,11 +95,18 @@ class UserRecursiveKNNRecommender(UserKNNRecommender):
                     else:
                         return self.mean_train_rating  
                     
-            if self.baseline == "cs+":
+            if self.neighbour_selection == "cs+":
                 nns1 = self.get_k_nearest_users_with_overlap(self.similarity_function, self.k, active_user, candidate_item, self.phi)
                 nns2 = self.get_k_nearest_users_with_overlap(self.similarity_function, self.k_prime, active_user, self.phi)
+                #print(nns1)
+                #print(nns2)
+                
+                #nns = copy.deepcopy(nns1)
+                
+                
                 nns = nns1 + nns2
-                nns = list(set(nns))
+                #print(nns)
+                #nns = list(set(nns))
                 prediction = self.calculate_wtd_avg_rating(nns)
                 
                 if prediction:  

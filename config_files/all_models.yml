@@ -1,7 +1,7 @@
 experiment_config:
   seed: 100
   save_in_s3: False
-  kolds: 5
+  kfolds: 5
   early_stop: True
   disable_ic: True
   paired_t_test: True
@@ -32,14 +32,14 @@ models:
     recursion_threshold: 3
     phi: 5
     k_prime: 20
-    baseline: "bs"
+    neighbour_selection: "bs"
   
  #ItemRecursiveKNN:
  #  weight_threshold: 1.0
  #  recursion_threshold: 3
  #  phi: 5
  #  k_prime: 20
- #  baseline: "bs"
+ #  neighbour_selection: "bs"
 
   CoRec:
     additions: 30

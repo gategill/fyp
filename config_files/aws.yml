@@ -1,7 +1,7 @@
 experiment_config:
   seed: 100
   save_in_s3: False
-  kolds: 10
+  kfolds: 10
   early_stop: True
   disable_ic: True
   paired_t_test: True
@@ -40,7 +40,7 @@ models:
     recursion_threshold: 2
     phi: 5
     k_prime: 20
-    baseline: "bs"
+    neighbour_selection: "bs"
     
   #CoRec:
     #neighbours: [5, 10, 15, 20]

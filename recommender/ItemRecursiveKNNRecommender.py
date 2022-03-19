@@ -17,7 +17,7 @@ class ItemRecursiveKNNRecommender(ItemKNNRecommender):
         self.recursion_threshold = kwargs["run_params"]["recursion_threshold"]
         self.phi = kwargs["run_params"]["phi"]
         self.k_prime = kwargs["run_params"]["k_prime"]
-        self.baseline = kwargs["run_params"]["baseline"]
+        self.neighbour_selection = kwargs["run_params"]["neighbour_selection"]
     
         
     def get_single_prediction(self, active_user_id, candidate_item_id):
@@ -30,9 +30,9 @@ class ItemRecursiveKNNRecommender(ItemKNNRecommender):
         
         # starts at 1
         if recursion_level > self.recursion_threshold:
-            #ic("Reached Recursion Limit - Using Baseline")
-            if self.baseline == "bs":
-                # baseline
+            #ic("Reached Recursion Limit - Using neighbour_selection")
+            if self.neighbour_selection == "bs":
+                # neighbour_selection
                 # is this even right? does it make sense? TODO
                 return self.predict_rating_item_based_nn_wtd(active_user, candidate_item)
 
