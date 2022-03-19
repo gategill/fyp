@@ -7,8 +7,8 @@ experiment_config:
 testing_strategy:
   method:
     #k_folds: 5
-    validation: [0.6, 0.2, 0.2]
-    #train_ratio: 0.8
+    #validation: [0.6, 0.2, 0.2]
+    train_ratio: 0.8
   paired_t_test: True
   evaluation_metrics: "MAE"
 

@@ -57,6 +57,7 @@ def run_experiment(config_path) -> None:
     elif "train_ratio" in  kwargs["testing_strategy"]["method"]:
         kwargs["dataset_config"]["train_ratio"] = train_ratio = kwargs["testing_strategy"]["method"]["train_ratio"]
         k_folds = 1
+        validation = False
         
     elif "validation" in  kwargs["testing_strategy"]["method"]:
         kwargs["dataset_config"]["validation"] = validation = True
@@ -133,6 +134,7 @@ def run_experiment(config_path) -> None:
                     tic = time.time()
                     a_recommender = recommenders[model](dataset, **kwargs)
                     a_recommender.train()
+                    
                     which = "validation" if validation else None
                     a_prediction = a_recommender.predict(which = which) 
                     toc = time.time()

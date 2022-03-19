@@ -110,6 +110,7 @@ class UserKNNRecommender(GenericRecommender):
                 # what's your ID? 
                 candidate_neighbour['rating'] = self.user_train_ratings[user_id][candidate_item_id]
             
+            # update_neighbours()
             nearest_neighbours.append(candidate_neighbour)
             
             # ensure there are at most k neighbours, else remove the most unsimilar
