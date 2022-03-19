@@ -61,7 +61,7 @@ def run_experiment(config_path) -> None:
         random.seed(a_seed)
         
     current_timestamp = int(time.time())
-    save_path = "./results/{}".format(current_timestamp)
+    save_path = "./results/{}-official".format(current_timestamp)
     os.mkdir(save_path)
     os.mkdir(save_path + "/all")
     os.mkdir(save_path + "/model")

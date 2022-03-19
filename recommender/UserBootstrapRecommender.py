@@ -30,7 +30,7 @@ class UserBootstrapRecommender(UserKNNRecommender):
         #ic("bs_rec.enhance()")
         
         for enrichment_round in range(self.enrichments):
-            print("\n")
+            print("encrichent {}\n".format(enrichment_round))
 
             new_recommendations = []
         
