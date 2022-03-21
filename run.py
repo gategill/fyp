@@ -61,7 +61,7 @@ def run_experiment(config_path) -> None:
         random.seed(a_seed)
         
     current_timestamp = int(time.time())
-    save_path = "./results/{}-official".format(current_timestamp)
+    save_path = "./results/{}-official-user_r_knn_cs+".format(current_timestamp)
     os.mkdir(save_path)
     os.mkdir(save_path + "/all")
     os.mkdir(save_path + "/model")
@@ -117,6 +117,7 @@ def run_experiment(config_path) -> None:
                     tic = time.time()
                     a_recommender = recommenders[model](dataset, **kwargs)
                     a_recommender.train()
+                    print("\nGetting Predictions\n")
                     test = a_recommender.get_predictions()
                     toc = time.time()
                     time_elapsed = round(toc - tic, 3)

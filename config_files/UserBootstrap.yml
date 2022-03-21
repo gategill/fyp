@@ -1,14 +1,12 @@
 experiment_config:
-  seed: 100
+  seed: 1
   save_in_s3: False
   kfolds: 5
-  early_stop: True
+  early_stop: False
   disable_ic: True
   paired_t_test: True
-  
-  evaluation_metrics: ["MAE", "RMSE"]
-  neighbours: 10
-  similarity: sim_sim
+  evaluation_metrics: "MAE"
+
 
 dataset_config:
   dataset_path: "./data/given/"
@@ -16,5 +14,8 @@ dataset_config:
 
 models:
   UserBootstrap:
-    enrichments: 2
-    additions: 5
+    neighbours: [5, 10, 15, 20, 25]
+    similarity: sim_sim
+    enrichments: 3
+    additions: 10
+

@@ -15,7 +15,7 @@ class UserRecursiveKNNRecommender(UserKNNRecommender):
         self.weight_threshold = kwargs["run_params"]["weight_threshold"]
         self.recursion_threshold = kwargs["run_params"]["recursion_threshold"]
         self.phi = kwargs["run_params"]["phi"]
-        self.k_prime = kwargs["run_params"]["k_prime"]
+        self.k_prime = self.k #kwargs["run_params"]["k_prime"]
         self.neighbour_selection = kwargs["run_params"]["neighbour_selection"]
     
         
@@ -23,11 +23,11 @@ class UserRecursiveKNNRecommender(UserKNNRecommender):
         return self.recursive_prediction(active_user_id, candidate_item_id)
 
         
-    def recursive_prediction(self, active_user: int, candidate_item: int, recursion_level: int = 2) -> float:
+    def recursive_prediction(self, active_user: int, candidate_item: int, recursion_level: int = 0) -> float:
         """"""
         #ic("pp_rec.recursive_prediction()")
         
-        # starts at 1
+        # starts at 0
         if recursion_level > self.recursion_threshold:
             return self.baseline_predictor(active_user, candidate_item)
 

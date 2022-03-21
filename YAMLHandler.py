@@ -105,8 +105,6 @@ def read_in_yaml_file(config_path):
             raise KeyError("missing recursion_threshold in UserRecursiveKNN")
         if "phi" not in kwargs["models"]["UserRecursiveKNN"]:
             raise KeyError("missing phi in UserRecursiveKNN")
-        if "k_prime" not in kwargs["models"]["UserRecursiveKNN"]:
-            raise KeyError("missing k_prime in UserRecursiveKNN")
         if "neighbour_selection" not in kwargs["models"]["UserRecursiveKNN"]:
             raise KeyError("missing neighbour_selection in UserRecursiveKNN")
 
@@ -116,8 +114,6 @@ def read_in_yaml_file(config_path):
             raise TypeError("UserRecursiveKNN.recursion_threshold should be an integer")
         if type(kwargs["models"]["UserRecursiveKNN"]["phi"]) != int:
             raise TypeError("UserRecursiveKNN.phi should be an integer")
-        if type(kwargs["models"]["UserRecursiveKNN"]["k_prime"]) != int:
-            raise TypeError("UserRecursiveKNN.k_prime should be an integer")
         if type(kwargs["models"]["UserRecursiveKNN"]["neighbour_selection"]) != str:
             raise TypeError("UserRecursiveKNN.neighbour_selection should be a string")
         
