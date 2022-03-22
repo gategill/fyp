@@ -209,8 +209,10 @@ class UserKNNRecommender(GenericRecommender):
     
     def get_num_shared_items(self, active_user_id, user_id):
         #ic("user_rec.get_num_shared_items()")
-        u1_items = set([entry["movie_id"] for entry in self.user_train_ratings[active_user_id]])
-        u2_items = set([entry["movie_id"] for entry in self.user_train_ratings[user_id]])
+        #print(self.user_train_ratings[active_user_id])
+        u1_items = set(self.user_train_ratings[active_user_id].keys())
+        u2_items = set(self.user_train_ratings[user_id].keys())
+        #u2_items = set([entry["movie_id"] for entry in self.user_train_ratings[user_id]])
              
         shared_items = u1_items.intersection(u2_items)
         return len(shared_items)

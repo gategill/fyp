@@ -1,14 +1,12 @@
 experiment_config:
-  seed: 100
+  seed: 1
   save_in_s3: False
-  k_folds: 5
-  early_stop: True
+  kfolds: 5
+  early_stop: False
   disable_ic: True
   paired_t_test: True
+  evaluation_metrics: "MAE"
 
-  evaluation_metrics: ["MAE", "RMSE"]
-  neighbours: 10
-  similarity: sim_sim
 
 dataset_config:
   dataset_path: "./data/given/"
@@ -16,5 +14,7 @@ dataset_config:
 
 models:
   CoRec:
-    additions: 30
-    top_m: 50
+    neighbours: [5, 10, 15, 20, 25]
+    similarity: sim_sim
+    additions: 50
+    top_m: 0.1

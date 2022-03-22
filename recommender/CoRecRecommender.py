@@ -22,6 +22,7 @@ class CoRecRecommender(GenericRecommender):
         
         self.additions = kwargs["run_params"]["additions"]
         self.top_m = kwargs["run_params"]["top_m"]
+
         
 
     def train(self):
@@ -36,24 +37,16 @@ class CoRecRecommender(GenericRecommender):
         return user_predicted_rating, item_predicted_rating
     
     
-    def predict(self):
-        for i, test in enumerate(self.test_ratings):
-            try:
-                user_id = int(test['user_id'])
-                item_id = int(test['item_id'])
+    def get_predictions(self):
+        for test in self.test_ratings:
+            user_id = int(test['user_id'])
+            item_id = int(test['item_id'])
+            
+            user_predicted_rating, item_predicted_rating = self.get_single_prediction(active_user_id = user_id, candidate_item_id = item_id)
                 
-                user_predicted_rating, item_predicted_rating = self.get_single_prediction(active_user_id = user_id, candidate_item_id = item_id)
-                    
-                test["user_pred_rating"] = user_predicted_rating
-                test["item_pred_rating"] = item_predicted_rating
-                self.add_prediction(test)
-
-                if self.kwargs["experiment_config"]["early_stop"]:
-                    if i > 30:
-                        break
-                        
-            except KeyboardInterrupt:
-                break
+            test["user_pred_rating"] = user_predicted_rating
+            test["item_pred_rating"] = item_predicted_rating
+            self.add_prediction(test)
         
         return test
     
@@ -90,12 +83,17 @@ class CoRecRecommender(GenericRecommender):
         train_unlabelled_users = copy.deepcopy(unlabelled_entries)
         train_unlabelled_items = copy.deepcopy(unlabelled_entries)
         
+        top = math.floor(self.top_m * len(unlabelled_entries))
+        #print(top)
+
+        
         old_num_users = len(train_unlabelled_users)
         old_num_items = len(train_unlabelled_items)
         
         while (train_unlabelled_users) and (train_unlabelled_items): 
-            print("There are {} ratings in the USER dataset".format(self.user_rec.dataset.num_ratings))
-            print("There are {} ratings in the ITEM dataset".format(self.item_rec.dataset.num_ratings))
+            print("{} ratings in USER left".format(len(train_unlabelled_users)))
+            #print("There are {} ratings in the USER trainset".format(self.user_rec.dataset.num_ratings))
+            #print("There are {} ratings in the ITEM trainset".format(self.item_rec.dataset.num_ratings))
                         
             predicted_user_ratings = []
             predicted_item_ratings = []
@@ -113,15 +111,17 @@ class CoRecRecommender(GenericRecommender):
                     entry["confidence"] = round(confidence, 3)
                     predicted_user_ratings.append(entry)
                                         
-                    if self.kwargs["experiment_config"]["early_stop"]:
-                        if i > 100:
-                            break
+                    #if self.kwargs["experiment_config"]["early_stop"]:
+                    #    if i > 100:
+                    #        break
                 
                 except KeyboardInterrupt:
                     break
             
             # get top m confident predictions                    
-            top_m_user_predictions = sorted(predicted_user_ratings, key = lambda d: d["confidence"])[-self.top_m:]
+            #print(len(predicted_user_ratings))
+            top_m_user_predictions = sorted(predicted_user_ratings, key = lambda d: d["confidence"])[-top:]
+            #print(len(top_m_user_predictions))
             
             # train item rec, predict and get confident results
             for i, entry in enumerate(train_unlabelled_items):
@@ -136,37 +136,46 @@ class CoRecRecommender(GenericRecommender):
                     entry["confidence"] = round(confidence, 3)
                     predicted_item_ratings.append(entry)
                     
-                    if self.kwargs["experiment_config"]["early_stop"]:
-                        if i > 100:
-                            break
+                    #if self.kwargs["experiment_config"]["early_stop"]:
+                    #    if i > 100:
+                    #        break
                     
                 except KeyboardInterrupt:
                     break
                 
             # get top m confident predictions
-            top_m_item_predictions = sorted(predicted_item_ratings, key = lambda d: d["confidence"])[-self.top_m:]
+            #print(len(predicted_item_ratings))
+            top_m_item_predictions = sorted(predicted_item_ratings, key = lambda d: d["confidence"])[-top:]
+            #print(len(top_m_item_predictions))
             
             # get union of top_m_confident_user_predictions and top_m_confident_item_predictions
             top_m_predictions = top_m_user_predictions + top_m_item_predictions
+            
+            #print(top_m_user_predictions[:30])
+            #print(top_m_item_predictions[:30])
              
             try:         
-                for ite in top_m_user_predictions:
+                #print(len(top_m_predictions))
+                #print(len(train_unlabelled_users))
+                for ite in top_m_predictions:
                     if ite in train_unlabelled_users:
                         train_unlabelled_users.remove(ite)
+                        #before after?
+                #print(len(train_unlabelled_users))
 
-                for ite in top_m_item_predictions:
+                for ite in top_m_predictions:
                     if ite in train_unlabelled_items:
                         train_unlabelled_items.remove(ite)
         
+                
                 assert(old_num_users > len(train_unlabelled_users)), "ERROR: the number of unlabelled users is NOT decreasing"
                 assert(old_num_items > len(train_unlabelled_items)), "ERROR: the number of unlabelled items is NOT decreasing"
                 
-                old_num_users -= len(train_unlabelled_users)
-                old_num_items -= len(train_unlabelled_items)
+                old_num_users -= len(top_m_user_predictions)
+                old_num_items -= len(top_m_item_predictions)
             
             except AssertionError as msg:
-                print(msg)
-                break
+                raise AssertionError(msg)
      
             # update unlabelled datasets train_unlabelled_users and train_unlabelled_items
             # remove "confidence" and "rating" keys from list of dicts 
@@ -206,8 +215,8 @@ class CoRecRecommender(GenericRecommender):
             self.user_rec.add_new_recommendations(top_m_item_predictions) # add item to user
             self.item_rec.add_new_recommendations(top_m_user_predictions) # add user to item
             
-            if (self.kwargs["experiment_config"]["early_stop"]) and (old_num_items < int(math.floor(0.9 * train_unlabelled_users))):
-                break
+            #if (self.kwargs["experiment_config"]["early_stop"]) and (old_num_items < int(math.floor(0.9 * len(train_unlabelled_users)))):
+            #    break
 
 
     def predict_co_rec_for_users(self, user_id, item_id) -> float:
@@ -254,6 +263,7 @@ class CoRecRecommender(GenericRecommender):
         
         items_rated = items_rated_in_train.intersection(items_rated_in_test)
         unlabelled_entries = list(set(self.item_ids).difference(items_rated))
+        #print(len(unlabelled_entries))
         unlabelled_entries = random.sample(unlabelled_entries, number)
         
         return unlabelled_entries

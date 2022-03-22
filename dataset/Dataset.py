@@ -7,6 +7,7 @@ import random
 from icecream import ic
 import numpy as np
 import pandas as pd
+import math
 
 class Dataset:
     def __init__(self, **kwargs):
@@ -53,9 +54,18 @@ class Dataset:
         self.user_ids = np.unique(user_ids)
         
         
-    def read_in_ratings(self,  filename: str = "ratings.txt"):
+    def read_in_ratings(self,  filename: str = "ratings_part.txt"):
         """ Reads in the data from a ratings file."""
         #ic("ds.read_in_ratings()")
+        
+        if self.kwargs["kfolds"] == 1:
+            filename = "ratings.txt"
+            # full test
+        else:
+            filename = "ratings_part.txt"
+            # validation k folds
+            
+
         
         if type(filename) != str:
             raise TypeError("load_ratings: you supplied filename = '%s' but filename must be a string" % filename)
@@ -63,8 +73,10 @@ class Dataset:
         all_ratings = []
         for line in open(self.DATA_PATH + filename):
             substrings = line.strip().split('\t')
-            user_id = int(substrings[0])
-            item_id = int(substrings[1])
+            if substrings[0] == "user_id":
+                continue
+            user_id = int(float(substrings[0]))
+            item_id = int(float(substrings[1]))
             rating = float(substrings[2])
             
             if rating < 1.0:
@@ -193,49 +205,31 @@ class Dataset:
         """
      
         num_ratings = 0
+        n_split = self.kwargs["kfolds"]
         
         df = self.get_ratings_as_df()
         nrow = df.shape[0]
         
-        if fold_num:
-            n_split = self.kwargs["k_folds"]
-            a, b = ((fold_num * nrow) // n_split), ((1 + fold_num) * nrow // n_split) 
-
-            df_test = df.loc[np.r_[a:b], :]
-            df_train = df[~df.isin(df_test)].dropna()
-            
-            self.train_ratings = list(df_train.T.to_dict().values())
-            self.test_ratings = list(df_test.T.to_dict().values())
-            
-        elif "validation" in self.kwargs:
-            a = np.floor(nrow * self.kwargs["train_ratio"])
-            b = np.floor(nrow * (self.kwargs["train_ratio"] + self.kwargs["validation_ratio"]))
-            
-            df_train = df.loc[np.r_[0:a], :]
-            df_validation = df.loc[np.r_[a:b], :]
-            df_test = df.loc[np.r_[b:nrow], :]
-            
-            self.train_ratings = list(df_train.T.to_dict().values())
-            self.validation_ratings = list(df_validation.T.to_dict().values())
-            self.test_ratings = list(df_test.T.to_dict().values())
-            
-            print(df_train.shape)
-            print(df_validation.shape)
-            print(df_test.shape)
-            
-        elif "train_ratio" in self.kwargs:
-            a, b = np.floor(nrow * self.kwargs["train_ratio"]), nrow
-            
-            df_test = df.loc[np.r_[a:b], :]
-            df_train = df[~df.isin(df_test)].dropna()
-            
-            self.train_ratings = list(df_train.T.to_dict().values())
-            self.test_ratings = list(df_test.T.to_dict().values())
-            
+        if n_split == 1:
+            #df_test = df.sample(frac = 0.2)
+            #df_train = pd.read_csv("./data/given/ratings_part.txt", sep = "\t")
+            df_test = pd.read_csv("./data/given/ratings_part_test.txt", sep = "\t")
+            #print(df_test.head())
             
         else:
-            raise ValueError("error loading ratings")
-            
+            a,b = ((fold_num * nrow) // n_split), ((1 + fold_num) * nrow // n_split)
+            df_test = df.loc[np.r_[a:b], :]
+        
+        df_train = df[~df.isin(df_test)].dropna()
+        
+        
+        #df_train.to_csv("./ratings_part.txt", header=True, index=None, sep="\t", mode='a')
+        #df_test.to_csv("./ratings_part_test.txt", header=True, index=None, sep="\t", mode='a')
+
+        
+        self.train_ratings = list(df_train.T.to_dict().values())
+        self.test_ratings = list(df_test.T.to_dict().values())
+        
         # train_ratings
         for entry in self.train_ratings:
             entry["user_id"] = int(entry["user_id"])

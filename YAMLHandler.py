@@ -5,15 +5,16 @@ import yaml
 def read_in_yaml_file(config_path):
     with open(config_path) as f:
         kwargs = yaml.load(f, Loader = yaml.FullLoader)
+        return kwargs
     '''
     if "experiment_config" not in kwargs:
         raise KeyError("missing experiment_config in kwargs")
-    if "seed" not in kwargs["experiment_config"]:
-        raise KeyError("missing seed in experiment_config")
+    #if "seed" not in kwargs["experiment_config"]:
+    #    raise KeyError("missing seed in experiment_config")
     if "save_in_s3" not in kwargs["experiment_config"]:
         raise KeyError("missing save_in_s3 in experiment_config")
-    if "k_folds" not in kwargs["experiment_config"]:
-        raise KeyError("missing k_folds in experiment_config")
+    if "kfolds" not in kwargs["experiment_config"]:
+        raise KeyError("missing kfolds in experiment_config")
     if "early_stop" not in kwargs["experiment_config"]:
         raise KeyError("missing early_stop in experiment_config")
     if "disable_ic" not in kwargs["experiment_config"]:
@@ -24,12 +25,12 @@ def read_in_yaml_file(config_path):
             raise KeyError("missing paired_t_test in experiment_config")
 
 
-    if (type(kwargs["experiment_config"]["seed"]) != int):
-        raise TypeError("seed should be an integer")
+    #if (type(kwargs["experiment_config"]["seed"]) != int):
+    #    raise TypeError("seed should be an integer")
     if type(kwargs["experiment_config"]["save_in_s3"]) != bool:
         raise TypeError("save_in_s3 should be boolean")
-    if type(kwargs["experiment_config"]["k_folds"]) != int:
-        raise TypeError("k_folds should be an integer")
+    if type(kwargs["experiment_config"]["kfolds"]) != int:
+        raise TypeError("kfolds should be an integer")
     if type(kwargs["experiment_config"]["early_stop"]) != bool:
         raise TypeError("early_stop should be boolean")
     if type(kwargs["experiment_config"]["disable_ic"]) != bool:
@@ -58,7 +59,7 @@ def read_in_yaml_file(config_path):
         raise ValueError("no models provided in kwargs[models]")
     for model in kwargs["models"]:
         if model not in ["UserKNN", "ItemKNN", "UserBootstrap","ItemBootstrap", "UserRecursiveKNN", "ItemRecursiveKNN", "CoRec", "MatrixFactorisation", "MostPop", "Random", "Mean", "ConfidentUserBootstrap","ConfidentItemBootstrap"]:
-            raise KeyError("invalid model\nvalid model are: [UserKNN, ItemKNN, UserBootstrap, ItemBootstrap, UserRecursiveKNN, ItemRecursiveKNN, CoRec, MatrixFactorisation, MostPop, Random, Mean, ConfidentUserBootstrap,ConfidentItemBootstrap]")
+            raise KeyError("invalid modelvalid model are: [UserKNN, ItemKNN, UserBootstrap, ItemBootstrap, UserRecursiveKNN, ItemRecursiveKNN, CoRec, MatrixFactorisation, MostPop, Random, Mean, ConfidentUserBootstrap,ConfidentItemBootstrap]")
         
     for model in kwargs["models"]:
         if "neighbours" not in kwargs["models"][model]:
@@ -69,10 +70,10 @@ def read_in_yaml_file(config_path):
         if type(kwargs["models"][model]["neighbours"]) not in [int, list]:
             raise TypeError("neighbours should be a list of integers list")
             
-        if type(kwargs["models"][model]["neighbours"]) == list:
-            for nn in kwargs["models"][model]:
-                if type(nn) != int:
-                    raise TypeError("neighbours should be integers in a list")
+        #if type(kwargs["models"][model]["neighbours"]) == list:
+        #    for nn in kwargs["models"][model]:
+        #        if type(nn) != int:
+        #            raise TypeError("neighbours should be integers in a list")
                 
         if type(kwargs["models"][model]["neighbours"]) == int:
             li = []
@@ -105,10 +106,8 @@ def read_in_yaml_file(config_path):
             raise KeyError("missing recursion_threshold in UserRecursiveKNN")
         if "phi" not in kwargs["models"]["UserRecursiveKNN"]:
             raise KeyError("missing phi in UserRecursiveKNN")
-        if "k_prime" not in kwargs["models"]["UserRecursiveKNN"]:
-            raise KeyError("missing k_prime in UserRecursiveKNN")
-        if "baseline" not in kwargs["models"]["UserRecursiveKNN"]:
-            raise KeyError("missing baseline in UserRecursiveKNN")
+        if "neighbour_selection" not in kwargs["models"]["UserRecursiveKNN"]:
+            raise KeyError("missing neighbour_selection in UserRecursiveKNN")
 
         if type(kwargs["models"]["UserRecursiveKNN"]["weight_threshold"]) != float:
             raise TypeError("UserRecursiveKNN.weight_threshold should be a float")
@@ -116,13 +115,11 @@ def read_in_yaml_file(config_path):
             raise TypeError("UserRecursiveKNN.recursion_threshold should be an integer")
         if type(kwargs["models"]["UserRecursiveKNN"]["phi"]) != int:
             raise TypeError("UserRecursiveKNN.phi should be an integer")
-        if type(kwargs["models"]["UserRecursiveKNN"]["k_prime"]) != int:
-            raise TypeError("UserRecursiveKNN.k_prime should be an integer")
-        if type(kwargs["models"]["UserRecursiveKNN"]["baseline"]) != str:
-            raise TypeError("UserRecursiveKNN.baseline should be a string")
+        if type(kwargs["models"]["UserRecursiveKNN"]["neighbour_selection"]) != str:
+            raise TypeError("UserRecursiveKNN.neighbour_selection should be a string")
         
-        if kwargs["models"]["UserRecursiveKNN"]["baseline"] not in ["bs", "bs+", "ss", "cs", "cs+"]:
-            raise ValueError("invalid UserRecursiveKNN.baseline\navailable baselines are: [bs, bs+, ss, cs, cs+]")
+        if kwargs["models"]["UserRecursiveKNN"]["neighbour_selection"] not in ["bs", "bs+", "ss", "cs", "cs+"]:
+            raise ValueError("invalid UserRecursiveKNN.neighbour_selection\navailable neighbour_selections are: [bs, bs+, ss, cs, cs+]")
         
 
     if "ItemRecursiveKNN" in kwargs["models"]:
@@ -134,8 +131,8 @@ def read_in_yaml_file(config_path):
             raise KeyError("missing phi in ItemRecursiveKNN")
         if "k_prime" not in kwargs["models"]["ItemRecursiveKNN"]:
             raise KeyError("missing k_prime in ItemRecursiveKNN")
-        if "baseline" not in kwargs["models"]["ItemRecursiveKNN"]:
-            raise KeyError("missing baseline in ItemRecursiveKNN")
+        if "neighbour_selection" not in kwargs["models"]["ItemRecursiveKNN"]:
+            raise KeyError("missing neighbour_selection in ItemRecursiveKNN")
 
         if type(kwargs["models"]["ItemRecursiveKNN"]["weight_threshold"]) != float:
             raise TypeError("ItemRecursiveKNN.weight_threshold should be a float")
@@ -145,11 +142,11 @@ def read_in_yaml_file(config_path):
             raise TypeError("ItemRecursiveKNN.phi should be an integer")
         if type(kwargs["models"]["ItemRecursiveKNN"]["k_prime"]) != int:
             raise TypeError("ItemRecursiveKNN.k_prime should be an integer")
-        if type(kwargs["models"]["ItemRecursiveKNN"]["baseline"]) != str:
-            raise TypeError("ItemRecursiveKNN.baseline should be a string")
+        if type(kwargs["models"]["ItemRecursiveKNN"]["neighbour_selection"]) != str:
+            raise TypeError("ItemRecursiveKNN.neighbour_selection should be a string")
         
-        if kwargs["models"]["ItemRecursiveKNN"]["baseline"] not in ["bs", "bs+", "ss", "cs", "cs+"]:
-            raise ValueError("invalid ItemRecursiveKNN.baseline\navailable baselines are: [bs, bs+, ss, cs, cs+]")
+        if kwargs["models"]["ItemRecursiveKNN"]["neighbour_selection"] not in ["bs", "bs+", "ss", "cs", "cs+"]:
+            raise ValueError("invalid ItemRecursiveKNN.neighbour_selection\navailable neighbour_selections are: [bs, bs+, ss, cs, cs+]")
         
         
     if "CoRec" in kwargs["models"]:
@@ -160,10 +157,10 @@ def read_in_yaml_file(config_path):
 
         if type(kwargs["models"]["CoRec"]["additions"]) != int:
             raise TypeError("CoRec.additions should be an integer")
-        if type(kwargs["models"]["CoRec"]["top_m"]) != int:
-            raise TypeError("CoRec.top_m should be an integer")
-        if kwargs["models"]["CoRec"]["top_m"] < kwargs["models"]["CoRec"]["additions"]:
-            raise ValueError("CoRec.top_m should be larger than additions (I think)")
+        #if type(kwargs["models"]["CoRec"]["top_m"]) != int:
+        #    raise TypeError("CoRec.top_m should be an integer")
+        #if kwargs["models"]["CoRec"]["top_m"] < kwargs["models"]["CoRec"]["additions"]:
+        #    raise ValueError("CoRec.top_m should be larger than additions (I think)")
         
         
     if "MatrixFactorisation" in kwargs["models"]:
@@ -229,4 +226,3 @@ def read_in_yaml_file(config_path):
             raise ValueError("ConfidentItemBootstrap.top_m should be larger than additions (I think)")
         '''
             
-    return kwargs

@@ -51,28 +51,19 @@ def run_experiment(config_path) -> None:
     kwargs = YAMLHandler.read_in_yaml_file(config_path)
     # pass some agruments down
     kwargs["config_path"] = config_path
-    if "k_folds" in  kwargs["testing_strategy"]["method"]:
-        kwargs["dataset_config"]["k_folds"] = k_folds = kwargs["testing_strategy"]["method"]["k_fold"]
-        
-    elif "train_ratio" in  kwargs["testing_strategy"]["method"]:
-        kwargs["dataset_config"]["train_ratio"] = train_ratio = kwargs["testing_strategy"]["method"]["train_ratio"]
-        k_folds = 1
-        validation = False
-        
-    elif "validation" in  kwargs["testing_strategy"]["method"]:
-        kwargs["dataset_config"]["validation"] = validation = True
-        kwargs["dataset_config"]["train_ratio"]  = kwargs["testing_strategy"]["method"]["validation"][0]
-        kwargs["dataset_config"]["validation_ratio"]  = kwargs["testing_strategy"]["method"]["validation"][1]
-        kwargs["dataset_config"]["test_ratio"] = kwargs["testing_strategy"]["method"]["validation"][2]
-        k_folds = 1
-        
-    else:
-        raise ValueError("invalid method in testing_strategy")
 
     save_in_s3 = kwargs["experiment_config"]["save_in_s3"]
     a_seed = kwargs["experiment_config"]["seed"]
+    kwargs["dataset_config"]["kfolds"] = kwargs["experiment_config"]["kfolds"]
+
+    save_in_s3 = kwargs["experiment_config"]["save_in_s3"]
+    kfolds = kwargs["experiment_config"]["kfolds"]
+    if "seed" in kwargs["experiment_config"]:
+        a_seed = kwargs["experiment_config"]["seed"]
+        random.seed(a_seed)
+        
     current_timestamp = int(time.time())
-    save_path = "./results/{}".format(current_timestamp)
+    save_path = "./results/{}-official-user_r_knn_cs+".format(current_timestamp)
     os.mkdir(save_path)
     os.mkdir(save_path + "/all")
     os.mkdir(save_path + "/model")
@@ -89,10 +80,7 @@ def run_experiment(config_path) -> None:
             s3.upload_fileobj(f, Bucket = "fyp-w9797878",  Key = str(current_timestamp) + "/config_file.yml")
 
     all_models =  "_".join(list(kwargs["models"].keys()))
-    
-    if a_seed != -1:
-        random.seed(a_seed)
-    
+
     if kwargs["experiment_config"]["disable_ic"]: 
         ic.disable()
         
@@ -117,26 +105,26 @@ def run_experiment(config_path) -> None:
             #model_k_rmse = []
             model_k_results = results_header
 
-            for fold_num in range(k_folds):
+            for fold_num in range(kfolds):
                 single_results = results_header
                 
-                print("FOLD NUMBER = {}/{}\n".format(fold_num + 1, k_folds))
+                print("FOLD NUMBER = {}/{}\n".format(fold_num + 1, kfolds))
             
                 dataset.load_ratings(fold_num) if k_folds > 1 else dataset.load_ratings()
         
                 try:                
-                    print("running {} recommender".format(model))
-                    #kwargs["models"][model]["neighbours"] = K
-                    #kwargs["models"][model]["similarity"] = kwargs["experiment_config"]["similarity"]
+                    print("Running {} Recommender".format(model))
+                    kwargs["models"][model]["neighbours"] = K
+                    kwargs["models"][model]["similarity"] = kwargs["models"][model]["similarity"]
                     kwargs["run_params"] = kwargs["models"][model]
                     kwargs["run_params"]["neighbours"] = K
                     
                     tic = time.time()
                     a_recommender = recommenders[model](dataset, **kwargs)
                     a_recommender.train()
-                    
-                    which = "validation" if validation else None
-                    a_prediction = a_recommender.predict(which = which) 
+
+                    print("\nGetting Predictions\n")
+                    test = a_recommender.get_predictions()
                     toc = time.time()
                     time_elapsed = round(toc - tic, 3)
                     
