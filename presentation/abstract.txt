@@ -1,0 +1,13 @@
+## Recommender Systems and Sparse Datasets
+
+We come in contact with recommender systems (RS) daily thought services like Netflix, Spotify and soon, your next meal at McDonald’s will be personalised by an AI. RS help users to navigate the sea of endless content by serving content they'll like, as well as discovering novel items. 
+
+The amount of data we produce doubles around 18 months in a trend resembling Moore's Law, this presents both opportunities and challenges. This means that as a consumer, there is more and more to choose from, yet it's increasingly difficult to discover useful and relevant information. RS alleviate this by serving personalised and relevant content. 
+
+However, an important issue persists; sparsity. In practice, commercial datasets (such as Netflix's or Amazon's) have thousands of users and items, and millions of ratings. It is not uncommon to see datasets that are 95% empty. This creates difficulty in finding sufficiently similar users and items since in general, any user will only ever rate a small well under 1\% of the items. As a result, the accuracy of recommendations is poor. By augmenting the available data, we can use existing ratings to enhance sparse datasets and produce more data for an RS model to learn from. This translates to better and more personalised recommendations.
+
+In this project, we'll explore if using dataset augmentation techniques in RS help to remedy sparsity and provide a statistically significant improvement in prediction accuracy. We will test three algorithms that approach the problem of sparsity differently, compare them to a baseline and test for significance.
+
+**Keywords:** Co-training; Algorithms; Imputation; Sparsity; Cold-Starts
+
+**Technologies:** Recommender Systems; Collaborative Filtering; K-Nearest Neighbours

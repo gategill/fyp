@@ -51,9 +51,6 @@ def run_experiment(config_path) -> None:
     kwargs = YAMLHandler.read_in_yaml_file(config_path)
     # pass some agruments down
     kwargs["config_path"] = config_path
-
-    save_in_s3 = kwargs["experiment_config"]["save_in_s3"]
-    a_seed = kwargs["experiment_config"]["seed"]
     kwargs["dataset_config"]["kfolds"] = kwargs["experiment_config"]["kfolds"]
 
     save_in_s3 = kwargs["experiment_config"]["save_in_s3"]
@@ -63,7 +60,7 @@ def run_experiment(config_path) -> None:
         random.seed(a_seed)
         
     current_timestamp = int(time.time())
-    save_path = "./results/{}-official-user_r_knn_cs+".format(current_timestamp)
+    save_path = "./results/{}-cold-stuff".format(current_timestamp)
     os.mkdir(save_path)
     os.mkdir(save_path + "/all")
     os.mkdir(save_path + "/model")
