@@ -120,6 +120,7 @@ def run_experiment(config_path) -> None:
                     kwargs["run_params"] = kwargs["models"][model]
                     kwargs["run_params"]["neighbours"] = K
                     
+                    
                     tic = time.time()
                     a_recommender = recommenders[model](dataset, **kwargs)
                     a_recommender.train()
