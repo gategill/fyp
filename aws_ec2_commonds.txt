@@ -10,9 +10,9 @@ python3 -m pip install virtualenv
 
 git clone https://github.com/gategill/fyp.git && cd fyp
 
-virtualenv -p /usr/bin/python3.7 venv
+virtualenv -p /usr/bin/python3.7 venv1
 
-source venv/bin/activate
+source venv1/bin/activate
 
 echo "INSTALLING PACKAGES"
 

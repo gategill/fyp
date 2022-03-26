@@ -44,8 +44,6 @@ class UserRecursiveKNNRecommender(UserKNNRecommender):
         # starts at 0
         if recursion_level > self.recursion_threshold:
             pr = self.baseline_predictor(active_user, candidate_item)
-            if pr is None:
-                print("BREAKING NONONONOONONONONONONONo")
             #print(pr)
             return pr
 
@@ -75,9 +73,6 @@ class UserRecursiveKNNRecommender(UserKNNRecommender):
                 beta += self.weight_threshold * abs(sim_x_y)
         
         mean_rating_for_active_user = self.get_user_mean_rating(active_user)
-        if mean_rating_for_active_user is None:
-                print("BREAKING NONONONOONONONONONONONo")
-        
         if beta == 0.0:
             
             return mean_rating_for_active_user

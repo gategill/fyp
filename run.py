@@ -96,10 +96,10 @@ def run_experiment(config_path) -> None:
         #print(kwargs)
         model_results = results_header            
         print("MODEL = {}".format(model))
-        
+        neighbourhood_sizes = []
         #for K in kwargs["experiment_config"]["neighbours"]: 
         if kwargs["models"][model]["neighbours"] != list:
-            neighbourhood_sizes = [kwargs["models"][model]["neighbours"]]
+            neighbourhood_sizes.append(kwargs["models"][model]["neighbours"])
         else:
             neighbourhood_sizes = kwargs["models"][model]["neighbours"]
             
