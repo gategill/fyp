@@ -22,9 +22,9 @@ class Evaluation:
                     mae += abs(prediction["pred_rating"] - prediction["rating"])
                 
                 except TypeError as e:
-                    print("pred_ratings is: {}".format(prediction["pred_rating"]))
-                    print("rating is: ".format(prediction["rating"]))
-                    raise TypeError("Error is: " + e)
+                    print("pred_rating is: {}".format(prediction["pred_rating"]))
+                    print("rating is: {}".format(prediction["rating"]))
+                    raise TypeError("Error is: {}".format(e))
                     
                     
                 

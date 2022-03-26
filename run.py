@@ -129,6 +129,8 @@ def run_experiment(config_path) -> None:
                     toc = time.time()
                     time_elapsed = round(toc - tic, 3)
                     
+                    print(a_recommender.predictions)
+                    
                     mae = a_recommender.evaluate_predictions()
                         
 <<<<<<< HEAD
