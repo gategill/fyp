@@ -1,6 +1,15 @@
 venv/*
+venv/
+venv
 .vscode/
+.vscode
 results/*
+results/
+results
+report/*
 report/
+report
 Tests.py
 presentation/*
+presentation/
+presentation
