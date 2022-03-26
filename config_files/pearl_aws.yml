@@ -1,11 +1,12 @@
 experiment_config:
   seed: 1
   save_in_s3: True
-  kfolds: 5
+  kfolds: 1
   early_stop: False
   disable_ic: True
   paired_t_test: True
   evaluation_metrics: "MAE"
+  validation: True
 
 dataset_config:
   dataset_path: "./data/given/"
@@ -13,10 +14,10 @@ dataset_config:
 
 models:
   UserRecursiveKNN:
-    neighbours: [20, 25]
+    neighbours: [5, 10, 15, 20, 25]
     similarity: sim_sim
     weight_threshold: 0.5
-    recursion_threshold: 2
+    recursion_threshold: 1
     phi: 10
     #k_prime: 20
     neighbour_selection: "cs+"
