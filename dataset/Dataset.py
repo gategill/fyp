@@ -110,8 +110,8 @@ class Dataset:
             if type(strategy) != str:
                 raise TypeError("Invalid prefiltering strategy. Valid strategies must be a string")
         
-            if strategy not in ["user_k_core", "item_k_core", "cold_users"]:
-                raise KeyError("Invalid prefiltering strategy. Valid strategies include: user_k_core, item_k_core, cold_users")
+            if strategy not in ["user_k_core", "item_k_core", "cold_users", "cold_items"]:
+                raise KeyError("Invalid prefiltering strategy. Valid strategies include: user_k_core, item_k_core, cold_users, cold_items")
         
             if type(threshold) != int:
                 raise TypeError("Invalid prefiltering threshold parameter. Ensure it's an integer")
@@ -191,6 +191,31 @@ class Dataset:
                 
                 print("df.shape AFTER cold_users: " + str(df.shape))
                 
+                
+            if strategy == "cold_items":
+                data = df.copy()
+
+                print(f"\nPrefiltering retaining cold items with {threshold} or less ratings")
+                print("df.shape BEFORE cold_items: " + str(df.shape))
+                print(f"The transactions before filtering are {len(data)}")
+                print(f"The items before filtering are {data['item_id'].nunique()}")
+                
+                item_groups = data.groupby(['item_id'])
+                data = item_groups.filter(lambda x: len(x) <= threshold)
+                
+                print(f"The transactions after filtering are {len(data)}")
+                print(f"The items after filtering are {data['item_id'].nunique()}")
+                data["user_id"] = data["user_id"].astype(int)
+                data["item_id"] = data["item_id"].astype(int)
+                
+                df = data
+                # should these be all or training? TODO
+                self.user_ids = list(map(int, np.unique(df["user_id"].to_list())))
+                self.item_ids = list(map(int, np.unique(df["item_id"].to_list())))
+                
+                print("df.shape AFTER cold_users: " + str(df.shape))
+                
+                
         print("\n")
         reduced_all_ratings = list(df.T.to_dict().values())
         self.all_ratings = reduced_all_ratings
@@ -214,6 +239,19 @@ class Dataset:
             #df_test = df.sample(frac = 0.2)
             #df_train = pd.read_csv("./data/given/ratings_part.txt", sep = "\t")
             df_test = pd.read_csv("./data/given/ratings_part_test.txt", sep = "\t")
+            
+            new_users = list(map(int, np.unique(df_test["user_id"].to_list())))
+            #print(type(self.user_ids))
+            #print(self.user_ids[:20])
+            self.user_ids = list(set(self.user_ids).union(set(new_users)))
+            #self.user_ids = np.unique(self.user_ids)
+            
+            new_items = list(map(int, np.unique(df_test["item_id"].to_list())))
+            self.item_ids = list(set(self.item_ids).union(set(new_items)))
+            #self.item_ids = self.item_ids + new_items
+            #self.item_ids = np.unique(self.item_ids)
+            
+
             #print(df_test.head())
             
         else:
@@ -231,6 +269,11 @@ class Dataset:
         self.test_ratings = list(df_test.T.to_dict().values())
         
         # train_ratings
+        for u in self.user_ids:
+            self.user_train_ratings.setdefault(u, {})
+        for i in self.item_ids:
+            self.item_train_ratings.setdefault(i, {})
+            
         for entry in self.train_ratings:
             entry["user_id"] = int(entry["user_id"])
             entry["item_id"] = int(entry["item_id"])
@@ -240,9 +283,6 @@ class Dataset:
             item_id = entry["item_id"]
             rating = entry["rating"]
             
-            self.user_train_ratings.setdefault(user_id, {})
-            self.item_train_ratings.setdefault(item_id, {})
-        
             self.user_train_ratings[user_id][item_id] = rating
             self.item_train_ratings[item_id][user_id] = rating
             self.mean_train_rating = self.mean_train_rating + rating

@@ -18,7 +18,15 @@ class Evaluation:
         if "pred_rating" in predictions[0]:
             mae = 0
             for prediction in predictions:
-                mae += abs(prediction["pred_rating"] - prediction["rating"])
+                try:
+                    mae += abs(prediction["pred_rating"] - prediction["rating"])
+                
+                except TypeError as e:
+                    print("pred_ratings is: {}".format(prediction["pred_rating"]))
+                    print("rating is: ".format(prediction["rating"]))
+                    raise TypeError("Error is: " + e)
+                    
+                    
                 
             mae = round(mae/len(predictions), 5)
             

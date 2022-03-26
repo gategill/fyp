@@ -60,7 +60,11 @@ def run_experiment(config_path) -> None:
         random.seed(a_seed)
         
     current_timestamp = int(time.time())
+<<<<<<< HEAD
     save_path = "./results/{}-cold-stuff".format(current_timestamp)
+=======
+    save_path = "./results/{}-cold_recursive-r1".format(current_timestamp)
+>>>>>>> 40601bc (running cold start experiments)
     os.mkdir(save_path)
     os.mkdir(save_path + "/all")
     os.mkdir(save_path + "/model")
@@ -127,7 +131,11 @@ def run_experiment(config_path) -> None:
                     
                     mae = a_recommender.evaluate_predictions()
                         
+<<<<<<< HEAD
                     print(a_prediction, mae)
+=======
+                    print(test, mae)
+>>>>>>> 40601bc (running cold start experiments)
                     
                     model_k_mae.append(mae)
                     model_mae.append(mae)
@@ -185,6 +193,7 @@ def run_experiment(config_path) -> None:
                 s3_name = "{}/model_k/model_k-{}-{}.txt".format(current_timestamp, model, K)
                 s3.put_object(Body = model_k_results, Bucket = "fyp-w9797878", Key = s3_name)
              
+<<<<<<< HEAD
         print("RUnning VALIDATION")
         validated_model = best_recommender[1]
         best_k = best_recommender[0]
@@ -196,6 +205,19 @@ def run_experiment(config_path) -> None:
         
         model_results += "{}_{}: Validated_MAE = {}\n".format(model, best_k, validated_mae)
         all_results += "{}_{}: Validated_MAE = {}\n".format(model, best_k, validated_mae)           
+=======
+        #print("RUnning VALIDATION")
+        #validated_model = best_recommender[1]
+        #best_k = best_recommender[0]
+        #validated_model.prepare_for_validation()
+        #validated_prediction = validated_model.predict()
+        #validated_mae = validated_model.evaluate_predictions()
+    
+        #print(validated_prediction, validated_mae)
+        
+        #model_results += "{}_{}: Validated_MAE = {}\n".format(model, best_k, validated_mae)
+        #all_results += "{}_{}: Validated_MAE = {}\n".format(model, best_k, validated_mae)           
+>>>>>>> 40601bc (running cold start experiments)
 
                     
         # saving model   

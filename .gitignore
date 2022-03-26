@@ -3,3 +3,4 @@ venv/*
 results/*
 report/
 Tests.py
+presentation/*
