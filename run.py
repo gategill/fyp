@@ -61,6 +61,7 @@ def run_experiment(config_path) -> None:
         random.seed(a_seed)
         
     current_timestamp = int(time.time())
+    print(current_timestamp)
     save_path = "./results/{}-cold_recursive-r1".format(current_timestamp)
     if not os.path.exists("./results"):
         os.mkdir("./results")
@@ -96,14 +97,10 @@ def run_experiment(config_path) -> None:
         #print(kwargs)
         model_results = results_header            
         print("MODEL = {}".format(model))
-        neighbourhood_sizes = []
+        #neighbourhood_sizes = []
         #for K in kwargs["experiment_config"]["neighbours"]: 
-        if kwargs["models"][model]["neighbours"] != list:
-            neighbourhood_sizes.append(kwargs["models"][model]["neighbours"])
-        else:
-            neighbourhood_sizes = kwargs["models"][model]["neighbours"]
-            
-        for K in neighbourhood_sizes: # for param_set in param_space
+
+        for K in kwargs["models"][model]["neighbours"]: # for param_set in param_space
   
             print("NEIGHBOURS = {}".format(K))
             model_k_mae = []
@@ -220,6 +217,6 @@ def run_experiment(config_path) -> None:
         f.write(all_results)
            
     if save_in_s3:
-        s3_name = "{}/all/all-{}-{}-{}.txt".format(current_timestamp,model, all_models)
+        s3_name = "{}/all/all-{}.txt".format(current_timestamp, all_models)
         s3.put_object(Body = all_results, Bucket = "fyp-w9797878", Key = s3_name)
         

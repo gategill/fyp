@@ -1,8 +1,12 @@
 #!/bin/bash
 
+sudo amazon-linux-extras install python3.8 -y
+
 sudo yum update -y
 
 sudo yum install git -y
+
+cd home/ec2-user
 
 python3 -m pip install -U pip
 
@@ -10,7 +14,7 @@ python3 -m pip install virtualenv
 
 git clone https://github.com/gategill/fyp.git && cd fyp
 
-virtualenv -p /usr/bin/python3.7 venv1
+virtualenv -p /usr/bin/python3.8 venv1
 
 source venv1/bin/activate
 
