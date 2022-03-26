@@ -62,6 +62,8 @@ def run_experiment(config_path) -> None:
         
     current_timestamp = int(time.time())
     save_path = "./results/{}-cold_recursive-r1".format(current_timestamp)
+    if not os.path.exists("./results"):
+        os.mkdir("./results")
     os.mkdir(save_path)
     os.mkdir(save_path + "/all")
     os.mkdir(save_path + "/model")
