@@ -7,7 +7,7 @@ experiment_config:
 
 testing_strategy:
   method:
-    #k_folds: 5
+    #kfolds: 5
     #validation: [0.6, 0.2, 0.2]
     train_ratio: 0.8
   paired_t_test: True
@@ -15,11 +15,11 @@ testing_strategy:
 
 dataset_config:
   dataset_path: "./data/given/"
-  prefiltering: {"cold_users" : 30, "cold_items": 30}
+  prefiltering: {} # {"cold_users" : 30, "cold_items": 30}
 
 models:
   UserRecursiveKNN:
-    neighbours: 15
+    neighbours: [15]
     similarity: sim_sim
     weight_threshold: 0.5
     recursion_threshold: 2

@@ -22,11 +22,24 @@ class UserRecursiveKNNRecommender(UserKNNRecommender):
     def get_single_prediction(self, active_user_id, candidate_item_id):
         return self.recursive_prediction(active_user_id, candidate_item_id)
 
+    def get_predictions(self):
+        for test in self.test_ratings:
+            user_id = int(test['user_id'])
+            item_id = int(test['item_id'])
+            
+            user_predicted_rating = self.get_single_prediction(active_user_id = user_id, candidate_item_id = item_id)
+                
+            test["pred_rating"] = user_predicted_rating
+            #test["item_pred_rating"] = item_predicted_rating
+            self.add_prediction(test)
         
+        return test
+      
     def recursive_prediction(self, active_user: int, candidate_item: int, recursion_level: int = 0) -> float:
         """"""
         #ic("pp_rec.recursive_prediction()")
-        
+        active_user = int(active_user)
+        candidate_item = int(candidate_item)
         # starts at 0
         if recursion_level > self.recursion_threshold:
             return self.baseline_predictor(active_user, candidate_item)
@@ -38,7 +51,7 @@ class UserRecursiveKNNRecommender(UserKNNRecommender):
         beta = 0.0
         
         for neighbour in nns:
-            neighbour_id = neighbour["user_id"]
+            neighbour_id = int(neighbour["user_id"])
             neighbour_item_rating = self.get_user_item_rating(neighbour_id, candidate_item)
             
             if neighbour_item_rating is not None:
