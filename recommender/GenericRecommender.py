@@ -34,28 +34,28 @@ class GenericRecommender:
         raise NotImplementedError("implement this method")
 
     
-    def predict(self, which = None):
-        entries = self.validation_ratings if which == "validation" else self.test_ratings
-        #print(entries)
-        for i, entry in enumerate(entries):
-            #print(entry)
-            try:
-                user_id = int(entry['user_id'])
-                item_id = int(entry['item_id'])
-                
-                predicted_rating = self.get_single_prediction(active_user_id = user_id, candidate_item_id = item_id)
-                    
-                entry["pred_rating"] = predicted_rating
-                self.add_prediction(entry)
-                
-                if self.kwargs["experiment_config"]["early_stop"]:
-                    if i > 30:
-                        break
-                        
-            except KeyboardInterrupt:
-                break
-        #print(self.predictions)
-        return self.predictions[-1]
+    #def predict(self, which = None):
+    #    entries = self.validation_ratings if which == "validation" else self.test_ratings
+    #    #print(entries)
+    #    for i, entry in enumerate(entries):
+    #        #print(entry)
+    #        try:
+    #            user_id = int(entry['user_id'])
+    #            item_id = int(entry['item_id'])
+    #            
+    #            predicted_rating = self.get_single_prediction(active_user_id = user_id, candidate_item_id = item_id)
+    #                
+    #            entry["pred_rating"] = predicted_rating
+    #            self.add_prediction(entry)
+    #            
+    #            if self.kwargs["experiment_config"]["early_stop"]:
+    #                if i > 30:
+    #                    break
+    #                    
+    #        except KeyboardInterrupt:
+    #            break
+    #    #print(self.predictions)
+    #    return self.predictions[-1]
 
 
     def evaluate_predictions(self,):
@@ -165,9 +165,9 @@ class GenericRecommender:
         
         self.dataset.add_new_recommendations_to_trainset(new_recommendations)
 
-    def prepare_for_validation(self):
-        self.reset_predictions()
-        self.add_new_recommendations(self.validation_ratings) # might cause abnormalities in augmentation
+    #def prepare_for_validation(self):
+    #    self.reset_predictions()
+    #    self.add_new_recommendations(self.validation_ratings) # might cause abnormalities in augmentation
     
     
     def add_prediction(self, prediction: dict) -> None:

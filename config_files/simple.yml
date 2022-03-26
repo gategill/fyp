@@ -1,23 +1,24 @@
 experiment_config:
   seed: 1
   save_in_s3: False
-  kfolds: 2
+  kfolds: 1
   early_stop: False
   disable_ic: True
   paired_t_test: True
   evaluation_metrics: "MAE"
+  validation: True
 
 
 dataset_config:
   dataset_path: "./data/given/"
-  prefiltering: {"user_k_core" : 20, "item_k_core" : 5} # {"cold_users" : 30, "cold_items": 30}
+  prefiltering: {"user_k_core" : 20, "item_k_core" : 5} #  {"cold_users" : 30, "cold_items": 30} #  
 
 models:
   UserRecursiveKNN:
-    neighbours: [15]
+    neighbours: 15
     similarity: sim_sim
     weight_threshold: 0.5
-    recursion_threshold: 2
+    recursion_threshold: 1
     phi: 10
     #k_prime: 15
     neighbour_selection: "cs+"

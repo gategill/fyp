@@ -52,6 +52,7 @@ def run_experiment(config_path) -> None:
     # pass some agruments down
     kwargs["config_path"] = config_path
     kwargs["dataset_config"]["kfolds"] = kwargs["experiment_config"]["kfolds"]
+    kwargs["dataset_config"]["validation"] = kwargs["experiment_config"]["validation"]
 
     save_in_s3 = kwargs["experiment_config"]["save_in_s3"]
     kfolds = kwargs["experiment_config"]["kfolds"]
@@ -94,8 +95,13 @@ def run_experiment(config_path) -> None:
         model_results = results_header            
         print("MODEL = {}".format(model))
         
-        #for K in kwargs["experiment_config"]["neighbours"]:    
-        for K in kwargs["models"][model]["neighbours"]: # for param_set in param_space
+        #for K in kwargs["experiment_config"]["neighbours"]: 
+        if kwargs["models"][model]["neighbours"] != list:
+            neighbourhood_sizes = [kwargs["models"][model]["neighbours"]]
+        else:
+            neighbourhood_sizes = kwargs["models"][model]["neighbours"]
+            
+        for K in neighbourhood_sizes: # for param_set in param_space
   
             print("NEIGHBOURS = {}".format(K))
             model_k_mae = []
@@ -122,6 +128,7 @@ def run_experiment(config_path) -> None:
 
                     print("\nGetting Predictions\n")
                     test = a_recommender.get_predictions()
+                    #print(a_recommender.predictions)
                     toc = time.time()
                     time_elapsed = round(toc - tic, 3)
                     

@@ -29,6 +29,7 @@ class UserRecursiveKNNRecommender(UserKNNRecommender):
             
             user_predicted_rating = self.get_single_prediction(active_user_id = user_id, candidate_item_id = item_id)
                 
+
             test["pred_rating"] = user_predicted_rating
             #test["item_pred_rating"] = item_predicted_rating
             self.add_prediction(test)
@@ -42,7 +43,11 @@ class UserRecursiveKNNRecommender(UserKNNRecommender):
         candidate_item = int(candidate_item)
         # starts at 0
         if recursion_level > self.recursion_threshold:
-            return self.baseline_predictor(active_user, candidate_item)
+            pr = self.baseline_predictor(active_user, candidate_item)
+            if pr is None:
+                print("BREAKING NONONONOONONONONONONONo")
+            #print(pr)
+            return pr
 
         # no item id, doesn't limit to just rated
         nns = self.nearest_neighbour_seletion(active_user, candidate_item)
@@ -70,8 +75,11 @@ class UserRecursiveKNNRecommender(UserKNNRecommender):
                 beta += self.weight_threshold * abs(sim_x_y)
         
         mean_rating_for_active_user = self.get_user_mean_rating(active_user)
+        if mean_rating_for_active_user is None:
+                print("BREAKING NONONONOONONONONONONONo")
         
         if beta == 0.0:
+            
             return mean_rating_for_active_user
         else:
             prediction = mean_rating_for_active_user + (alpha/beta)

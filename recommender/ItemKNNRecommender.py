@@ -292,9 +292,13 @@ class ItemKNNRecommender(GenericRecommender):
             raise TypeError("get_item_mean_rating: you supplied item_id = '%s' but item_id must be a positive integer" % item_id)
         if item_id not in self.item_train_ratings:
             raise ValueError("get_item_mean_rating: you supplied item_id = %i but this item does not exist" % item_id)
+
         
-        return self.item_train_means[item_id]
+        if self.item_train_means[item_id] is None:
+            return self.mean_train_rating
             
+        else:
+            return self.item_train_means[item_id]
             
     def get_genre_ratings(self, genre: str) -> list:
         #ic("item_rec.get_genre_ratings()")

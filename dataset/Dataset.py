@@ -231,11 +231,13 @@ class Dataset:
      
         num_ratings = 0
         n_split = self.kwargs["kfolds"]
+        validation = self.kwargs["validation"]
+
         
         df = self.get_ratings_as_df()
         nrow = df.shape[0]
         
-        if n_split == 1:
+        if (n_split == 1) or (validation == False):
             #df_test = df.sample(frac = 0.2)
             #df_train = pd.read_csv("./data/given/ratings_part.txt", sep = "\t")
             df_test = pd.read_csv("./data/given/ratings_part_test.txt", sep = "\t")
@@ -254,8 +256,12 @@ class Dataset:
 
             #print(df_test.head())
             
+        elif (n_split == 1) and (validation == True):
+            df_test = df.sample(frac = 0.8)
+            
         else:
-            a,b = ((fold_num * nrow) // n_split), ((1 + fold_num) * nrow // n_split)
+            # (n_split > 1) and (validation == True):
+            a, b = ((fold_num * nrow) // n_split), ((1 + fold_num) * nrow // n_split)
             df_test = df.loc[np.r_[a:b], :]
         
         df_train = df[~df.isin(df_test)].dropna()

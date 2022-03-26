@@ -393,7 +393,11 @@ class UserKNNRecommender(GenericRecommender):
         if user_id not in self.user_train_ratings:
             raise ValueError("get_user_mean_rating: you supplied user_id = %i but this user does not exist" % user_id)
         
-        return self.user_train_means[user_id]
+        if self.user_train_means[user_id] is None:
+            return self.mean_train_rating
+            
+        else:
+            return self.user_train_means[user_id]
     
            
     def get_demographic_ratings(self, age = None, gender = None, occupation = None, zipcode = None) -> list:
