@@ -1,21 +1,16 @@
 experiment_config:
   seed: 1
   save_in_s3: False
-  kfolds: 1
-  early_stop: FALSE
+  kfolds: 2
+  early_stop: False
   disable_ic: True
-
-testing_strategy:
-  method:
-    #kfolds: 5
-    #validation: [0.6, 0.2, 0.2]
-    train_ratio: 0.8
   paired_t_test: True
   evaluation_metrics: "MAE"
 
+
 dataset_config:
   dataset_path: "./data/given/"
-  prefiltering: {} # {"cold_users" : 30, "cold_items": 30}
+  prefiltering: {"user_k_core" : 20, "item_k_core" : 5} # {"cold_users" : 30, "cold_items": 30}
 
 models:
   UserRecursiveKNN:
