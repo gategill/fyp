@@ -6,6 +6,8 @@
 from icecream import ic
 from recommender.UserKNNRecommender import UserKNNRecommender
 import copy
+import time
+from tqdm import tqdm
 
 class UserRecursiveKNNRecommender(UserKNNRecommender):
     def __init__(self, dataset = None, **kwargs) -> None:
@@ -22,19 +24,17 @@ class UserRecursiveKNNRecommender(UserKNNRecommender):
     def get_single_prediction(self, active_user_id, candidate_item_id):
         return self.recursive_prediction(active_user_id, candidate_item_id)
 
-    def get_predictions(self):
-        for test in self.test_ratings:
-            user_id = int(test['user_id'])
-            item_id = int(test['item_id'])
+    #def get_predictions(self):
+    #    for test in tqdm(self.test_ratings):
+    #        user_id = int(test['user_id'])
+    #        item_id = int(test['item_id'])
             
-            user_predicted_rating = self.get_single_prediction(active_user_id = user_id, candidate_item_id = item_id)
-                
+    #        user_predicted_rating = self.get_single_prediction(active_user_id = user_id, candidate_item_id = item_id)
 
-            test["pred_rating"] = user_predicted_rating
-            #test["item_pred_rating"] = item_predicted_rating
-            self.add_prediction(test)
-        
-        return test
+    #        test["pred_rating"] = user_predicted_rating
+    #        self.add_prediction(test)
+    #    
+    #    return test
       
     def recursive_prediction(self, active_user: int, candidate_item: int, recursion_level: int = 0) -> float:
         """"""

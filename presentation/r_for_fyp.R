@@ -570,25 +570,44 @@ t.test(k20, t, paired=TRUE)
 
 
 par(mfrow = c(1,1))
-plot(x, y.user_knn, type='l',
-     main = "K vs MAE of User Recursive KNN",
+x = c(5,10,15,20,25)
+plot(x, user.knn.means, type='l',
+     main = "K vs MAE of User Recursive KNN CS+",
      col= 1, pch=1, 
      xlab = "Neighbourhood Size",
      ylab="Mean MAE", lty=1,
      ylim = c(0.630,0.745))
 
-points(x, y.user_knn, col=1, pch=1,  cex = 2, lw = 2)
-lines(x, y.user_knn, col=1, pch=1,  lw = 3)
 
-t =  c(0.66526, 0.63645, 0.63389, 0.64073, 0.64418)
-points(x, t, col=2, pch=2,  cex = 2, lw = 2)
-lines(x, t, col=2,lty=2, lw= 3)
+#sd(user.knn.means)
+#rnorm(5, mean = 46526.67, sd = 1000)
+points(x, user.knn.means, col=1, pch=1,  cex = 2, lw = 2)
+lines(x, user.knn.means, col=1, pch=1,  lw = 3)
+
+#t =  c(0.66526, 0.63645, 0.63389, 0.64073, 0.64418)
+#x = c(5,10,15)
+points(x, user.rec.means[user.rec.means$Group.2 == 1,]$x, col=2, pch=2,  cex = 2, lw = 2)
+lines(x,  user.rec.means[user.rec.means$Group.2 == 1,]$x, col=2,lty=2, lw= 3)
+
+points(x,  user.rec.means[user.rec.means$Group.2 == 2,]$x, col=3, pch=3,  cex = 2, lw = 2)
+lines(x,  user.rec.means[user.rec.means$Group.2 == 2,]$x, col=3,lty=3, lw= 3)
 
 
-legend('topright', legend = c("Baseline", "CS+"), col = c(1:2),
-       pch = c(1:2), lty = c(1:2))
+legend('topright', legend = c("Baseline", "Recursion=1", "Recursion=2"), col = c(1:3),
+       pch = c(1:3), lty = c(1:3))
 
 which.min(t); min(t)
+
+
+
+user.rec = Recursive.Complete
+user.rec.means = aggregate(user.rec$mae, list(user.rec$k, user.rec$r), FUN=mean)
+user.rec.means
+user.rec.best.k = 10
+user.rec.best.r = 2
+user.rec.best.result = 0.63389
+
+which.min(user.rec$mae)
 
 ##############################
 #EDA
@@ -655,4 +674,22 @@ asq / length(ashs)
 hist(asq)  
 m = c(1,2,3,4,5)
 hist(rbind(m, asq))
+
+
+
+####################
+# recursive
+
+user.corec = CoRec_Complete[ , c("algorithm", "k", "mae_u", "fold_num", "a")]
+user.corec.means.k = aggregate(user.corec$mae, list(user.corec$k), FUN=mean)$x
+user.corec.means.a= aggregate(user.corec$mae, list(user.corec$a), FUN=mean)$x
+user.corec.means.k_a = aggregate(user.corec$mae, list(user.corec$k, user.corec$a), FUN=mean)
+user.corec.best.k = 15 # which.min(user.corec.means.k) * 5
+user.corec.best.a = 50#which.min(user.corec.means.a)
+user.corec.best.mean = min(user.corec.means.k, user.corec.means.k_a$x)
+user.corec.best.result = min(user.corec.means.k, user.corec.means.a)
+user.corec.best.results = user.corec[user.corec$k == user.corec.best.k & user.corec$a == user.corec.best.a, ]$mae
+
+
+
 

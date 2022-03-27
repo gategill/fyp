@@ -8,45 +8,45 @@ experiment_config:
   evaluation_metrics: "MAE"
   validation: True
 
-
 dataset_config:
   dataset_path: "./data/given/"
-  prefiltering: {"user_k_core" : 20, "item_k_core" : 5} #  {"cold_users" : 30, "cold_items": 30} #  
+  prefiltering:   {"user_k_core" : 20, "item_k_core" : 5} #{"cold_users" : 30, "cold_items": 30} # 
 
 models:
-  UserRecursiveKNN:
-    neighbours: 15
-    similarity: sim_sim
-    weight_threshold: 0.5
-    recursion_threshold: 1
-    phi: 10
-    #k_prime: 15
-    neighbour_selection: "cs+"
+  UserKNN:
+    neighbours: [5,10,15,20,25]
+    similarity: sim_pearson
 
-  # UserKNN:
-  #   neighbours: [20]
-  #   similarity: sim_sim
-  # ItemKNN:
-  #   neighbours: [15]
-  #   similarity: sim_sim
-# 
-  # UserBootstrap:
-  #   neighbours: [20]
-  #   similarity: sim_sim
-  #   enrichments: 1
-  #   additions: 10
-# 
-  # ItemBootstrap:
-  #   neighbours: [15]
-  #   similarity: sim_sim
-  #   enrichments: 1
-  #   additions: 10
-# 
-  # CoRec:
-  #   neighbours: [15]
-  #   similarity: sim_sim
-  #   additions: 50
-  #   top_m: 0.1
+  ItemKNN:
+    neighbours: [5,10,15,20,25]
+    similarity: sim_pearson
+
+#UserBootstrap:
+#  neighbours: [20]
+#  similarity: sim_sim
+#  enrichments: 1
+#  additions: 10
+#
+#ItemBootstrap:
+#  neighbours: [15]
+#  similarity: sim_sim
+#  enrichments: 1
+#  additions: 10
+#
+#CoRec:
+#  neighbours: [15]
+#  similarity: sim_sim
+#  additions: 50
+#  top_m: 0.1
+#
+#UserRecursiveKNN:
+#  neighbours: [10]
+#  similarity: sim_sim
+#  weight_threshold: 0.5
+#  recursion_threshold: 2
+#  phi: 10
+#  #k_prime: 15
+#  neighbour_selection: "cs+"
 
 
 

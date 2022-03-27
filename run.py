@@ -62,7 +62,7 @@ def run_experiment(config_path) -> None:
         
     current_timestamp = int(time.time())
     print(current_timestamp)
-    save_path = "./results/{}-cold_recursive-r1".format(current_timestamp)
+    save_path = "./results/{}-official-other-knn".format(current_timestamp)
     if not os.path.exists("./results"):
         os.mkdir("./results")
     os.mkdir(save_path)
@@ -70,7 +70,6 @@ def run_experiment(config_path) -> None:
     os.mkdir(save_path + "/model")
     os.mkdir(save_path + "/model_k")
     os.mkdir(save_path + "/single")
-
     
     src = kwargs["config_path"]
     dst = save_path + "/config.yml"
@@ -93,16 +92,12 @@ def run_experiment(config_path) -> None:
     
     for model in kwargs["models"]:
         model_mae = []
-        best_recommender = []
-        #print(kwargs)
+
         model_results = results_header            
         print("MODEL = {}".format(model))
-        #neighbourhood_sizes = []
-        #for K in kwargs["experiment_config"]["neighbours"]: 
-
         for K in kwargs["models"][model]["neighbours"]: # for param_set in param_space
   
-            print("NEIGHBOURS = {}".format(K))
+            print("\nNEIGHBOURS = {}".format(K))
             model_k_mae = []
             #model_k_rmse = []
             model_k_results = results_header
@@ -127,7 +122,6 @@ def run_experiment(config_path) -> None:
 
                     print("\nGetting Predictions\n")
                     test = a_recommender.get_predictions()
-                    #print(a_recommender.predictions)
                     toc = time.time()
                     time_elapsed = round(toc - tic, 3)
                     
@@ -137,9 +131,7 @@ def run_experiment(config_path) -> None:
                     
                     model_k_mae.append(mae)
                     model_mae.append(mae)
-                    
-                    best_recommender = [K, a_recommender] if mae <= min(model_mae) else best_recommender
-                    
+                                        
                     experiment_result = "{}, {}, {}, {}, {}\n".format(model, K, mae, time_elapsed, fold_num + 1)
                     all_results += experiment_result
                     model_results += experiment_result
@@ -191,19 +183,6 @@ def run_experiment(config_path) -> None:
                 s3_name = "{}/model_k/model_k-{}-{}.txt".format(current_timestamp, model, K)
                 s3.put_object(Body = model_k_results, Bucket = "fyp-w9797878", Key = s3_name)
              
-        #print("RUnning VALIDATION")
-        #validated_model = best_recommender[1]
-        #best_k = best_recommender[0]
-        #validated_model.prepare_for_validation()
-        #validated_prediction = validated_model.predict()
-        #validated_mae = validated_model.evaluate_predictions()
-    
-        #print(validated_prediction, validated_mae)
-        
-        #model_results += "{}_{}: Validated_MAE = {}\n".format(model, best_k, validated_mae)
-        #all_results += "{}_{}: Validated_MAE = {}\n".format(model, best_k, validated_mae)           
-
-                    
         # saving model   
         with open("{}/model/model-{}.txt".format(save_path, model), "w") as f:
             f.write(model_results)

@@ -8,6 +8,8 @@ from icecream import ic
 from dataset.Dataset import Dataset
 from evaluation.Evaluation import Evaluation
 from recommender.Similarities import Similarities
+from tqdm import tqdm
+
 
 
 class GenericRecommender:
@@ -34,28 +36,17 @@ class GenericRecommender:
         raise NotImplementedError("implement this method")
 
     
-    #def predict(self, which = None):
-    #    entries = self.validation_ratings if which == "validation" else self.test_ratings
-    #    #print(entries)
-    #    for i, entry in enumerate(entries):
-    #        #print(entry)
-    #        try:
-    #            user_id = int(entry['user_id'])
-    #            item_id = int(entry['item_id'])
-    #            
-    #            predicted_rating = self.get_single_prediction(active_user_id = user_id, candidate_item_id = item_id)
-    #                
-    #            entry["pred_rating"] = predicted_rating
-    #            self.add_prediction(entry)
-    #            
-    #            if self.kwargs["experiment_config"]["early_stop"]:
-    #                if i > 30:
-    #                    break
-    #                    
-    #        except KeyboardInterrupt:
-    #            break
-    #    #print(self.predictions)
-    #    return self.predictions[-1]
+    def get_predictions(self):
+        for test in tqdm(self.test_ratings, desc = "loading"):
+            user_id = int(test['user_id'])
+            item_id = int(test['item_id'])
+            
+            predicted_rating = self.get_single_prediction(active_user_id = user_id, candidate_item_id = item_id)
+                
+            test["pred_rating"] = predicted_rating
+            self.add_prediction(test)
+
+        return test
 
 
     def evaluate_predictions(self,):

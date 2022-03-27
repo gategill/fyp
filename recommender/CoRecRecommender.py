@@ -12,6 +12,8 @@ import random
 import copy
 import pandas as pd
 import math
+from tqdm import tqdm
+
 
 
 class CoRecRecommender(GenericRecommender):
@@ -38,7 +40,8 @@ class CoRecRecommender(GenericRecommender):
     
     
     def get_predictions(self):
-        for test in self.test_ratings:
+        for test in tqdm(self.test_ratings):
+
             user_id = int(test['user_id'])
             item_id = int(test['item_id'])
             
