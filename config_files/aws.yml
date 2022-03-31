@@ -15,27 +15,27 @@ dataset_config:
 models:
   UserKNN:
     neighbours: [5, 10, 15, 20]
-    similarity: sim_sim
+    similarity: sim_mod
 
   ItemKNN:
     neighbours: [5, 10, 15, 20]
-    similarity: sim_sim
+    similarity: sim_mod
 
   UserBootstrap:
     neighbours: [5, 10, 15, 20]
-    similarity: sim_sim
+    similarity: sim_mod
     enrichments: 2
     additions: 5
 
   ItemBootstrap:
     neighbours: [5, 10, 15, 20]
-    similarity: sim_sim
+    similarity: sim_mod
     enrichments: 2
     additions: 5
 
   UserRecursiveKNN:
     neighbours: [5, 10, 15, 20]
-    similarity: sim_sim
+    similarity: sim_mod
     weight_threshold: 1.0
     recursion_threshold: 2
     phi: 5
@@ -44,6 +44,6 @@ models:
     
   #CoRec:
     #neighbours: [5, 10, 15, 20]
-    #similarity: sim_sim
+    #similarity: sim_mod
   #  additions: 30
   #  top_m: 3000

@@ -10,12 +10,14 @@ hist(h,breaks = 30,
 
 user.knn = KNN_Complete[KNN_Complete$algorithm == "UserKNN" , ]
 user.knn.means = aggregate(user.knn$mae, list(user.knn$k), FUN=mean)$x
+user.knn.means.times = aggregate(user.knn$time_elapsed_s, list(user.knn$k), FUN=mean)$x
 user.knn.best.k = which.min(user.knn.means) * 5
 user.knn.best.result = min(user.knn.means)
 user.knn.best.results = user.knn[user.knn$k == user.knn.best.k, ]$mae
 
 item.knn = KNN_Complete[KNN_Complete$algorithm == "ItemKNN" , ]
 item.knn.means = aggregate(item.knn$mae, list(item.knn$k), FUN=mean)$x
+item.knn.means.times = aggregate(item.knn$time_elapsed_s, list(item.knn$k), FUN=mean)$x
 item.knn.best.k = which.min(item.knn.means) * 5
 item.knn.best.result = min(item.knn.means)
 item.knn.best.results = item.knn[item.knn$k == item.knn.best.k, ]$mae
@@ -30,7 +32,9 @@ item.knn.best.k
 
 
 x = c(5,10,15,20,25)
-par(mfrow = c(1,1))
+#par(mfrow = c(1,1))
+par(mar = c(5, 4, 4, 4) + 0.3)              # Additional space for second y-axis
+
 plot(x, user.knn.means,type = "l",
      main = "K vs MAE of User KNN and Item KNN",
      col= 1, pch=1, 
@@ -44,10 +48,42 @@ plot(x, user.knn.means,type = "l",
 
 points(x, item.knn.means, col=2, pch=2, cex = 2, lw = 2)
 lines(x, item.knn.means, col=2,lty=2, lw = 3)
+
+
+par(new = TRUE)                             # Add new plot
+plot(x, item.knn.means.times, pch = 17, col = 3,              # Create second plot without axes
+     axes = FALSE, xlab = "", ylab = "")
+points(x, user.knn.means.times, col=15, pch=5, cex = 2, lw = 2)
+axis(side = 4, at = pretty(range(item.knn.means.times)))      # Add second axis
+mtext("seconds", side = 4, line = 3)      
 legend('topright', legend = c("User KNN", "Item KNN"), col = c(1:2), pch = c(1:2), lty = c(1:2))
 
+hist( user.knn.means, breaks = 5)
+shas = rbind(user.knn.means, item.knn.means)
 
+require(plotrix)
 
+mycol <- c("green ", "blue ")
+mydata<- list(rnorm(5, 10,5),rnorm(5, 10, 8),rnorm(5, 15,5) )
+multhist(shas, col= mycol, x = )
+abline(a = 0, b = 0)
+require(ggplot2)
+hist(mydata[[1]], mydata[[2]], mydata[[3]], col = c(1,2,3), breaks = 100)
+
+barplot(ylim = c(0.60, 0.75),shas, beside = TRUE, names = c("5","10","15","20","25"), col = c(1,2),
+        xlab = "Neigbourhood Size",
+        ylab = "MAE",
+        main = "K vs MAE for User and Item based KNN", xpd = FALSE)
+abline(a = 0.6, b = 0)
+
+par(new = TRUE)                             # Add new plot
+plot(x, item.knn.means.times, pch = 15, col = 3,              # Create second plot without axes
+     axes = FALSE, xlab = "", ylab = "",cex = 2)
+points(x, user.knn.means.times, col=4, pch=16, cex = 2, lw = 2)
+axis(side = 4, at = pretty(range(item.knn.means.times)))      # Add second axis
+lines(x, item.knn.means.times, col=3,lty=1, lw = 3, fill = TRUE)
+lines(x, user.knn.means.times, col=4,lty=2, lw = 3)
+mtext("seconds", side = 4, line = 3)   
 
 ########################################################################################
 # USERBOOTSTRAPPED, best = e1 with k=20 at 0.695216, slightly better than e=0
@@ -569,7 +605,9 @@ t.test(k20, t, paired=TRUE)
 
 
 
-par(mfrow = c(1,1))
+#par(mfrow = c(1,1))
+par(mar = c(5, 4, 4, 4) + 0.3)              # Additional space for second y-axis
+
 x = c(5,10,15,20,25)
 plot(x, user.knn.means, type='l',
      main = "K vs MAE of User Recursive KNN CS+",
@@ -579,13 +617,9 @@ plot(x, user.knn.means, type='l',
      ylim = c(0.630,0.745))
 
 
-#sd(user.knn.means)
-#rnorm(5, mean = 46526.67, sd = 1000)
 points(x, user.knn.means, col=1, pch=1,  cex = 2, lw = 2)
 lines(x, user.knn.means, col=1, pch=1,  lw = 3)
 
-#t =  c(0.66526, 0.63645, 0.63389, 0.64073, 0.64418)
-#x = c(5,10,15)
 points(x, user.rec.means[user.rec.means$Group.2 == 1,]$x, col=2, pch=2,  cex = 2, lw = 2)
 lines(x,  user.rec.means[user.rec.means$Group.2 == 1,]$x, col=2,lty=2, lw= 3)
 
@@ -598,10 +632,19 @@ legend('topright', legend = c("Baseline", "Recursion=1", "Recursion=2"), col = c
 
 which.min(t); min(t)
 
+par(new = TRUE)  
+x
+# Add new plot
+plot(x, user.rec.means.time[user.rec.means.time$Group.2 == 1,]$x, pch = 17, col = 3,              # Create second plot without axes
+     axes = FALSE, xlab = "", ylab = "")
+axis(side = 4, at = pretty(range(user.rec.means.time[user.rec.means.time$Group.2 == 1,]$x)))      # Add second axis
+mtext("time", side = 4, line = 3)      
 
 
 user.rec = Recursive.Complete
+user.rec$time_elapsed_s = as.numeric(user.rec$time_elapsed_s)
 user.rec.means = aggregate(user.rec$mae, list(user.rec$k, user.rec$r), FUN=mean)
+user.rec.means.time = aggregate(user.rec$time_elapsed_s, list(user.rec$k, user.rec$r), FUN=mean)
 user.rec.means
 user.rec.best.k = 10
 user.rec.best.r = 2
@@ -609,6 +652,7 @@ user.rec.best.result = 0.63389
 
 which.min(user.rec$mae)
 
+user.rec$time_elapsed_s
 ##############################
 #EDA
 
@@ -676,20 +720,6 @@ m = c(1,2,3,4,5)
 hist(rbind(m, asq))
 
 
-
-####################
-# recursive
-
-user.corec = CoRec_Complete[ , c("algorithm", "k", "mae_u", "fold_num", "a")]
-user.corec.means.k = aggregate(user.corec$mae, list(user.corec$k), FUN=mean)$x
-user.corec.means.a= aggregate(user.corec$mae, list(user.corec$a), FUN=mean)$x
-user.corec.means.k_a = aggregate(user.corec$mae, list(user.corec$k, user.corec$a), FUN=mean)
-user.corec.best.k = 15 # which.min(user.corec.means.k) * 5
-user.corec.best.a = 50#which.min(user.corec.means.a)
-user.corec.best.mean = min(user.corec.means.k, user.corec.means.k_a$x)
-user.corec.best.result = min(user.corec.means.k, user.corec.means.a)
-user.corec.best.results = user.corec[user.corec$k == user.corec.best.k & user.corec$a == user.corec.best.a, ]$mae
-
-
-
+##################
+# cold starts
 

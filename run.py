@@ -62,7 +62,8 @@ def run_experiment(config_path) -> None:
         
     current_timestamp = int(time.time())
     print(current_timestamp)
-    save_path = "./results/{}-official-other-knn".format(current_timestamp)
+    save_name = kwargs["experiment_config"]["save_name"]
+    save_path = "./results/{}-{}".format(current_timestamp, save_name)
     if not os.path.exists("./results"):
         os.mkdir("./results")
     os.mkdir(save_path)

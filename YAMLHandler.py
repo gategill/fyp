@@ -83,8 +83,8 @@ def read_in_yaml_file(config_path):
         if type(kwargs["models"][model]["similarity"]) != str:
                 raise TypeError("similarity should be an string") 
             
-        if kwargs["models"][model]["similarity"] not in ["sim_pearson", "sim_cosine", "sim_sim"]:
-            raise ValueError("invalid similarity measure\navailable similarites are: [sim_pearson, sim_cosine, sim_sim]")
+        if kwargs["models"][model]["similarity"] not in ["sim_pearson", "sim_cosine", "sim_mod"]:
+            raise ValueError("invalid similarity measure\navailable similarites are: [sim_pearson, sim_cosine, sim_mod]")
             
             
     if "Bootstrap" in kwargs["models"]:

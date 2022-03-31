@@ -14,7 +14,7 @@ dataset_config:
 models:
   UserRecursiveKNN:
     neighbours: [5, 10, 15, 20, 25]
-    similarity: sim_sim
+    similarity: sim_mod
     weight_threshold: 0.5
     recursion_threshold: 2
     phi: 10

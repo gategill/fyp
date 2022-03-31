@@ -8,7 +8,7 @@ experiment_config:
   
   evaluation_metrics: ["MAE", "RMSE"]
   neighbours: 10
-  similarity: sim_sim
+  similarity: sim_mod
 
 dataset_config:
   dataset_path: "./data/given/"

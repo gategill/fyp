@@ -140,7 +140,89 @@ class ItemKNNRecommender(GenericRecommender):
                 nearest_neighbours.pop(lowest_sim_index)
                 
         return nearest_neighbours
+ 
+    
+    def get_k_nearest_items_with_overlap(self, similarity_function: types.FunctionType, k: int, candidate_item_id: int, active_user_id: int = None, overlap: int = 0) -> list:
+        #ic("user_rec.get_k_nearest_users_with_overlap()")
         
+        """
+        [{user_id: int, rating: float, sim: float}]
+
+        Get the k nearest users to active_user_id.
+        Optionally, if candidate_item_id is specified, the set of neighbours (users) is confined to those who have 
+        rated candidate_item_id.
+        In this case, each neighbour's rating for candidate_item_id is part of the final result.
+        With sharing at least overlap items together
+        
+ 
+        """
+        
+        if type(similarity_function) != types.FunctionType:
+            raise TypeError("get_k_nearest_items_with_overlap: you supplied similarity_function = '%s' but similarity_function must be a function" % similarity_function)
+        if (type(overlap) != int) or (overlap < 0):
+            raise TypeError("get_k_nearest_items_with_overlap: you supplied overlap = '%s' but overlap must be a integer >= 0" % similarity_function)
+        if type(k) != int or k < 1:
+            raise TypeError("get_k_nearest_items_with_overlap: you supplied k = '%s' but k must be a positive integer" % k)
+        if k > len(self.item_train_ratings):
+            raise ValueError("get_k_nearest_items_with_overlap: you supplied k = %i but this is too large" % k)
+        if type(candidate_item_id) != int or candidate_item_id < 1:
+            raise TypeError("get_k_nearest_items_with_overlap: you supplied candidate_item_id = '%s' but candidate_item_id must be a positive integer" % candidate_item_id)
+        if candidate_item_id not in self.item_train_ratings:
+            raise ValueError("get_k_nearest_items_with_overlap: you supplied candidate_item_id = %i but this user does not exist" % candidate_item_id)
+        if active_user_id:
+            if type(active_user_id) != int or active_user_id < 1:
+                raise TypeError("get_k_nearest_users_with_overlap: you supplied active_user_id = '%s' but active_user_id must be a positive integer" % active_user_id)
+            if active_user_id not in self.user_train_ratings:
+                raise ValueError("get_k_nearest_users_with_overlap: you supplied active_user_id = %i but this item does not exist" % active_user_id)     
+        
+        nearest_neighbours = []
+        
+        for item_id in self.item_train_ratings:
+    
+            if candidate_item_id == item_id:
+                continue
+            if (not active_user_id is None) and (not active_user_id in self.item_train_ratings[item_id]):
+                continue
+            
+            if self.get_num_shared_users(candidate_item_id, item_id) < overlap:
+                continue
+            
+            sim = self.get_item_similarity(similarity_function, candidate_item_id, item_id)
+            
+            candidate_neighbour = {'item_id': item_id, 'sim': sim}
+            
+            # if not None = if confined to users with that item ID
+            if not active_user_id is None:
+                # what's your ID? 
+                candidate_neighbour['rating'] = self.item_train_ratings[item_id][active_user_id]
+            
+            nearest_neighbours.append(candidate_neighbour)
+            
+            # ensure there are at most k neighbours, else remove the most unsimilar
+            if len(nearest_neighbours) > k:
+                lowest_sim_index = -1
+                lowest_sim = float('inf')
+                index = 0
+                
+                for neighbour in nearest_neighbours:
+                    
+                    if neighbour['sim'] < lowest_sim:
+                        lowest_sim_index = index
+                        lowest_sim = neighbour['sim']
+                        
+                    index = index + 1
+                nearest_neighbours.pop(lowest_sim_index)
+                
+        return nearest_neighbours
+    
+    
+    def get_num_shared_users(self, candidate_item, item_id):
+        i1_users = set(self.item_train_ratings[candidate_item].keys())
+        i2_users = set(self.item_train_ratings[item_id].keys())
+             
+        shared_users = i1_users.intersection(i2_users)
+        return len(shared_users)
+                   
 
     def get_thresholded_nearest_items(self, similarity_function: types.FunctionType, threshold: float, candidate_item_id: int, active_user_id: int = None) -> list:
         #ic("item_rec.get_thresholded_nearest_items()")
@@ -322,7 +404,7 @@ class ItemKNNRecommender(GenericRecommender):
         return ratings  
 
 
-    def get_item_user_rating(self, user_id: int, item_id: int) -> float:
+    def get_user_item_rating(self, user_id: int, item_id: int) -> float:
         #ic("user_rec.get_user_item_rating()")
         
         """

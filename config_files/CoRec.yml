@@ -15,6 +15,6 @@ dataset_config:
 models:
   CoRec:
     neighbours: [5, 10, 15, 20, 25]
-    similarity: sim_sim
+    similarity: sim_mod
     additions: 50
     top_m: 0.1

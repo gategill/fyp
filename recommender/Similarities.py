@@ -12,7 +12,7 @@ class Similarities:
         
         
     @staticmethod
-    def sim_sim(ratings1: dict, ratings2: dict) -> float:
+    def sim_mod(ratings1: dict, ratings2: dict) -> float:
         
         co_rated = []
         

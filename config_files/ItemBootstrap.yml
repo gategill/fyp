@@ -14,7 +14,7 @@ dataset_config:
 models:
   ItemBootstrap:
     neighbours: [5, 10, 15, 20, 25]
-    similarity: sim_sim
+    similarity: sim_mod
     enrichments: 1
     additions: 10
 

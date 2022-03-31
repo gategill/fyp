@@ -15,7 +15,7 @@ dataset_config:
 models:
   UserBootstrap:
     neighbours: [5, 10, 15, 20, 25]
-    similarity: sim_sim
+    similarity: sim_mod
     enrichments: 3
     additions: 10
 

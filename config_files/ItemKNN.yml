@@ -15,4 +15,4 @@ dataset_config:
 models:
   ItemKNN:
     neighbours: [25]
-    similarity: sim_sim
+    similarity: sim_mod

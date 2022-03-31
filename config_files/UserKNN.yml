@@ -15,5 +15,5 @@ dataset_config:
 models:
   UserKNN:
     neighbours: [25]
-    similarity: sim_sim
+    similarity: sim_mod
 

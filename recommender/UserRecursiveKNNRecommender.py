@@ -19,22 +19,11 @@ class UserRecursiveKNNRecommender(UserKNNRecommender):
         self.phi = kwargs["run_params"]["phi"]
         self.k_prime = self.k #kwargs["run_params"]["k_prime"]
         self.neighbour_selection = kwargs["run_params"]["neighbour_selection"]
+        self.hashed_predictions = {}
     
         
     def get_single_prediction(self, active_user_id, candidate_item_id):
         return self.recursive_prediction(active_user_id, candidate_item_id)
-
-    #def get_predictions(self):
-    #    for test in tqdm(self.test_ratings):
-    #        user_id = int(test['user_id'])
-    #        item_id = int(test['item_id'])
-            
-    #        user_predicted_rating = self.get_single_prediction(active_user_id = user_id, candidate_item_id = item_id)
-
-    #        test["pred_rating"] = user_predicted_rating
-    #        self.add_prediction(test)
-    #    
-    #    return test
       
     def recursive_prediction(self, active_user: int, candidate_item: int, recursion_level: int = 0) -> float:
         """"""
@@ -43,9 +32,15 @@ class UserRecursiveKNNRecommender(UserKNNRecommender):
         candidate_item = int(candidate_item)
         # starts at 0
         if recursion_level > self.recursion_threshold:
-            pr = self.baseline_predictor(active_user, candidate_item)
-            #print(pr)
-            return pr
+            hashkey_key = str(active_user) + "-"+ str(candidate_item)
+            if hashkey_key in self.hashed_predictions:
+                #print("HIT!")
+                return self.hashed_predictions[hashkey_key]
+            else:
+                pr = self.baseline_predictor(active_user, candidate_item)
+                #print(pr)
+                self.hashed_predictions[hashkey_key] = pr
+                return pr
 
         # no item id, doesn't limit to just rated
         nns = self.nearest_neighbour_seletion(active_user, candidate_item)

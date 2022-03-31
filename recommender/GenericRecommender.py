@@ -58,8 +58,8 @@ class GenericRecommender:
     def get_similarity_function(self):
         s = self.kwargs["run_params"]["similarity"]
         
-        if s == "sim_sim":
-            return Similarities.sim_sim
+        if s == "sim_mod":
+            return Similarities.sim_mod
         
         if s == "sim_pearson":
             return Similarities.sim_pearson
