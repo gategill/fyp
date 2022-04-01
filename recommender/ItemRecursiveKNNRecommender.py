@@ -27,20 +27,11 @@ class ItemRecursiveKNNRecommender(ItemKNNRecommender):
       
     def recursive_prediction(self, active_user: int, candidate_item: int, recursion_level: int = 0) -> float:
         """"""
-        #ic("pp_rec.recursive_prediction()")
         active_user = int(active_user)
         candidate_item = int(candidate_item)
         # starts at 0
         if recursion_level > self.recursion_threshold:
-            hashkey_key = str(active_user) + "-"+ str(candidate_item)
-            if hashkey_key in self.hashed_predictions:
-                #print("HIT!")
-                return self.hashed_predictions[hashkey_key]
-            else:
-                pr = self.baseline_predictor(active_user, candidate_item)
-                #print(pr)
-                self.hashed_predictions[hashkey_key] = pr
-                return pr
+            return self.baseline_predictor(active_user, candidate_item)
 
         # no item id, doesn't limit to just rated
         nns = self.nearest_neighbour_seletion(active_user, candidate_item)
@@ -50,9 +41,10 @@ class ItemRecursiveKNNRecommender(ItemKNNRecommender):
         
         for neighbour in nns:
             neighbour_id = int(neighbour["item_id"])
-            neighbour_item_rating = self.get_user_item_rating(user_id = active_user, item_id = neighbour_id) # should change?
             
-            if neighbour_item_rating is not None: # has a rating
+            # Check if it's rated
+            neighbour_item_rating = self.is_it_rated(user_ID = active_user, item_ID = neighbour_id)
+            if (neighbour_item_rating is not None): # has a rating
                 sim_x_y = self.get_item_similarity(self.similarity_function, candidate_item, neighbour_id)
                 mean_rating_for_neighbour = self.get_item_mean_rating(neighbour_id)
                 
@@ -60,7 +52,11 @@ class ItemRecursiveKNNRecommender(ItemKNNRecommender):
                 beta += abs(sim_x_y)
                 
             else:
-                rec_pred = self.recursive_prediction(active_user_id = active_user, candidate_item_id = neighbour_id, recursion_level = recursion_level + 1)
+                rec_pred = self.recursive_prediction(active_user, neighbour_id, recursion_level = recursion_level + 1)
+                
+                hashkey_key = str(active_user) + "-"+ str(neighbour_id)
+                self.hashed_predictions[hashkey_key] = rec_pred
+                
                 sim_x_y = self.get_item_similarity(self.similarity_function, candidate_item, neighbour_id)
                 mean_rating_for_neighbour = self.get_item_mean_rating(neighbour_id)
                 
@@ -82,6 +78,19 @@ class ItemRecursiveKNNRecommender(ItemKNNRecommender):
     
             return round(prediction, self.ROUNDING)
         
+    def is_it_rated(self, user_ID, item_ID):  
+        # Check if the rating exists in self.train, then in the intermediate calculations, else return None      
+        if self.get_user_item_rating(user_id = user_ID, item_id = item_ID) is not None:
+            return self.get_user_item_rating(user_id = user_ID, item_id = item_ID)
+         
+        else:
+            hashkey_key = str(user_ID) + "-"+ str(item_ID)
+            if hashkey_key in self.hashed_predictions:
+                return self.hashed_predictions[hashkey_key]
+            
+            else:
+                return None
+            
         
     def nearest_neighbour_seletion(self, active_user, candidate_item):
         if self.neighbour_selection == "bs":

@@ -7,7 +7,7 @@ experiment_config:
   paired_t_test: True
   evaluation_metrics: "MAE"
   validation: False
-  save_name: "official_rec_r1_k20_k25"
+  save_name: "test_item_rec_r2"
 
 dataset_config:
   dataset_path: "./data/given/"
@@ -40,11 +40,11 @@ models:
 #  additions: 50
 #  top_m: 0.1
 #
-  UserRecursiveKNN:
-    neighbours: [20, 25]
+  ItemRecursiveKNN:
+    neighbours: [5, 10, 15, 20, 25]
     similarity: sim_mod
     weight_threshold: 0.5
-    recursion_threshold: 1
+    recursion_threshold: 2
     phi: 10
     #k_prime: 10
     neighbour_selection: "cs+"

@@ -70,20 +70,39 @@ abline(a = 0, b = 0)
 require(ggplot2)
 hist(mydata[[1]], mydata[[2]], mydata[[3]], col = c(1,2,3), breaks = 100)
 
+
+
+
+par(mar = c(5, 4, 4, 4) + 0.3)              # Additional space for second y-axis
+
 barplot(ylim = c(0.60, 0.75),shas, beside = TRUE, names = c("5","10","15","20","25"), col = c(1,2),
         xlab = "Neigbourhood Size",
         ylab = "MAE",
-        main = "K vs MAE for User and Item based KNN", xpd = FALSE)
+        main = "K vs MAE and Time for User and Item KNN", xpd = FALSE)
 abline(a = 0.6, b = 0)
+abline(h = c(0.6, 0.62, 0.64, 0.66, 0.68, 0.70, 0.72, 0.74), lty = 2)
 
 par(new = TRUE)                             # Add new plot
-plot(x, item.knn.means.times, pch = 15, col = 3,              # Create second plot without axes
+plot(x, item.knn.means.times, pch = 15, col = 6,              # Create second plot without axes
      axes = FALSE, xlab = "", ylab = "",cex = 2)
-points(x, user.knn.means.times, col=4, pch=16, cex = 2, lw = 2)
+points(x, user.knn.means.times, col=8, pch=17, cex = 2, lw = 2)
 axis(side = 4, at = pretty(range(item.knn.means.times)))      # Add second axis
-lines(x, item.knn.means.times, col=3,lty=1, lw = 3, fill = TRUE)
-lines(x, user.knn.means.times, col=4,lty=2, lw = 3)
-mtext("seconds", side = 4, line = 3)   
+lines(x, item.knn.means.times, col=6,lty=1, lw = 3)
+lines(x, user.knn.means.times, col=8,lty=1, lw = 3)
+mtext("Task Time (seconds)", side = 4, line = 3)   
+legend('topright', legend = c("User MAE", "Item MAE"), border = "black", fill = 1:2)
+legend(22.4,104, legend = c("User Time", "Item Time"), col = c(6,8),  pch = c(15,17), lty = 1)
+
+
+plot(x, item.knn.means.times, pch = 15, col = 1, xlab = "Neighbourhood Size", ylab = "Task Time (seconds)",
+     main = "K vs Task Time for User and Item KNN",cex = 2)
+lines(x, item.knn.means.times, col = 1, lw = 2, lty = 1)
+
+points(x, user.knn.means.times, col=2, pch=16, cex = 2)
+lines(x, user.knn.means.times, col=2, lw = 3, lty = 2)
+
+legend("topright", legend = c("User KNN", "Item KNN"), lty = 1:2, col = 1:2, pch = 15:16)
+
 
 ########################################################################################
 # USERBOOTSTRAPPED, best = e1 with k=20 at 0.695216, slightly better than e=0
@@ -92,6 +111,7 @@ user.bootstrap = Bootstrap.Complete[Bootstrap.Complete$algorithm == "UserBootstr
 user.bootstrap.means.k = aggregate(user.bootstrap$mae, list(user.bootstrap$k), FUN=mean)$x
 user.bootstrap.means.e= aggregate(user.bootstrap$mae, list(user.bootstrap$e), FUN=mean)$x
 user.bootstrap.means.k_e = aggregate(user.bootstrap$mae, list(user.bootstrap$k, user.bootstrap$e), FUN=mean)
+user.bootstrap.means.k_e.times = aggregate(user.bootstrap$time_elapsed_s, list(user.bootstrap$k, user.bootstrap$e), FUN=mean)
 user.bootstrap.best.k = which.min(user.bootstrap.means.k) * 5
 user.bootstrap.best.e = which.min(user.bootstrap.means.e) * 1
 user.bootstrap.best.result = min(user.bootstrap.means.k, user.bootstrap.means.e)
@@ -101,6 +121,7 @@ item.bootstrap = Bootstrap.Complete[Bootstrap.Complete$algorithm == "ItemBootstr
 item.bootstrap.means.k = aggregate(item.bootstrap$mae, list(item.bootstrap$k), FUN=mean)$x
 item.bootstrap.means.e= aggregate(item.bootstrap$mae, list(item.bootstrap$e), FUN=mean)$x
 item.bootstrap.means.k_e = aggregate(item.bootstrap$mae, list(item.bootstrap$k, item.bootstrap$e), FUN=mean)
+item.bootstrap.means.k_e.times = aggregate(item.bootstrap$time_elapsed_s, list(item.bootstrap$k, item.bootstrap$e), FUN=mean)
 item.bootstrap.best.k = which.min(item.bootstrap.means.k) * 5
 item.bootstrap.best.e = which.min(item.bootstrap.means.e) * 1
 item.bootstrap.best.result = min(item.bootstrap.means.k, item.bootstrap.means.e)
@@ -121,6 +142,8 @@ item.bootstrap.best.e
 user.bootstrap.means.k_e.all_1 = user.bootstrap.means.k_e[user.bootstrap.means.k_e$Group.2 == 1, ]$mae
 user.bootstrap.means.k_e.all_2 = user.bootstrap.means.k_e[user.bootstrap.means.k_e$Group.2 == 3, ]$mae
 user.bootstrap.means.k_e.all_3 = user.bootstrap.means.k_e[user.bootstrap.means.k_e$Group.2 == 3, ]$mae
+
+item.bootstrap.means.k_e.times[1,]
 
 x = c(5,10,15,20,25)
 par(mfrow = c(1,1))
@@ -147,6 +170,22 @@ lines(x,user.bootstrap.means.k_e.all_3, col=4,lty=4,  lw= 3)
 legend('topright', legend = c( "Baseline", "Rounds=1", "Rounds=2", "Rounds=3"), col = c(1:4),
        pch = c(1:4), lty = c(1:4))
 
+
+
+plot(x, user.knn.means.times, pch = 15, col = 1, xlab = "Neighbourhood Size", ylab = "Task Time (seconds)",
+     main = "K vs Task Time for User KNN and Bootstrap",cex = 2, ylim = c(0,250))
+lines(x, user.knn.means.times, col = 1, lw = 2, lty = 1)
+
+points(x, user.bootstrap.means.k_e.times[1:5,]$x, col=2, pch=16, cex = 2)
+lines(x, user.bootstrap.means.k_e.times[1:5,]$x, col=2, lw = 3, lty = 2)
+
+points(x, user.bootstrap.means.k_e.times[6:10,]$x, col=3, pch=17, cex = 2)
+lines(x, user.bootstrap.means.k_e.times[6:10,]$x, col=3, lw = 3, lty = 3)
+
+points(x, user.bootstrap.means.k_e.times[11:15,]$x, col=4, pch=18, cex = 2)
+lines(x, user.bootstrap.means.k_e.times[11:15,]$x, col=4, lw = 3, lty = 4)
+
+legend("topright", legend = c("Baseline", "Iterations=1", "Iterations=2", "Iterations=3"), lty = 1:4, col = 1:4, pch = 15:18)
 
 ###############################################################################
 # item bootstrap knn, min k= 15  at 0.654952, e = 1, slightly better than e=0

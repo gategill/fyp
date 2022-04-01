@@ -97,20 +97,19 @@ def run_experiment(config_path) -> None:
         model_results = results_header            
         print("MODEL = {}".format(model))
         for K in kwargs["models"][model]["neighbours"]: # for param_set in param_space
-  
-            print("\nNEIGHBOURS = {}".format(K))
-            model_k_mae = []
-            #model_k_rmse = []
-            model_k_results = results_header
+            try:
+                print("\nNEIGHBOURS = {}".format(K))
+                model_k_mae = []
+                #model_k_rmse = []
+                model_k_results = results_header
 
-            for fold_num in range(kfolds):
-                single_results = results_header
+                for fold_num in range(kfolds):
+                    single_results = results_header
+                    
+                    print("FOLD NUMBER = {}/{}\n".format(fold_num + 1, kfolds))
                 
-                print("FOLD NUMBER = {}/{}\n".format(fold_num + 1, kfolds))
-            
-                dataset.load_ratings(fold_num) if kfolds > 1 else dataset.load_ratings()
-        
-                try:                
+                    dataset.load_ratings(fold_num) if kfolds > 1 else dataset.load_ratings()
+                           
                     print("Running {} Recommender".format(model))
                     kwargs["models"][model]["neighbours"] = K
                     kwargs["models"][model]["similarity"] = kwargs["models"][model]["similarity"]
@@ -146,44 +145,36 @@ def run_experiment(config_path) -> None:
                     if save_in_s3:
                         s3_name = "{}/single/single-{}-{}-{}.txt".format(current_timestamp,model, K, fold_num)
                         s3.put_object(Body = single_results, Bucket = "fyp-w9797878", Key = s3_name)
-                
-                except Exception as e:
-                    line_error = "error performing experiment, {}, error = {}".format(model, e)
-                    print(traceback.print_exc())
                     
-                    # saving errors
-                    with open("{}/single/single-{}-{}-{}.txt".format(save_path, model, K, fold_num), "w") as f:
-                        f.write(line_error)
+                  
                     
-                    if save_in_s3:
-                        s3_name = "{}/single/single-{}-{}-{}.txt".format(current_timestamp,model, K, fold_num)
-                        s3.put_object(Body = line_error, Bucket = "fyp-w9797878", Key = s3_name)
+                    
+                if model == "CoRec":
+                    user_mae = [i [0] for i in model_k_mae]
+                    item_mae = [i [1] for i in model_k_mae]
+                    
+                    model_k_user_mean_mae = round(np.mean(user_mae), 5) 
+                    model_k_item_mean_mae = round(np.mean(item_mae), 5) 
+                    
+                    model_k_mean_mae = [model_k_user_mean_mae, model_k_item_mean_mae]
+                    
+                else:
+                    model_k_mean_mae = round(np.mean(model_k_mae), 5) 
                 
+                model_k_results += "{}_{}: Averaged_MAE = {}\n".format(model, K, model_k_mean_mae)
+                model_results += "{}_{}: Averaged_MAE = {}\n".format(model, K, model_k_mean_mae)
+                all_results += "{}_{}: Averaged_MAE = {}\n".format(model, K, model_k_mean_mae)            
                 
-            if model == "CoRec":
-                user_mae = [i [0] for i in model_k_mae]
-                item_mae = [i [1] for i in model_k_mae]
-                
-                model_k_user_mean_mae = round(np.mean(user_mae), 5) 
-                model_k_item_mean_mae = round(np.mean(item_mae), 5) 
-                
-                model_k_mean_mae = [model_k_user_mean_mae, model_k_item_mean_mae]
-                
-            else:
-                model_k_mean_mae = round(np.mean(model_k_mae), 5) 
+                # saving model_k
+                with open("{}/model_k/model_k-{}-{}.txt".format(save_path, model, K), "w") as f:
+                    f.write(model_k_results)
             
-            model_k_results += "{}_{}: Averaged_MAE = {}\n".format(model, K, model_k_mean_mae)
-            model_results += "{}_{}: Averaged_MAE = {}\n".format(model, K, model_k_mean_mae)
-            all_results += "{}_{}: Averaged_MAE = {}\n".format(model, K, model_k_mean_mae)            
-            
-            # saving model_k
-            with open("{}/model_k/model_k-{}-{}.txt".format(save_path, model, K), "w") as f:
-                f.write(model_k_results)
-        
-            if save_in_s3:
-                s3_name = "{}/model_k/model_k-{}-{}.txt".format(current_timestamp, model, K)
-                s3.put_object(Body = model_k_results, Bucket = "fyp-w9797878", Key = s3_name)
-             
+                if save_in_s3:
+                    s3_name = "{}/model_k/model_k-{}-{}.txt".format(current_timestamp, model, K)
+                    s3.put_object(Body = model_k_results, Bucket = "fyp-w9797878", Key = s3_name)
+                    
+            except KeyboardInterrupt:
+                continue 
         # saving model   
         with open("{}/model/model-{}.txt".format(save_path, model), "w") as f:
             f.write(model_results)
