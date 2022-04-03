@@ -696,28 +696,46 @@ user.rec$time_elapsed_s
 #EDA
 
 par(mfrow = c(1,1))
-ashs = (all_ratings$item_id)
-ashs
-length(ashs)
+ashs = (ratings$V2)
+length(unique(ratings$V2))
+length(ashs[ashs == 19])
 #hist(ashs, breaks = 500)
 asq = as.numeric(table(ashs))
 asq
 x <- sort(table(ashs),decreasing=FALSE)
 x
-q1 = hist(x , breaks = 50, main = "Interactions Per Movie", xlab = "Number of Interactions")
+as = as.data.frame(x)
+as$ashs = as.numeric(as$ashs)
+sum(as[as$ashs <= 10,]$Freq)/1682
+length(as[as$Freq <= 100,]$ashs)/16.82 # THIS!!!
+length(as[as$Freq <= 27,]$ashs)/16.82 # THIS!!!
+sum(as[as$Freq >= 60,]$Freq)/10000
 
-ashs = (all_ratings$user_id)
-ashs
+
+1682 - 52
+# items 1682
+# users 943
+
+q1 = hist(x, breaks = 100, main = "Interactions Per Movie", xlab = "Number of Interactions")
+
+ashs = ratings$V1
+length(unique(ashs))
+x <- sort(table(ashs),decreasing=FALSE)
+x
+as = as.data.frame(x)
+as$ashs = as.numeric(as$ashs)
+
+length(as[as$Freq <= 65,]$ashs)/9.43 # THIS!!!
+
 length(ashs)
 #hist(ashs, breaks = 500)
 asq = as.numeric(table(ashs))
 asq
-x <- sort(table(ashs),decreasing=FALSE)
-p1 = hist(x , breaks = 50, main = "Interactions Per User", xlab = "Number of Interactions")
-
-plot(q1, col = 2, xlim = c(0,400), main = "Interactions Per User and Item", xlab = "Numeber of Interactions")
-plot(p1, add = TRUE, col = 3)
-legend("topright", legend = c("Users", "Movies"), col = c(2,3), fill = c(2,3))
+#x <- sort(table(ashs),decreasing=FALSE)
+p1 = hist(x , breaks = 150,  main = "Interactions Per User", xlab = "Number of Interactions")
+plot(p1,  xlim = c(0,400), col = rgb(1,0,0,0.5), main = "Interactions Per User and Item", xlab = "Number of Interactions")
+plot(q1, add = TRUE, col = rgb(0,0,1,0.5))
+legend("topright", legend = c("Users", "Movies"), col = c(rgb(1,0,0,0.5), rgb(0,0,1,0.5)), fill = c(rgb(1,0,0,0.5),rgb(0,0,1,0.5)))
 
 #asq
 length(asq)

@@ -50,7 +50,7 @@ class UserRecursiveKNNRecommender(UserKNNRecommender):
         
         for neighbour in nns:
             neighbour_id = int(neighbour["user_id"])
-            neighbour_item_rating = self.get_user_item_rating(neighbour_id, candidate_item)
+            neighbour_item_rating = self.is_it_rated(user_ID = neighbour_id, item_ID = candidate_item)
             
             if neighbour_item_rating is not None:
                 sim_x_y = self.get_user_similarity(self.similarity_function, active_user, neighbour_id)
@@ -61,6 +61,10 @@ class UserRecursiveKNNRecommender(UserKNNRecommender):
                 
             else:
                 rec_pred = self.recursive_prediction(neighbour_id, candidate_item, recursion_level + 1)
+                  
+                hashkey_key = str(neighbour_id) + "-"+ str(candidate_item)
+                self.hashed_predictions[hashkey_key] = rec_pred
+                
                 sim_x_y = self.get_user_similarity(self.similarity_function, active_user, neighbour_id)
                 mean_rating_for_neighbour = self.get_user_mean_rating(neighbour_id)
                 
@@ -81,6 +85,20 @@ class UserRecursiveKNNRecommender(UserKNNRecommender):
                 prediction = 5.0
     
             return round(prediction, self.ROUNDING)
+       
+       
+    def is_it_rated(self, user_ID, item_ID):  
+        # Check if the rating exists in self.train, then in the intermediate calculations, else return None      
+        if self.get_user_item_rating(user_id = user_ID, item_id = item_ID) is not None:
+            return self.get_user_item_rating(user_id = user_ID, item_id = item_ID)
+         
+        else:
+            hashkey_key = str(user_ID) + "-"+ str(item_ID)
+            if hashkey_key in self.hashed_predictions:
+                return self.hashed_predictions[hashkey_key]
+            
+            else:
+                return None 
         
         
     def nearest_neighbour_seletion(self, active_user, candidate_item):

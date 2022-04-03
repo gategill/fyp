@@ -64,8 +64,8 @@ class ItemRecursiveKNNRecommender(ItemKNNRecommender):
                 beta += self.weight_threshold * abs(sim_x_y)
         
         mean_rating_for_candidate_item = self.get_item_mean_rating(candidate_item)
+        
         if beta == 0.0:
-            
             return mean_rating_for_candidate_item
         else:
             prediction = mean_rating_for_candidate_item + (alpha/beta)
@@ -73,7 +73,7 @@ class ItemRecursiveKNNRecommender(ItemKNNRecommender):
             if prediction < 1.0:
                 prediction = 1.0
                 
-            if prediction > 5:
+            if prediction > 5.0:
                 prediction = 5.0
     
             return round(prediction, self.ROUNDING)

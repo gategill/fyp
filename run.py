@@ -29,6 +29,10 @@ import random
 import shutil
 import os
 
+import itertools
+
+
+
 s3 = boto3.client('s3')
 
 def run_experiment(config_path) -> None:
@@ -96,25 +100,31 @@ def run_experiment(config_path) -> None:
 
         model_results = results_header            
         print("MODEL = {}".format(model))
-        for K in kwargs["models"][model]["neighbours"]: # for param_set in param_space
+        parameter_space = get_parameter_space(kwargs["models"][model])
+        #for K in kwargs["models"][model]["neighbours"]: # for param_set in param_space
+        for parameter_set in parameter_space:
             try:
-                print("\nNEIGHBOURS = {}".format(K))
+                print("\nPARAMETERS = {}".format(parameter_set))
+                all_param_val =[str(v) for v in parameter_set.values()]
+                all_param_val = "_".join(all_param_val)
                 model_k_mae = []
                 #model_k_rmse = []
                 model_k_results = results_header
 
                 for fold_num in range(kfolds):
                     single_results = results_header
+                    K = parameter_set["neighbours"]
                     
                     print("FOLD NUMBER = {}/{}\n".format(fold_num + 1, kfolds))
                 
                     dataset.load_ratings(fold_num) if kfolds > 1 else dataset.load_ratings()
                            
                     print("Running {} Recommender".format(model))
-                    kwargs["models"][model]["neighbours"] = K
-                    kwargs["models"][model]["similarity"] = kwargs["models"][model]["similarity"]
-                    kwargs["run_params"] = kwargs["models"][model]
-                    kwargs["run_params"]["neighbours"] = K
+                    #kwargs["models"][model]["neighbours"] = K
+                    #kwargs["models"][model]["similarity"] = kwargs["models"][model]["similarity"]
+                    #kwargs["run_params"] = kwargs["models"][model]
+                    #kwargs["run_params"]["neighbours"] = K
+                    kwargs["run_params"] = parameter_set
                     
                     tic = time.time()
                     a_recommender = recommenders[model](dataset, **kwargs)
@@ -132,49 +142,31 @@ def run_experiment(config_path) -> None:
                     model_k_mae.append(mae)
                     model_mae.append(mae)
                                         
-                    experiment_result = "{}, {}, {}, {}, {}\n".format(model, K, mae, time_elapsed, fold_num + 1)
+                    experiment_result = "{}, {}, {}, {}, {}\n".format(model, mae, time_elapsed, fold_num + 1, all_param_val)
                     all_results += experiment_result
                     model_results += experiment_result
                     model_k_results += experiment_result
                     single_results += experiment_result
                     
                     # saving singles
-                    with open("{}/single/single-{}-{}-{}.txt".format(save_path, model, K, fold_num + 1), "w") as f:
+                    with open("{}/single/single-{}-{}-{}.txt".format(save_path, model, fold_num + 1, all_param_val), "w") as f:
                         f.write(single_results)
                     
                     if save_in_s3:
-                        s3_name = "{}/single/single-{}-{}-{}.txt".format(current_timestamp,model, K, fold_num)
-                        s3.put_object(Body = single_results, Bucket = "fyp-w9797878", Key = s3_name)
-                    
-                  
-                    
-                    
-                if model == "CoRec":
-                    user_mae = [i [0] for i in model_k_mae]
-                    item_mae = [i [1] for i in model_k_mae]
-                    
-                    model_k_user_mean_mae = round(np.mean(user_mae), 5) 
-                    model_k_item_mean_mae = round(np.mean(item_mae), 5) 
-                    
-                    model_k_mean_mae = [model_k_user_mean_mae, model_k_item_mean_mae]
-                    
-                else:
-                    model_k_mean_mae = round(np.mean(model_k_mae), 5) 
-                
-                model_k_results += "{}_{}: Averaged_MAE = {}\n".format(model, K, model_k_mean_mae)
-                model_results += "{}_{}: Averaged_MAE = {}\n".format(model, K, model_k_mean_mae)
-                all_results += "{}_{}: Averaged_MAE = {}\n".format(model, K, model_k_mean_mae)            
+                        s3_name = "{}/single/single-{}-{}-{}.txt".format(current_timestamp,model, fold_num, all_param_val)
+                        s3.put_object(Body = single_results, Bucket = "fyp-w9797878", Key = s3_name)       
                 
                 # saving model_k
-                with open("{}/model_k/model_k-{}-{}.txt".format(save_path, model, K), "w") as f:
+                with open("{}/model_k/model_k-{}-{}.txt".format(save_path, model, all_param_val), "w") as f:
                     f.write(model_k_results)
             
                 if save_in_s3:
-                    s3_name = "{}/model_k/model_k-{}-{}.txt".format(current_timestamp, model, K)
+                    s3_name = "{}/model_k/model_k-{}-{}.txt".format(current_timestamp, model, all_param_val)
                     s3.put_object(Body = model_k_results, Bucket = "fyp-w9797878", Key = s3_name)
                     
             except KeyboardInterrupt:
                 continue 
+            
         # saving model   
         with open("{}/model/model-{}.txt".format(save_path, model), "w") as f:
             f.write(model_results)
@@ -190,4 +182,25 @@ def run_experiment(config_path) -> None:
     if save_in_s3:
         s3_name = "{}/all/all-{}.txt".format(current_timestamp, all_models)
         s3.put_object(Body = all_results, Bucket = "fyp-w9797878", Key = s3_name)
+        
+        
+def get_parameter_space(model_params):
+    for k, v in model_params.items():
+        # turn parameters to lists
+        if type(v) != list:
+            l = []
+            l.append(v)
+            model_params[k] = l
+
+    param_value_list = [v for v in model_params.values()]
+    all_combinations = list(itertools.product(*param_value_list))
+
+    output_list = []
+    for param_set in all_combinations:
+        dict_of_params = {}
+        for i, k in enumerate(list(model_params.keys())):
+            dict_of_params[k] = param_set[i]
+        output_list.append(dict_of_params)
+        
+    return output_list
         
