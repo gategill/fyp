@@ -2,12 +2,12 @@ experiment_config:
   seed: 1
   save_in_s3: False
   kfolds: 1
-  early_stop: True
+  early_stop: False
   disable_ic: True
   paired_t_test: True
   evaluation_metrics: "MAE"
   validation: False
-  save_name: "rest_of_item_r2"
+  save_name: "get_times_and_results_for_full"
 
 dataset_config:
   dataset_path: "./data/given/"
@@ -15,40 +15,43 @@ dataset_config:
 
 models:
   UserKNN:
-    neighbours: [5, 20]
-    similarity: ["sim_mod", "sim_pearson"]
+    neighbours: [5, 10, 15, 20, 25]
+    similarity: "sim_mod"
 
-  #ItemKNN:
-  #  neighbours: [5,10,15,20,25]
-  #  similarity: sim_mod
+  ItemKNN:
+    neighbours: [5, 10, 15, 20, 25]
+    similarity: "sim_mod"
 
-#UserBootstrap:
-#  neighbours: [20]
-#  similarity: sim_mod
-#  enrichments: 1
-#  additions: 10
-#
-#ItemBootstrap:
-#  neighbours: [15]
-#  similarity: sim_mod
-#  enrichments: 1
-#  additions: 10
-#
-#CoRec:
-#  neighbours: [15]
-#  similarity: sim_mod
-#  additions: 50
-#  top_m: 0.1
-#
-  #ItemRecursiveKNN:
-  #  neighbours: [15,20,25]
-  #  similarity: sim_mod
-  #  weight_threshold: 0.5
-  #  recursion_threshold: 2
-  #  phi: 10
-    #k_prime: 10
-  #  neighbour_selection: "cs+"
+  UserBootstrap:
+    neighbours: [5, 10, 15, 20, 25]
+    similarity: "sim_mod"
+    enrichments: [1, 2, 3]
+    additions: 10
+  
+  ItemBootstrap:
+    neighbours: [5, 10, 15, 20, 25]
+    similarity: "sim_mod"
+    enrichments: [1, 2, 3]
+    additions: 10
+  
+  CoRec:
+    neighbours: [5, 10, 15, 20, 25]
+    similarity: "sim_mod"
+    additions: [10, 30, 50]
+    top_m: 0.1
+  
+  UserRecursiveKNN:
+    neighbours: [5, 10, 15, 20, 25]
+    similarity: "sim_mod"
+    weight_threshold: 0.5
+    recursion_threshold: [1, 2]
+    phi: 10
+    neighbour_selection: "cs+"
 
-
-
-
+  ItemRecursiveKNN:
+    neighbours: [5, 10, 15, 20, 25]
+    similarity: "sim_mod"
+    weight_threshold: 0.5
+    recursion_threshold: [1, 2]
+    phi: 10
+    neighbour_selection: "cs+"
