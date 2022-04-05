@@ -1,15 +1,10 @@
-"""
-
-"""
-
-
+from recommender.ConfidentUserBootstrapRecommender import ConfidentUserBootstrapRecommender
+from recommender.ConfidentItemBootstrapRecommender import ConfidentItemBootstrapRecommender
 from recommender.MatrixFactorisationRecommender import MatrixFactorisationRecommender
 from recommender.UserRecursiveKNNRecommender import UserRecursiveKNNRecommender
 from recommender.ItemRecursiveKNNRecommender import ItemRecursiveKNNRecommender
 from recommender.UserBootstrapRecommender import UserBootstrapRecommender
-from recommender.ConfidentUserBootstrapRecommender import ConfidentUserBootstrapRecommender
 from recommender.ItemBootstrapRecommender import ItemBootstrapRecommender
-from recommender.ConfidentItemBootstrapRecommender import ConfidentItemBootstrapRecommender
 from recommender.ItemKNNRecommender import ItemKNNRecommender
 from recommender.UserKNNRecommender import UserKNNRecommender
 from recommender.MostPopRecommender import MostPopRecommender
@@ -18,20 +13,14 @@ from recommender.CoRecRecommender import CoRecRecommender
 from recommender.MeanRecommender import MeanRecommender
 from dataset.Dataset import Dataset
 
-from scipy.stats import ttest_rel
 from icecream import ic
-import numpy as np
 import YAMLHandler
-import traceback
-import time
-import boto3
+import itertools
 import random
 import shutil
+import boto3
+import time
 import os
-
-import itertools
-
-
 
 s3 = boto3.client('s3')
 
@@ -100,30 +89,25 @@ def run_experiment(config_path) -> None:
 
         model_results = results_header            
         print("MODEL = {}".format(model))
+        
         parameter_space = get_parameter_space(kwargs["models"][model])
-        #for K in kwargs["models"][model]["neighbours"]: # for param_set in param_space
         for parameter_set in parameter_space:
             try:
                 print("\nPARAMETERS = {}".format(parameter_set))
                 all_param_val =[str(v) for v in parameter_set.values()]
                 all_param_val = "_".join(all_param_val)
                 model_k_mae = []
-                #model_k_rmse = []
                 model_k_results = results_header
 
                 for fold_num in range(kfolds):
                     single_results = results_header
-                    K = parameter_set["neighbours"]
                     
                     print("FOLD NUMBER = {}/{}\n".format(fold_num + 1, kfolds))
                 
                     dataset.load_ratings(fold_num) if kfolds > 1 else dataset.load_ratings()
                            
                     print("Running {} Recommender".format(model))
-                    #kwargs["models"][model]["neighbours"] = K
-                    #kwargs["models"][model]["similarity"] = kwargs["models"][model]["similarity"]
-                    #kwargs["run_params"] = kwargs["models"][model]
-                    #kwargs["run_params"]["neighbours"] = K
+
                     kwargs["run_params"] = parameter_set
                     
                     tic = time.time()
@@ -185,17 +169,18 @@ def run_experiment(config_path) -> None:
         
         
 def get_parameter_space(model_params):
+    output_list = []
+    
+    # turn parameters to lists
     for k, v in model_params.items():
-        # turn parameters to lists
         if type(v) != list:
-            l = []
+            l = list()
             l.append(v)
             model_params[k] = l
 
     param_value_list = [v for v in model_params.values()]
     all_combinations = list(itertools.product(*param_value_list))
 
-    output_list = []
     for param_set in all_combinations:
         dict_of_params = {}
         for i, k in enumerate(list(model_params.keys())):

@@ -7,11 +7,11 @@ experiment_config:
   paired_t_test: True
   evaluation_metrics: "MAE"
   validation: False
-  save_name: "get_times_and_results_for_full"
+  save_name: "get_times_and_results_for_cold"
 
 dataset_config:
   dataset_path: "./data/given/"
-  prefiltering: {"user_k_core" : 20, "item_k_core" : 5} #  {"cold_users" : 30, "cold_items": 30} 
+  prefiltering: {"cold_users" : 30, "cold_items": 30} # {"user_k_core" : 20, "item_k_core" : 5}
 
 models:
   UserKNN:

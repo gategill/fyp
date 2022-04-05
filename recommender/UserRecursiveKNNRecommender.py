@@ -1,13 +1,5 @@
-"""
-
-"""
-
-
-from icecream import ic
 from recommender.UserKNNRecommender import UserKNNRecommender
-import copy
-import time
-from tqdm import tqdm
+from icecream import ic
 
 class UserRecursiveKNNRecommender(UserKNNRecommender):
     def __init__(self, dataset = None, **kwargs) -> None:
@@ -17,7 +9,7 @@ class UserRecursiveKNNRecommender(UserKNNRecommender):
         self.weight_threshold = kwargs["run_params"]["weight_threshold"]
         self.recursion_threshold = kwargs["run_params"]["recursion_threshold"]
         self.phi = kwargs["run_params"]["phi"]
-        self.k_prime = self.k #kwargs["run_params"]["k_prime"]
+        self.k_prime = self.k 
         self.neighbour_selection = kwargs["run_params"]["neighbour_selection"]
         self.hashed_predictions = {}
     
@@ -34,11 +26,9 @@ class UserRecursiveKNNRecommender(UserKNNRecommender):
         if recursion_level > self.recursion_threshold:
             hashkey_key = str(active_user) + "-"+ str(candidate_item)
             if hashkey_key in self.hashed_predictions:
-                #print("HIT!")
                 return self.hashed_predictions[hashkey_key]
             else:
                 pr = self.baseline_predictor(active_user, candidate_item)
-                #print(pr)
                 self.hashed_predictions[hashkey_key] = pr
                 return pr
 
