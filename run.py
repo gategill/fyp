@@ -40,6 +40,18 @@ def run_experiment(config_path) -> None:
                        "Mean" : MeanRecommender,
                        }
             
+    print(u''' .----------------.  .----------------.  .----------------.  .----------------.  .----------------. 
+| .--------------. || .--------------. || .--------------. || .--------------. || .--------------. |
+| |  _________   | || |   _____      | || |  ____  ____  | || |     ____     | || |  _________   | |
+| | |_   ___  |  | || |  |_   _|     | || | |_  _||_  _| | || |   .'    `.   | || | |  _   _  |  | |
+| |   | |_  \_|  | || |    | |       | || |   \ \  / /   | || |  /  .--.  \  | || | |_/ | | \_|  | |
+| |   |  _|  _   | || |    | |   _   | || |    \ \/ /    | || |  | |    | |  | || |     | |      | |
+| |  _| |___/ |  | || |   _| |__/ |  | || |    _|  |_    | || |  \  `--'  /  | || |    _| |_     | |
+| | |_________|  | || |  |________|  | || |   |______|   | || |   `.____.'   | || |   |_____|    | |
+| |              | || |              | || |              | || |              | || |              | |
+| '--------------' || '--------------' || '--------------' || '--------------' || '--------------' |
+ '----------------'  '----------------'  '----------------'  '----------------'  '----------------' ''')
+    time.sleep(4)
         
     kwargs = YAMLHandler.read_in_yaml_file(config_path)
     # pass some agruments down
@@ -85,14 +97,14 @@ def run_experiment(config_path) -> None:
     all_results = results_header
     
     for model in kwargs["models"]:
-        model_mae = []
+        try:
+            model_mae = []
 
-        model_results = results_header            
-        print("MODEL = {}".format(model))
-        
-        parameter_space = get_parameter_space(kwargs["models"][model])
-        for parameter_set in parameter_space:
-            try:
+            model_results = results_header            
+            print("MODEL = {}".format(model))
+            
+            parameter_space = get_parameter_space(kwargs["models"][model])
+            for parameter_set in parameter_space:
                 print("\nPARAMETERS = {}".format(parameter_set))
                 all_param_val =[str(v) for v in parameter_set.values()]
                 all_param_val = "_".join(all_param_val)
@@ -105,7 +117,7 @@ def run_experiment(config_path) -> None:
                     print("FOLD NUMBER = {}/{}\n".format(fold_num + 1, kfolds))
                 
                     dataset.load_ratings(fold_num) if kfolds > 1 else dataset.load_ratings()
-                           
+                            
                     print("Running {} Recommender".format(model))
 
                     kwargs["run_params"] = parameter_set
@@ -147,18 +159,18 @@ def run_experiment(config_path) -> None:
                 if save_in_s3:
                     s3_name = "{}/model_k/model_k-{}-{}.txt".format(current_timestamp, model, all_param_val)
                     s3.put_object(Body = model_k_results, Bucket = "fyp-w9797878", Key = s3_name)
-                    
-            except KeyboardInterrupt:
-                continue 
+                        
+            # saving model   
+            with open("{}/model/model-{}.txt".format(save_path, model), "w") as f:
+                f.write(model_results)
             
-        # saving model   
-        with open("{}/model/model-{}.txt".format(save_path, model), "w") as f:
-            f.write(model_results)
-        
-        if save_in_s3:
-            s3_name = "{}/model/model-{}.txt".format(current_timestamp, model)
-            s3.put_object(Body = model_results, Bucket = "fyp-w9797878", Key = s3_name)
+            if save_in_s3:
+                s3_name = "{}/model/model-{}.txt".format(current_timestamp, model)
+                s3.put_object(Body = model_results, Bucket = "fyp-w9797878", Key = s3_name)
        
+        except KeyboardInterrupt:
+            break 
+        
     # saving all         
     with open("{}/all/all-{}.txt".format(save_path, all_models), "w") as f:
         f.write(all_results)
