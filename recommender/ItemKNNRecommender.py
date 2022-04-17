@@ -109,7 +109,7 @@ class ItemKNNRecommender(GenericRecommender):
         
         nearest_neighbours = []
         
-        for item_id in self.item_train_ratings: # what is happening here???
+        for item_id in self.item_train_ratings:
             if candidate_item_id == item_id:
                 continue
             
