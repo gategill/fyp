@@ -16,8 +16,8 @@ class Dataset:
         self.kwargs = kwargs
         self.DATA_PATH = self.kwargs["dataset_path"]
         self.__reset()
-        self.load_items()
-        self.load_users()
+        #self.load_items()
+        #self.load_users()
         self.read_in_ratings()
         self.prefilter_ratings()
     
@@ -59,8 +59,8 @@ class Dataset:
         #ic("ds.read_in_ratings()")
         
         if self.kwargs["kfolds"] == 1:
-            filename = "ratings.txt"
             # full test
+            filename = "ratings.txt"
         else:
             filename = "ratings_part.txt"
             # validation k folds
@@ -71,6 +71,10 @@ class Dataset:
             raise TypeError("load_ratings: you supplied filename = '%s' but filename must be a string" % filename)
         
         all_ratings = []
+        user_ids = []
+        item_ids = []
+
+
         for line in open(self.DATA_PATH + filename):
             substrings = line.strip().split('\t')
             if substrings[0] == "user_id":
@@ -79,6 +83,8 @@ class Dataset:
             item_id = int(float(substrings[1]))
             rating = float(substrings[2])
             
+            
+            
             if rating < 1.0:
                 rating = 1.0
                 
@@ -86,6 +92,12 @@ class Dataset:
                 rating = 5.0
                                 
             all_ratings.append({'user_id': user_id, 'item_id': item_id, 'rating': rating})
+            user_ids.append(int(user_id))
+            item_ids.append(int(item_id))
+            
+        self.user_ids = np.unique(user_ids)
+        self.item_ids = np.unique(item_ids)
+        
         
         # inplace, returns None
         random.shuffle(all_ratings)
@@ -240,7 +252,8 @@ class Dataset:
         if (n_split == 1) or (validation == False):
             #df_test = df.sample(frac = 0.2)
             #df_train = pd.read_csv("./data/given/ratings_part.txt", sep = "\t")
-            df_test = pd.read_csv("./data/given/ratings_part_test.txt", sep = "\t")
+            #df_test = pd.read_csv("./data/given/ratings_part_test.txt", sep = "\t")
+            df_test = pd.read_csv(self.DATA_PATH + "test_ratings.txt", sep = "\t")
             
             new_users = list(map(int, np.unique(df_test["user_id"].to_list())))
             #print(type(self.user_ids))
@@ -257,7 +270,7 @@ class Dataset:
             #print(df_test.head())
             
         elif (n_split == 1) and (validation == True):
-            df_test = df.sample(frac = 0.8)
+            df_test = df.sample(frac = 0.2)
             
         else:
             # (n_split > 1) and (validation == True):

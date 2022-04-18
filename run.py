@@ -51,7 +51,7 @@ def run_experiment(config_path) -> None:
 | |              | || |              | || |              | || |              | || |              | |
 | '--------------' || '--------------' || '--------------' || '--------------' || '--------------' |
  '----------------'  '----------------'  '----------------'  '----------------'  '----------------' ''')
-    time.sleep(4)
+    time.sleep(1)
         
     kwargs = YAMLHandler.read_in_yaml_file(config_path)
     # pass some agruments down

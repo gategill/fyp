@@ -23,7 +23,7 @@ class ItemBootstrapRecommender(ItemKNNRecommender):
         
         
     def get_single_prediction(self, active_user_id, candidate_item_id):
-        return super().get_single_prediction(active_user_id, candidate_item_id)
+        return super().get_single_prediction(int(active_user_id), int(candidate_item_id))
     
         
     def enrich(self) -> None:
@@ -35,10 +35,10 @@ class ItemBootstrapRecommender(ItemKNNRecommender):
             new_recommendations = []
         
             for item_id in self.item_train_ratings.keys(): # does this even make sense?
-                users_unrated = self.get_item_unrated_users(item_id, self.additions)
+                users_unrated = self.get_item_unrated_users(int(item_id), self.additions)
 
                 for user_id in users_unrated:
-                    predicted_rating = self.get_single_prediction(user_id, item_id)     
+                    predicted_rating = self.get_single_prediction(int(user_id), int(item_id))     
                     new_recommendations.append({"user_id" : int(user_id) , "item_id" : int(item_id) ,"rating" : float(predicted_rating)})
                 
             self.add_new_recommendations(new_recommendations)
