@@ -14,13 +14,13 @@ dataset_config:
   prefiltering: {} # {"user_k_core" : 20, "item_k_core" : 5} # {"cold_users" : 65, "cold_items": 27} #
 
 models:
-  UserKNN:
-    neighbours: [5, 10, 15, 20, 25]
-    similarity: "sim_mod"
+  #UserKNN:
+  #  neighbours: [5, 10, 15, 20, 25]
+  #  similarity: "sim_mod"
 
-  ItemKNN:
-    neighbours: [5, 10, 15, 20, 25]
-    similarity: "sim_mod"
+  #ItemKNN:
+  #  neighbours: [5, 10, 15, 20, 25]
+  #  similarity: "sim_mod"
 
   UserBootstrap:
     neighbours: [5, 10, 15, 20, 25]

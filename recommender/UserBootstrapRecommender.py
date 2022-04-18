@@ -23,7 +23,7 @@ class UserBootstrapRecommender(UserKNNRecommender):
         
         
     def get_single_prediction(self, active_user_id, candidate_item_id):
-        return super().get_single_prediction(int(active_user_id), (candidate_item_id))
+        return super().get_single_prediction(int(active_user_id), int(candidate_item_id))
     
         
     def enrich(self) -> None:

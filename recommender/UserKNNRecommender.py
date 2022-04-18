@@ -10,7 +10,7 @@ class UserKNNRecommender(GenericRecommender):
 
 
     def get_single_prediction(self, active_user_id, candidate_item_id):
-        prediction =  self.predict_rating_user_based_nn_wtd(active_user_id, candidate_item_id)
+        prediction =  self.predict_rating_user_based_nn_wtd(int(active_user_id), int(candidate_item_id))
     
         if prediction < 1.0:
             prediction = 1.0
@@ -43,13 +43,13 @@ class UserKNNRecommender(GenericRecommender):
     def predict_rating_user_based_nn_wtd(self, active_user_id: int, candidate_item_id: int) -> float:
         #ic("user_rec.predict_rating_user_based_nn_wtd()")
 
-        nns = self.get_k_nearest_users(self.similarity_function, self.k, active_user_id, candidate_item_id)
+        nns = self.get_k_nearest_users(self.similarity_function, self.k, int(active_user_id), int(candidate_item_id))
         prediction = self.calculate_wtd_avg_rating(nns)
         
         if prediction:  
             return prediction
         else:
-            prediction = self.get_user_mean_rating(active_user_id)
+            prediction = self.get_user_mean_rating(int(active_user_id))
             
             if prediction:
                 return prediction
@@ -77,12 +77,12 @@ class UserKNNRecommender(GenericRecommender):
             raise TypeError("get_k_nearest_users: you supplied k = '%s' but k must be a positive integer" % k)
         if k > len(self.user_train_ratings):
             raise ValueError("get_k_nearest_users: you supplied k = %i but this is too large" % k)
-        if type(active_user_id) != int or active_user_id < 1:
+        if type(active_user_id) != int or active_user_id < 0:
             raise TypeError("get_k_nearest_users: you supplied active_user_id = '%s' but active_user_id must be a positive integer" % active_user_id)
         if active_user_id not in self.user_train_ratings:
             raise ValueError("get_k_nearest_users: you supplied active_user_id = %i but this user does not exist" % active_user_id)
         if candidate_item_id:
-            if type(candidate_item_id) != int or candidate_item_id < 1:
+            if type(candidate_item_id) != int or candidate_item_id < 0:
                 raise TypeError("get_k_nearest_users: you supplied candidate_item_id = '%s' but candidate_item_id must be a positive integer" % candidate_item_id)
             if candidate_item_id not in self.item_train_ratings:
                 raise ValueError("get_k_nearest_users: you supplied candidate_item_id = %i but this item does not exist" % candidate_item_id)     
@@ -149,12 +149,12 @@ class UserKNNRecommender(GenericRecommender):
             raise TypeError("get_k_nearest_users_with_overlap: you supplied k = '%s' but k must be a positive integer" % k)
         if k > len(self.user_train_ratings):
             raise ValueError("get_k_nearest_users_with_overlap: you supplied k = %i but this is too large" % k)
-        if type(active_user_id) != int or active_user_id < 1:
+        if type(active_user_id) != int or active_user_id < 0:
             raise TypeError("get_k_nearest_users_with_overlap: you supplied active_user_id = '%s' but active_user_id must be a positive integer" % active_user_id)
         if active_user_id not in self.user_train_ratings:
             raise ValueError("get_k_nearest_users_with_overlap: you supplied active_user_id = %i but this user does not exist" % active_user_id)
         if candidate_item_id:
-            if type(candidate_item_id) != int or candidate_item_id < 1:
+            if type(candidate_item_id) != int or candidate_item_id < 0:
                 raise TypeError("get_k_nearest_users_with_overlap: you supplied candidate_item_id = '%s' but candidate_item_id must be a positive integer" % candidate_item_id)
             if candidate_item_id not in self.item_train_ratings:
                 raise ValueError("get_k_nearest_users_with_overlap: you supplied candidate_item_id = %i but this item does not exist" % candidate_item_id)     
@@ -222,12 +222,12 @@ class UserKNNRecommender(GenericRecommender):
             raise TypeError("get_thresholded_nearest_users: you supplied similarity_function = '%s' but similarity_function must be a function" % similarity_function)
         if type(threshold) != float:
             raise TypeError("get_thresholded_nearest_users: you supplied threshold = '%s' but threshold must be a floating point number" % threshold)
-        if type(active_user_id) != int or active_user_id < 1:
+        if type(active_user_id) != int or active_user_id < 0:
             raise TypeError("get_thresholded_nearest_users: you supplied active_user_id = '%s' but active_user_id must be a positive integer" % active_user_id)
         if active_user_id not in self.user_train_ratings:
             raise ValueError("get_thresholded_nearest_users: you supplied active_user_id = %i but this user does not exist" % active_user_id)
         if candidate_item_id:
-            if type(candidate_item_id) != int or candidate_item_id < 1:
+            if type(candidate_item_id) != int or candidate_item_id < 0:
                 raise TypeError("get_thresholded_nearest_users: you supplied candidate_item_id = '%s' but candidate_item_id must be a positive integer" % candidate_item_id)
             if candidate_item_id not in self.item_train_ratings:
                 raise ValueError("get_thresholded_nearest_users: you supplied candidate_item_id = %i but this item does not exist" % candidate_item_id)     
@@ -275,12 +275,12 @@ class UserKNNRecommender(GenericRecommender):
             raise ValueError("get_k_thresholded_nearest_users: you supplied k = %i but this is too large" % k)
         if type(threshold) != float:
             raise TypeError("get_k_thresholded_nearest_users: you supplied threshold = '%s' but threshold must be a floating point number" % threshold)
-        if type(active_user_id) != int or active_user_id < 1:
+        if type(active_user_id) != int or active_user_id < 0:
             raise TypeError("get_k_thresholded_nearest_users: you supplied active_user_id = '%s' but active_user_id must be a positive integer" % active_user_id)
         if active_user_id not in self.user_train_ratings:
             raise ValueError("get_k_thresholded_nearest_users: you supplied active_user_id = %i but this user does not exist" % active_user_id)
         if candidate_item_id:
-            if type(candidate_item_id) != int or candidate_item_id < 1:
+            if type(candidate_item_id) != int or candidate_item_id < 0:
                 raise TypeError("get_k_thresholded_nearest_users: you supplied candidate_item_id = '%s' but candidate_item_id must be a positive integer" % candidate_item_id)
             if candidate_item_id not in self.item_train_ratings:
                 raise ValueError("get_k_thresholded_nearest_users: you supplied candidate_item_id = %i but this item does not exist" % candidate_item_id)     
@@ -333,11 +333,11 @@ class UserKNNRecommender(GenericRecommender):
         train set.
         """
         
-        if type(user_id) != int or user_id < 1:
+        if type(user_id) != int or user_id < 0:
             raise TypeError("get_user_item_rating: you supplied user_id = '%s' but user_id must be a positive integer" % user_id)
         if user_id not in self.user_train_ratings:
             raise ValueError("get_user_item_rating: you supplied user_id = %i but this user does not exist" % user_id)
-        if type(item_id) != int or item_id < 1:
+        if type(item_id) != int or item_id < 0:
             raise TypeError("get_user_item_rating: you supplied item_id = '%s' but item_id must be a positive integer" % item_id)
         if item_id not in self.item_train_ratings:
             raise ValueError("get_user_item_rating: you supplied item_id = %i but this item does not exist" % item_id)
@@ -358,7 +358,7 @@ class UserKNNRecommender(GenericRecommender):
         train set, an empty list is the result.
         """
         
-        if type(user_id) != int or user_id < 1:
+        if type(user_id) != int or user_id < 0:
             raise TypeError("get_user_ratings: you supplied user_id = '%s' but user_id must be a positive integer" % user_id)
         if user_id not in self.user_train_ratings:
             raise ValueError("get_user_ratings: you supplied user_id = %i but this user does not exist" % user_id)
@@ -377,7 +377,7 @@ class UserKNNRecommender(GenericRecommender):
         train set, the mean is None.
         """
         
-        if type(user_id) != int or user_id < 1:
+        if type(user_id) != int or user_id < 0:
             raise TypeError("get_user_mean_rating: you supplied user_id = '%s' but user_id must be a positive integer" % user_id)
         if user_id not in self.user_train_ratings:
             raise ValueError("get_user_mean_rating: you supplied user_id = %i but this user does not exist" % user_id)
@@ -416,7 +416,7 @@ class UserKNNRecommender(GenericRecommender):
         Gets all of user_id's demographic data as a dictionary.
         """
         
-        if type(user_id) != int or user_id < 1:
+        if type(user_id) != int or user_id < 0:
             raise TypeError("get_user_demographics: you supplied user_id = '%s' but user_id must be a positive integer" % user_id)
         if user_id not in self.user_train_ratings:
             raise ValueError("get_user_demographics: you supplied user_id = %i but this user does not exist" % user_id)

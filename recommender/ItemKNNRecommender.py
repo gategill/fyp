@@ -16,7 +16,7 @@ class ItemKNNRecommender(GenericRecommender):
     
 
     def get_single_prediction(self, active_user_id, candidate_item_id):
-        prediction =  self.predict_rating_item_based_nn_wtd(active_user_id, candidate_item_id)
+        prediction =  self.predict_rating_item_based_nn_wtd(int(active_user_id), int(candidate_item_id))
 
         if prediction < 1.0:
             prediction = 1.0
@@ -31,7 +31,7 @@ class ItemKNNRecommender(GenericRecommender):
     def predict_rating_item_based_nn(self, active_user_id: int, candidate_item_id: int) -> float:
         #ic("item_rec.predict_rating_item_based_nn()")
         
-        nns = self.get_k_thresholded_nearest_items(self.similarity_function, self.k, 0.0, candidate_item_id, active_user_id)
+        nns = self.get_k_thresholded_nearest_items(self.similarity_function, self.k, 0.0, int(candidate_item_id), int(active_user_id))
         prediction = self.calculate_avg_rating(nns)
         
         if prediction:
@@ -45,7 +45,7 @@ class ItemKNNRecommender(GenericRecommender):
             return prediction
 
         else:
-            prediction = self.get_item_mean_rating(candidate_item_id)
+            prediction = self.get_item_mean_rating(int(candidate_item_id))
             
             if prediction:
                 return prediction
@@ -56,7 +56,7 @@ class ItemKNNRecommender(GenericRecommender):
     def predict_rating_item_based_nn_wtd(self, active_user_id: int, candidate_item_id: int) -> float:
         #ic("item_rec.predict_rating_item_based_nn_wtd()")
         
-        nns = self.get_k_nearest_items(self.similarity_function, self.k, candidate_item_id, active_user_id)
+        nns = self.get_k_nearest_items(self.similarity_function, self.k, int(candidate_item_id), int(active_user_id))
         prediction = self.calculate_wtd_avg_rating(nns)
         
         if prediction:
@@ -68,7 +68,7 @@ class ItemKNNRecommender(GenericRecommender):
                 prediction = 5.0
             return prediction
         else:
-            prediction = self.get_item_mean_rating(candidate_item_id)
+            prediction = self.get_item_mean_rating(int(candidate_item_id))
             
             if prediction:
                 return prediction
@@ -97,12 +97,12 @@ class ItemKNNRecommender(GenericRecommender):
             raise TypeError("get_k_nearest_items: you supplied k = '%s' but k must be a positive integer" % k)
         if k > len(self.item_train_ratings):
             raise ValueError("get_k_nearest_items: you supplied k = %i but this is too large" % k)
-        if type(candidate_item_id) != int or candidate_item_id < 1:
+        if type(candidate_item_id) != int or candidate_item_id < 0:
             raise TypeError("get_k_nearest_items: you supplied candidate_item_id = '%s' but candidate_item_id must be a positive integer" % candidate_item_id)
         if candidate_item_id not in self.item_train_ratings:
             raise ValueError("get_k_nearest_items: you supplied candidate_item_id = %i but this item does not exist" % candidate_item_id)
         if active_user_id:
-            if type(active_user_id) != int or active_user_id < 1:
+            if type(active_user_id) != int or active_user_id < 0:
                 raise TypeError("get_k_nearest_items: you supplied active_user_id = '%s' but active_user_id must be a positive integer" % active_user_id)
             if active_user_id not in self.user_train_ratings:
                 raise ValueError("get_k_nearest_items: you supplied active_user_id = %i but this user does not exist" % active_user_id)     
@@ -165,12 +165,12 @@ class ItemKNNRecommender(GenericRecommender):
             raise TypeError("get_k_nearest_items_with_overlap: you supplied k = '%s' but k must be a positive integer" % k)
         if k > len(self.item_train_ratings):
             raise ValueError("get_k_nearest_items_with_overlap: you supplied k = %i but this is too large" % k)
-        if type(candidate_item_id) != int or candidate_item_id < 1:
+        if type(candidate_item_id) != int or candidate_item_id < 0:
             raise TypeError("get_k_nearest_items_with_overlap: you supplied candidate_item_id = '%s' but candidate_item_id must be a positive integer" % candidate_item_id)
         if candidate_item_id not in self.item_train_ratings:
             raise ValueError("get_k_nearest_items_with_overlap: you supplied candidate_item_id = %i but this user does not exist" % candidate_item_id)
         if active_user_id:
-            if type(active_user_id) != int or active_user_id < 1:
+            if type(active_user_id) != int or active_user_id < 0:
                 raise TypeError("get_k_nearest_users_with_overlap: you supplied active_user_id = '%s' but active_user_id must be a positive integer" % active_user_id)
             if active_user_id not in self.user_train_ratings:
                 raise ValueError("get_k_nearest_users_with_overlap: you supplied active_user_id = %i but this item does not exist" % active_user_id)     
@@ -239,12 +239,12 @@ class ItemKNNRecommender(GenericRecommender):
             raise TypeError("get_thresholded_nearest_items: you supplied similarity_function = '%s' but similarity_function must be a function" % similarity_function)
         if type(threshold) != float:
             raise TypeError("get_thresholded_nearest_items: you supplied threshold = '%s' but threshold must be a floating point number" % threshold)
-        if type(candidate_item_id) != int or candidate_item_id < 1:
+        if type(candidate_item_id) != int or candidate_item_id < 0:
             raise TypeError("get_thresholded_nearest_items: you supplied candidate_item_id = '%s' but candidate_item_id must be a positive integer" % candidate_item_id)
         if candidate_item_id not in self.item_train_ratings:
             raise ValueError("get_thresholded_nearest_items: you supplied candidate_item_id = %i but this item does not exist" % candidate_item_id)
         if active_user_id:
-            if type(active_user_id) != int or active_user_id < 1:
+            if type(active_user_id) != int or active_user_id < 0:
                 raise TypeError("get_thresholded_nearest_items: you supplied active_user_id = '%s' but active_user_id must be a positive integer" % active_user_id)
             if active_user_id not in self.user_train_ratings:
                 raise ValueError("get_thresholded_nearest_items: you supplied active_user_id = %i but this user does not exist" % active_user_id)     
@@ -292,12 +292,12 @@ class ItemKNNRecommender(GenericRecommender):
             raise ValueError("get_k_thresholded_nearest_items: you supplied k = %i but this is too large" % k)
         if type(threshold) != float:
             raise TypeError("get_k_thresholded_nearest_items: you supplied threshold = '%s' but threshold must be a floating point number" % threshold)            
-        if type(candidate_item_id) != int or candidate_item_id < 1:
+        if type(candidate_item_id) != int or candidate_item_id < 0:
             raise TypeError("get_k_thresholded_nearest_items: you supplied candidate_item_id = '%s' but candidate_item_id must be a positive integer" % candidate_item_id)
         if candidate_item_id not in self.item_train_ratings:
             raise ValueError("get_k_thresholded_nearest_items: you supplied candidate_item_id = %i but this item does not exist" % candidate_item_id)
         if active_user_id:
-            if type(active_user_id) != int or active_user_id < 1:
+            if type(active_user_id) != int or active_user_id < 0:
                 raise TypeError("get_k_thresholded_nearest_items: you supplied active_user_id = '%s' but active_user_id must be a positive integer" % active_user_id)
             if active_user_id not in self.user_train_ratings:
                 raise ValueError("get_k_thresholded_nearest_items: you supplied active_user_id = %i but this user does not exist" % active_user_id)     
@@ -351,7 +351,7 @@ class ItemKNNRecommender(GenericRecommender):
         train set, an empty list is the result.
         """
         
-        if type(item_id) != int or item_id < 1:
+        if type(item_id) != int or item_id < 0:
             raise TypeError("get_item_ratings: you supplied item_id = '%s' but item_id must be a positive integer" % item_id)
         if item_id not in self.item_train_ratings:
             raise ValueError("get_item_ratings: you supplied item_id = %i but this item does not exist" % item_id)
@@ -370,7 +370,7 @@ class ItemKNNRecommender(GenericRecommender):
         train set, the mean is None.
         """
         
-        if type(item_id) != int or item_id < 1:
+        if type(item_id) != int or item_id < 0:
             raise TypeError("get_item_mean_rating: you supplied item_id = '%s' but item_id must be a positive integer" % item_id)
         if item_id not in self.item_train_ratings:
             raise ValueError("get_item_mean_rating: you supplied item_id = %i but this item does not exist" % item_id)
@@ -412,11 +412,11 @@ class ItemKNNRecommender(GenericRecommender):
         train set.
         """
         
-        if type(item_id) != int or item_id < 1:
+        if type(item_id) != int or item_id < 0:
             raise TypeError("get_user_item_rating: you supplied item_id = '%s' but item_id must be a positive integer" % item_id)
         if item_id not in self.item_train_ratings:
             raise ValueError("get_user_item_rating: you supplied item_id = %i but this item does not exist" % item_id)
-        if type(user_id) != int or user_id < 1:
+        if type(user_id) != int or user_id < 0:
             raise TypeError("get_user_item_rating: you supplied user_id = '%s' but user_id must be a positive integer" % user_id)
         if user_id not in self.user_train_ratings:
             raise ValueError("get_user_item_rating: you supplied user_id = %i but this user does not exist" % user_id)
@@ -434,7 +434,7 @@ class ItemKNNRecommender(GenericRecommender):
         Gets all of item_id's descriptors as a dictionary.
         """
         
-        if type(item_id) != int or item_id < 1:
+        if type(item_id) != int or item_id < 0:
             raise TypeError("get_item_descriptors: you supplied item_id = '%s' but item_id must be a positive integer" % item_id)
         if item_id not in self.item_train_ratings:
             raise ValueError("get_item_descriptors: you supplied item_id = %i but this item does not exist" % item_id)
