@@ -1,3 +1,21 @@
+# collect results here
+# at least do books
+# C:\Users\Asus\AppData\Local\ActiveState + other user/asus/perl 
+# summary table of results % in summary or something
+# change p-values to sicentific notaion
+# do more for the comparison sections 
+# do more for the limitations and boundaries section
+# write a summary for chapetrs
+# chapters 5 and 6
+# reread
+# conclusions!!!
+
+###############
+#OK
+# and my love Ashley
+# write about confidence more, insprired by Zhang et al.,
+
+
 BOOKS
 algorithm, k, mae, time_elapsed_s, fold_num
 --------------------------------------------
@@ -13,4 +31,8 @@ ItemKNN, 0.5496, 600.272, 1, 15_sim_mod
 ItemKNN, 0.54945, 595.603, 1, 20_sim_mod
 ItemKNN, 0.54945, 579.808, 1, 25_sim_mod
 
+################################################
 
+JESTER
+algorithm, k, mae, time_elapsed_s, fold_num
+--------------------------------------------

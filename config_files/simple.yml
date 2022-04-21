@@ -7,11 +7,11 @@ experiment_config:
   paired_t_test: True
   evaluation_metrics: "MAE"
   validation: True
-  save_name: "get_times_and_results_for_jester"
+  save_name: "books_item_bootstrap_only_prefiltered"
 
 dataset_config:
-  dataset_path: "./data/jester/"
-  prefiltering: {} # {"user_k_core" : 20, "item_k_core" : 5} # {"cold_users" : 65, "cold_items": 27} #
+  dataset_path: "./data/books/"
+  prefiltering: {"user_k_core" : 20, "item_k_core" : 5} # {"cold_users" : 65, "cold_items": 27} #
 
 models:
   #UserKNN:
@@ -22,11 +22,11 @@ models:
   #  neighbours: [5, 10, 15, 20, 25]
   #  similarity: "sim_mod"
 
-  UserBootstrap:
-    neighbours: [5, 10, 15, 20, 25]
-    similarity: "sim_mod"
-    enrichments: [1, 2, 3]
-    additions: 10
+  #UserBootstrap:
+  #  neighbours: [5, 10, 15, 20, 25]
+  #  similarity: "sim_mod"
+  #  enrichments: [1, 2, 3]
+  #  additions: 10
   
   ItemBootstrap:
     neighbours: [5, 10, 15, 20, 25]
@@ -34,25 +34,25 @@ models:
     enrichments: [1, 2, 3]
     additions: 10
 
-  UserRecursiveKNN:
-    neighbours: [5, 10, 15, 20, 25]
-    similarity: "sim_mod"
-    weight_threshold: 0.5
-    recursion_threshold: [1]
-    phi: 10
-    neighbour_selection: "cs+"
+  #UserRecursiveKNN:
+  #  neighbours: [5, 10, 15, 20, 25]
+  #  similarity: "sim_mod"
+  #  weight_threshold: 0.5
+  #  recursion_threshold: [1,2]
+  #  phi: 10
+  #  neighbour_selection: "cs+"
 
-  ItemRecursiveKNN:
-    neighbours: [5, 10, 15, 20, 25]
-    similarity: "sim_mod"
-    weight_threshold: 0.5
-    recursion_threshold: [1]
-    phi: 10
-    neighbour_selection: "cs+"
+  #ItemRecursiveKNN:
+  #  neighbours: [5, 10, 15, 20, 25]
+  #  similarity: "sim_mod"
+  #  weight_threshold: 0.5
+  #  recursion_threshold: [1,2]
+  #  phi: 10
+  #  neighbour_selection: "cs+"
   
-  CoRec:
-    neighbours: [5, 10, 15, 20, 25]
-    similarity: "sim_mod"
-    additions: [10, 30, 50]
-    top_m: 0.1
+  #CoRec:
+  #  neighbours: [5, 10, 15, 20, 25]
+  #  similarity: "sim_mod"
+  #  additions: [10, 30, 50]
+  #  top_m: 0.1
   
