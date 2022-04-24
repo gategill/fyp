@@ -252,8 +252,8 @@ class Dataset:
         if (n_split == 1) or (validation == False):
             #df_test = df.sample(frac = 0.2)
             #df_train = pd.read_csv("./data/given/ratings_part.txt", sep = "\t")
-            #df_test = pd.read_csv("./data/given/ratings_part_test.txt", sep = "\t")
-            df_test = pd.read_csv(self.DATA_PATH + "test_ratings.txt", sep = "\t")
+            df_test = pd.read_csv("./data/given/ratings_part_test.txt", sep = "\t")
+            #df_test = pd.read_csv(self.DATA_PATH + "test_ratings.txt", sep = "\t")
             
             new_users = list(map(int, np.unique(df_test["user_id"].to_list())))
             #print(type(self.user_ids))

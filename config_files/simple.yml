@@ -1,32 +1,32 @@
 experiment_config:
   seed: 1
   save_in_s3: False
-  kfolds: 1
+  kfolds: 5
   early_stop: False
   disable_ic: True
   paired_t_test: True
   evaluation_metrics: "MAE"
   validation: True
-  save_name: "books_item_bootstrap_only_prefiltered"
+  save_name: "movies"
 
 dataset_config:
-  dataset_path: "./data/books/"
+  dataset_path: "./data/given/"
   prefiltering: {"user_k_core" : 20, "item_k_core" : 5} # {"cold_users" : 65, "cold_items": 27} #
 
 models:
-  #UserKNN:
-  #  neighbours: [5, 10, 15, 20, 25]
-  #  similarity: "sim_mod"
+  UserKNN:
+    neighbours: [5, 10, 15, 20, 25]
+    similarity: "sim_mod"
 
-  #ItemKNN:
-  #  neighbours: [5, 10, 15, 20, 25]
-  #  similarity: "sim_mod"
+  ItemKNN:
+    neighbours: [5, 10, 15, 20, 25]
+    similarity: "sim_mod"
 
-  #UserBootstrap:
-  #  neighbours: [5, 10, 15, 20, 25]
-  #  similarity: "sim_mod"
-  #  enrichments: [1, 2, 3]
-  #  additions: 10
+  UserBootstrap:
+    neighbours: [5, 10, 15, 20, 25]
+    similarity: "sim_mod"
+    enrichments: [1, 2, 3]
+    additions: 10
   
   ItemBootstrap:
     neighbours: [5, 10, 15, 20, 25]
@@ -34,25 +34,25 @@ models:
     enrichments: [1, 2, 3]
     additions: 10
 
-  #UserRecursiveKNN:
-  #  neighbours: [5, 10, 15, 20, 25]
-  #  similarity: "sim_mod"
-  #  weight_threshold: 0.5
-  #  recursion_threshold: [1,2]
-  #  phi: 10
-  #  neighbour_selection: "cs+"
+  UserRecursiveKNN:
+    neighbours: [5, 10, 15, 20, 25]
+    similarity: "sim_mod"
+    weight_threshold: 0.5
+    recursion_threshold: [1,2]
+    phi: 10
+    neighbour_selection: "cs+"
 
-  #ItemRecursiveKNN:
-  #  neighbours: [5, 10, 15, 20, 25]
-  #  similarity: "sim_mod"
-  #  weight_threshold: 0.5
-  #  recursion_threshold: [1,2]
-  #  phi: 10
-  #  neighbour_selection: "cs+"
+  ItemRecursiveKNN:
+    neighbours: [5, 10, 15, 20, 25]
+    similarity: "sim_mod"
+    weight_threshold: 0.5
+    recursion_threshold: [1,2]
+    phi: 10
+    neighbour_selection: "cs+"
   
-  #CoRec:
-  #  neighbours: [5, 10, 15, 20, 25]
-  #  similarity: "sim_mod"
-  #  additions: [10, 30, 50]
-  #  top_m: 0.1
+  CoRec:
+    neighbours: [5, 10, 15, 20, 25]
+    similarity: "sim_mod"
+    additions: [10, 30, 50]
+    top_m: 0.1
   

@@ -1,38 +1,16 @@
-# collect results here
-# at least do books
+# TODO
+# Discussion + chapter 8
+# Do chapters 5 and 6
+# Do the comparison sections 
+# Do the limitations and boundaries sections
+# Write a summary for each chapters
+# Reread
+# Typos
 # C:\Users\Asus\AppData\Local\ActiveState + other user/asus/perl 
-# summary table of results % in summary or something
-# change p-values to sicentific notaion
-# do more for the comparison sections 
-# do more for the limitations and boundaries section
-# write a summary for chapetrs
-# chapters 5 and 6
-# reread
-# conclusions!!!
 
 ###############
-#OK
-# and my love Ashley
-# write about confidence more, insprired by Zhang et al.,
-
-
-BOOKS
-algorithm, k, mae, time_elapsed_s, fold_num
---------------------------------------------
-UserKNN, 0.74939, 286.434, 1, 5_sim_mod
-UserKNN, 0.74952, 284.159, 1, 10_sim_mod
-UserKNN, 0.74965, 249.521, 1, 15_sim_mod
-UserKNN, 0.7497, 228.135, 1, 20_sim_mod
-UserKNN, 0.74953, 232.189, 1, 25_sim_mod
-
-ItemKNN, 0.54963, 551.452, 1, 5_sim_mod
-ItemKNN, 0.5496, 579.753, 1, 10_sim_mod
-ItemKNN, 0.5496, 600.272, 1, 15_sim_mod
-ItemKNN, 0.54945, 595.603, 1, 20_sim_mod
-ItemKNN, 0.54945, 579.808, 1, 25_sim_mod
-
-################################################
-
-JESTER
-algorithm, k, mae, time_elapsed_s, fold_num
---------------------------------------------
+# Done
+# My love Ashley
+# Write about confidence more, insprired by Zhang et al
+# Change p-values to scientific notaion
+# Summary table of results % in summary
