@@ -1,16 +1,10 @@
-from recommender.ConfidentUserBootstrapRecommender import ConfidentUserBootstrapRecommender
-from recommender.ConfidentItemBootstrapRecommender import ConfidentItemBootstrapRecommender
-from recommender.MatrixFactorisationRecommender import MatrixFactorisationRecommender
 from recommender.UserRecursiveKNNRecommender import UserRecursiveKNNRecommender
 from recommender.ItemRecursiveKNNRecommender import ItemRecursiveKNNRecommender
 from recommender.UserBootstrapRecommender import UserBootstrapRecommender
 from recommender.ItemBootstrapRecommender import ItemBootstrapRecommender
 from recommender.ItemKNNRecommender import ItemKNNRecommender
 from recommender.UserKNNRecommender import UserKNNRecommender
-from recommender.MostPopRecommender import MostPopRecommender
-from recommender.RandomRecommender import RandomRecommender
 from recommender.CoRecRecommender import CoRecRecommender
-from recommender.MeanRecommender import MeanRecommender
 from dataset.Dataset import Dataset
 
 from icecream import ic
@@ -28,16 +22,10 @@ def run_experiment(config_path) -> None:
     recommenders = {"UserKNN" : UserKNNRecommender, 
                        "ItemKNN" : ItemKNNRecommender,
                        "UserBootstrap" : UserBootstrapRecommender,
-                       "ConfidentUserBootstrap" : ConfidentUserBootstrapRecommender,
                        "ItemBootstrap" : ItemBootstrapRecommender,
-                       "ConfidentItemBootstrap" : ConfidentItemBootstrapRecommender,
                        "UserRecursiveKNN" : UserRecursiveKNNRecommender, 
                        "ItemRecursiveKNN" : ItemRecursiveKNNRecommender, 
-                       "CoRec" : CoRecRecommender,
-                       "MatrixFactorisation" : MatrixFactorisationRecommender,
-                       "MostPop" : MostPopRecommender,
-                       "Random" : RandomRecommender,
-                       "Mean" : MeanRecommender,
+                       "CoRec" : CoRecRecommender
                        }
             
     print(u''' .----------------.  .----------------.  .----------------.  .----------------.  .----------------. 
